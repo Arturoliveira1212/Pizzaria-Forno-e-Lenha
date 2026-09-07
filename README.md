@@ -5,6 +5,6 @@
 ## Autores
 
 - Artur Alves de Oliveira.
-- Guilherme Carvalho Rosa.
+- Guilherme Carvalho da Rosa.
 
 TODO => Detalhar comandos e referências bibliográficas.
