@@ -1,0 +1,36 @@
+{
+    "name": "pizzaria-forno-e-lenha/api",
+    "description": "Projeto para avaliação da disciplina de Projeto Integrador de Sistemas",
+    "type": "project",
+    "scripts": {
+        "start": "php -S localhost:8080",
+        "test": "kahlan",
+        "st": "phpstan analyze src --level=6"
+    },
+    "config": {
+        "process-timeout": 0
+    },
+    "autoload": {
+        "psr-4": {
+            "": [
+                "src/",
+                "src/pizza/"
+            ]
+        }
+    },
+    "authors": [
+        {
+            "name": "Artur Alves",
+            "email": "artur.oliveira@aluno.cefet-rj.br"
+        },
+        {
+            "name": "Guilherme Rosa",
+            "email": "guilherme.rosa.1@aluno.cefet-rj.br"
+        }
+    ],
+    "require-dev": {
+        "phputil/router": "^0.4.0",
+        "phputil/cors": "^0.5.3",
+        "phpstan/phpstan": "^2.2"
+    }
+}

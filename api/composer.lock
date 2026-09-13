@@ -1,0 +1,169 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "c5cb33d72b21430497169a51809eeb1f",
+    "packages": [],
+    "packages-dev": [
+        {
+            "name": "phpstan/phpstan",
+            "version": "2.2.14",
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9c672e7a8e791dfc3d30e55f683e73fc0b63a3ac",
+                "reference": "9c672e7a8e791dfc3d30e55f683e73fc0b63a3ac",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4|^8.0"
+            },
+            "conflict": {
+                "phpstan/phpstan-shim": "*"
+            },
+            "bin": [
+                "phpstan",
+                "phpstan.phar"
+            ],
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ondřej Mirtes"
+                },
+                {
+                    "name": "Markus Staab"
+                },
+                {
+                    "name": "Vincent Langlet"
+                }
+            ],
+            "description": "PHPStan - PHP Static Analysis Tool",
+            "keywords": [
+                "dev",
+                "static analysis"
+            ],
+            "support": {
+                "docs": "https://phpstan.org/user-guide/getting-started",
+                "forum": "https://github.com/phpstan/phpstan/discussions",
+                "issues": "https://github.com/phpstan/phpstan/issues",
+                "security": "https://github.com/phpstan/phpstan/security/policy",
+                "source": "https://github.com/phpstan/phpstan-src"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/ondrejmirtes",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/phpstan",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-09-12T21:39:33+00:00"
+        },
+        {
+            "name": "phputil/cors",
+            "version": "v0.5.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thiagodp/cors.git",
+                "reference": "3f15e6d9dfdc7b79beb3e56b6cc7fccd4a480a2f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thiagodp/cors/zipball/3f15e6d9dfdc7b79beb3e56b6cc7fccd4a480a2f",
+                "reference": "3f15e6d9dfdc7b79beb3e56b6cc7fccd4a480a2f",
+                "shasum": ""
+            },
+            "require-dev": {
+                "kahlan/kahlan": "^5.2",
+                "phpstan/phpstan": "^1.9",
+                "phputil/router": "^0.3.3",
+                "symfony/http-client": "^5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/cors.php"
+                ],
+                "psr-4": {
+                    "phputil\\cors\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "CORS middleware for phputil/router",
+            "support": {
+                "issues": "https://github.com/thiagodp/cors/issues",
+                "source": "https://github.com/thiagodp/cors/tree/v0.5.3"
+            },
+            "time": "2025-05-10T21:57:59+00:00"
+        },
+        {
+            "name": "phputil/router",
+            "version": "v0.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thiagodp/router.git",
+                "reference": "4ba5fae70bdc21938a4845772c384dd978de87d1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thiagodp/router/zipball/4ba5fae70bdc21938a4845772c384dd978de87d1",
+                "reference": "4ba5fae70bdc21938a4845772c384dd978de87d1",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "ext-pcre": "*",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3",
+                "kahlan/kahlan": "^6.1",
+                "php": ">=8.2",
+                "phpstan/phpstan": "^2.2",
+                "phputil/restage": "^0.4.1",
+                "rector/rector": "^2.5",
+                "symfony/http-client": "^8.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "phputil\\router\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "ExpressJS-like router for PHP",
+            "support": {
+                "issues": "https://github.com/thiagodp/router/issues",
+                "source": "https://github.com/thiagodp/router/tree/v0.4.0"
+            },
+            "time": "2026-07-15T04:10:54+00:00"
+        }
+    ],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {},
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {},
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
+}
