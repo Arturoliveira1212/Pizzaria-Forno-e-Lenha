@@ -4,6 +4,7 @@
     "type": "project",
     "scripts": {
         "start": "php -S localhost:8080",
+        "phinx": "vendor/bin/phinx",
         "test": "kahlan",
         "st": "phpstan analyze src --level=6"
     },
@@ -14,7 +15,8 @@
         "psr-4": {
             "": [
                 "src/",
-                "src/pizza/"
+                "src/pizza/",
+                "src/infra/"
             ]
         }
     },
@@ -29,8 +31,12 @@
         }
     ],
     "require-dev": {
+        "phpstan/phpstan": "^2.2"
+    },
+    "require": {
+        "robmorgan/phinx": "^0.16.12",
         "phputil/router": "^0.4.0",
         "phputil/cors": "^0.5.3",
-        "phpstan/phpstan": "^2.2"
+        "vlucas/phpdotenv": "^5.7"
     }
 }
