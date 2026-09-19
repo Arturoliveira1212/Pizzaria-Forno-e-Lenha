@@ -5,7 +5,7 @@ $finder = (new PhpCsFixer\Finder())
 
 return (new PhpCsFixer\Config())
     ->setRules([
-        '@PER-CS' => true,
+        '@PER-CS3.0' => true,
         'braces_position' => [
             'functions_opening_brace' => 'same_line',
             'classes_opening_brace' => 'same_line',
@@ -22,13 +22,16 @@ return (new PhpCsFixer\Config())
         'class_attributes_separation' => [
             'elements' => ['method' => 'one', 'const' => 'none', 'property' => 'none',],
         ],
-        'trim_array_spaces' => true,
-        'single_quote' => true,
-        'explicit_string_variable' => true,
+        'blank_line_before_statement' => [
+            'statements' => ['return'],
+        ],
         'ordered_imports' => [
             'sort_algorithm' => 'alpha',
             'imports_order' => ['class', 'function', 'const'],
         ],
+        'trim_array_spaces' => true,
+        'single_quote' => true,
+        'explicit_string_variable' => true,
         'no_unused_imports' => true,
         'no_useless_else' => true,
         'no_useless_return' => true,
