@@ -7,7 +7,7 @@
         "phinx": "vendor/bin/phinx",
         "test": "kahlan",
         "st": "phpstan analyze src --level=6",
-        "format" : "vendor/bin/php-cs-fixer fix"
+        "format": "vendor/bin/php-cs-fixer fix"
     },
     "config": {
         "process-timeout": 0
@@ -17,7 +17,8 @@
             "": [
                 "src/",
                 "src/pizza/",
-                "src/infra/"
+                "src/infra/db/",
+                "src/infra/exceptions/"
             ]
         }
     },
