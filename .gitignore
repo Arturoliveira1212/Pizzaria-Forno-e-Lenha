@@ -3,3 +3,5 @@ vendor/
 dist/
 output/
 .env
+.php-cs-fixer.cache
+teste.php

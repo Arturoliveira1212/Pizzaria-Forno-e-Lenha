@@ -1,5 +1,3 @@
 <?php
 
-class Pizza {
-
-}
+class Pizza {}

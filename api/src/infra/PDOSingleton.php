@@ -3,8 +3,7 @@
 class PDOSingleton {
     private static ?PDO $pdo = null;
 
-    private function __construct() {
-    }
+    private function __construct() {}
 
     private static function conectar(): PDO {
         return new PDO(

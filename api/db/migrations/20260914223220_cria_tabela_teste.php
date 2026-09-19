@@ -3,7 +3,6 @@
 use Phinx\Migration\AbstractMigration;
 
 final class CriaTabelaTeste extends AbstractMigration {
-
     public function up(): void {
         $sql = <<<'SQL'
             CREATE TABLE teste (
