@@ -7,7 +7,7 @@ require_once 'vendor/autoload.php';
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-$pdo = PDOSingleton::get();
+$pdo = PDOSingleton::obter();
 
 return [
     'paths' => [

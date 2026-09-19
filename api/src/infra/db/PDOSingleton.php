@@ -13,7 +13,7 @@ class PDOSingleton {
         );
     }
 
-    public static function get(): PDO {
+    public static function obter(): PDO {
         if (!self::$pdo instanceof PDO) {
             self::$pdo = self::conectar();
         }
