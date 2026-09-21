@@ -6,7 +6,7 @@ class BancoDados {
     ) {}
 
     /**
-     * @param array<int|string, scalar|null> $parametros
+     * @param array<string, scalar|null> $parametros
      */
     public function rodar(string $comando, array $parametros = []): PDOStatement {
         $ps = $this->pdo->prepare($comando);
@@ -16,7 +16,7 @@ class BancoDados {
     }
 
     /**
-     * @param array<int|string, scalar|null> $parametros
+     * @param array<string, scalar|null> $parametros
      */
     public function executar(string $comando, array $parametros = []): int {
         $ps = $this->rodar($comando, $parametros);
@@ -25,7 +25,7 @@ class BancoDados {
     }
 
     /**
-     * @param array<int|string, scalar|null> $parametros
+     * @param array<string, scalar|null> $parametros
      * @return array<array<string, mixed>>
      */
     public function consultar(string $comando, array $parametros = []): array {

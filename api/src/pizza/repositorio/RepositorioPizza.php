@@ -2,7 +2,7 @@
 
 interface RepositorioPizza {
     /**
-     * @return array<Pizza>
+     * @return Pizza[]
     */
     public function obterPizzas(): array;
 }

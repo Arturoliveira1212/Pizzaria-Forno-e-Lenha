@@ -1,0 +1,10 @@
+<?php
+
+enum StatusPedido: string {
+    case RECEBIDO = 'RECEBIDO';
+    case EM_PREPARACAO = 'EM_PREPARACAO';
+    case SAIU_PARA_ENTREGA = 'SAIU_PARA_ENTREGA';
+    case PRONTO_PARA_RETIRADA = 'PRONTO_PARA_RETIRADA';
+    case FINALIZADO = 'FINALIZADO';
+    case CANCELADO = 'CANCELADO';
+}

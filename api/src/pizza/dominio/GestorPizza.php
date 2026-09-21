@@ -2,11 +2,11 @@
 
 class GestorPizza {
     public function __construct(
-        private RepositorioPizza $repositorio,
+        private readonly RepositorioPizza $repositorio,
     ) {}
 
     /**
-     * @return array<Pizza>
+     * @return Pizza[]
      */
     public function obterPizzas(): array {
         return $this->repositorio->obterPizzas();

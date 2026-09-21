@@ -2,13 +2,13 @@
 
 class RepositorioPizzaEmBDR implements RepositorioPizza {
     public function __construct(
-        private BancoDados $bancoDados,
+        private readonly BancoDados $bancoDados,
     ) {}
 
     public function obterPizzas(): array {
         $resultado = $this->bancoDados->consultar('SELECT * FROM pizzas');
 
-        $pizzas = [new Pizza()];
+        $pizzas = [];
 
         return $pizzas;
     }
