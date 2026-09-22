@@ -16,9 +16,28 @@
         "psr-4": {
             "": [
                 "src/",
-                "src/pizza/",
+                "src/cliente/dominio/",
+                "src/cliente/repositorio/",
+                "src/configuracao-fidelidade/dominio/",
+                "src/configuracao-fidelidade/repositorio/",
+                "src/endereco/dominio/",
+                "src/endereco/repositorio/",
+                "src/entregador/dominio/",
+                "src/entregador/repositorio/",
                 "src/infra/db/",
-                "src/infra/exceptions/"
+                "src/infra/exceptions/",
+                "src/ingrediente/dominio/",
+                "src/ingrediente/repositorio/",
+                "src/ingrediente-adicional/dominio/",
+                "src/ingrediente-adicional/repositorio/",
+                "src/pedido/dominio/",
+                "src/pedido/repositorio/",
+                "src/pizza/dominio/",
+                "src/pizza/repositorio/",
+                "src/produto-simples/dominio/",
+                "src/produto-simples/repositorio/",
+                "src/promocao/dominio/",
+                "src/promocao/repositorio/"
             ]
         }
     },
