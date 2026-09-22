@@ -38,5 +38,7 @@ return (new PhpCsFixer\Config())
         'phpdoc_align' => ['align' => 'left'],
         'phpdoc_order' => true,
         'no_empty_phpdoc' => true,
+        'binary_operator_spaces' => true,
+        'no_singleline_whitespace_before_semicolons' => true,
     ])
     ->setFinder($finder);
