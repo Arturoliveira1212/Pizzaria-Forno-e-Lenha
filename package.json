@@ -1,0 +1,29 @@
+{
+  "name": "g5",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "spa/**/*.{js,ts,json,html,css,md}": "pnpm --dir spa format",
+    "api/**/*.php": "composer -d api format"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.23.0",
+      "onFail": "download"
+    }
+  },
+  "packageManager": "pnpm@11.23.0",
+  "type": "module",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.1"
+  }
+}
