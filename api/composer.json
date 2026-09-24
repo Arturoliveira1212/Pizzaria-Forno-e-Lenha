@@ -7,7 +7,7 @@
         "phinx": "vendor/bin/phinx",
         "test": "kahlan",
         "st": "phpstan analyze src --level=6",
-        "format": "vendor/bin/php-cs-fixer fix"
+        "format": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php"
     },
     "config": {
         "process-timeout": 0
@@ -53,7 +53,8 @@
     ],
     "require-dev": {
         "phpstan/phpstan": "^2.2",
-        "friendsofphp/php-cs-fixer": "^3.95"
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "kahlan/kahlan": "^6.1"
     },
     "require": {
         "robmorgan/phinx": "^0.16.12",

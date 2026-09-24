@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1989bd149d9cf69f4dbb13580f31554b",
+    "content-hash": "8b338237ea820e4d3f487e0ebcd3cd41",
     "packages": [
         {
             "name": "cakephp/chronos",
@@ -2679,6 +2679,65 @@
                 }
             ],
             "time": "2026-09-08T11:11:37+00:00"
+        },
+        {
+            "name": "kahlan/kahlan",
+            "version": "6.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kahlan/kahlan.git",
+                "reference": "043cfed915990800b971189d16024082b3190312"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kahlan/kahlan/zipball/043cfed915990800b971189d16024082b3190312",
+                "reference": "043cfed915990800b971189d16024082b3190312",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "rector/rector": "^2.5",
+                "squizlabs/php_codesniffer": "^3.10.1"
+            },
+            "bin": [
+                "bin/kahlan"
+            ],
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/functions.php"
+                ],
+                "psr-4": {
+                    "Kahlan\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "CrysaLEAD"
+                }
+            ],
+            "description": "The PHP Test Framework for Freedom, Truth and Justice.",
+            "keywords": [
+                "BDD",
+                "Behavior-Driven Development",
+                "Monkey Patching",
+                "TDD",
+                "mock",
+                "stub",
+                "testing",
+                "unit test"
+            ],
+            "support": {
+                "issues": "https://github.com/kahlan/kahlan/issues",
+                "source": "https://github.com/kahlan/kahlan/tree/6.1.1"
+            },
+            "time": "2026-07-21T08:31:19+00:00"
         },
         {
             "name": "phpstan/phpstan",
