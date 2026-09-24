@@ -5,11 +5,11 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
         private readonly BancoDados $bancoDados,
     ) {}
 
+    public function obterPizzasParaCardapio(): array {
+        return [];
+    }
+
     public function obterPizzas(): array {
-        $resultado = $this->bancoDados->consultar('SELECT * FROM pizzas');
-
-        $pizzas = [];
-
-        return $pizzas;
+        return [];
     }
 }

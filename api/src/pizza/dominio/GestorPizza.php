@@ -6,6 +6,13 @@ class GestorPizza {
     ) {}
 
     /**
+     * @return PizzaParaCardapio[]
+     */
+    public function obterPizzasParaCardapio(): array {
+        return $this->repositorio->obterPizzasParaCardapio();
+    }
+
+    /**
      * @return Pizza[]
      */
     public function obterPizzas(): array {
