@@ -4,7 +4,7 @@ class RestricoesParaBuscaClientes {
     public function __construct(
         public readonly ?string $identificador,
         public readonly ?int $pagina,
-        public readonly ?int $tamanhoPagina,
+        public readonly ?int $limite,
     ) {}
 
     /**
@@ -14,7 +14,7 @@ class RestricoesParaBuscaClientes {
         return new self(
             identificador: (isset($dados['identificador']) ? trim((string) $dados['identificador']) : null),
             pagina: isset($dados['pagina']) ? (int) $dados['pagina'] : null,
-            tamanhoPagina: isset($dados['tamanhoPagina']) ? (int) $dados['tamanhoPagina'] : null,
+            limite: isset($dados['limite']) ? (int) $dados['limite'] : null,
         );
     }
 }

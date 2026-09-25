@@ -11,8 +11,10 @@ class GestorCliente {
     public function obterClientes(RestricoesParaBuscaClientes $restricoes): array {
         $filtro = new FiltroCliente(
             identificador: trim($restricoes->identificador ?? ''),
-            pagina: $restricoes->pagina ?? FiltroCliente::PAGINA_PADRAO,
-            tamanhoPagina: $restricoes->tamanhoPagina ?? FiltroCliente::TAMANHO_PAGINA_PADRAO,
+            paginacao: new Paginacao(
+                pagina: $restricoes->pagina ?? Paginacao::PAGINA_PADRAO,
+                limite: $restricoes->limite ?? FiltroCliente::LIMITE_PADRAO,
+            ),
         );
 
         return $this->repositorio->obterClientes($filtro);
