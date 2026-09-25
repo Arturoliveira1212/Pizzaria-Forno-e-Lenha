@@ -8,14 +8,15 @@ class GestorPromocao {
     /**
      * @return Promocao[]
      */
-    public function obterPromocoesAtivasNoMomento(): array {
-        return $this->repositorio->obterPromocoesAtivasNoMomento();
-    }
+    public function obterPromocoes(RestricoesParaBuscaDePromocoes $restricoes): array {
+        $filtro = new FiltroPromocao(
+            apenasVigentes: $restricoes->apenasVigentes ?? false,
+            paginacao: new Paginacao(
+                pagina: $restricoes->pagina ?? Paginacao::PAGINA_PADRAO,
+                limite: $restricoes->limite ?? Paginacao::LIMITE_PADRAO,
+            ),
+        );
 
-    /**
-     * @return Promocao[]
-     */
-    public function obterPromocoes(): array {
-        return $this->repositorio->obterPromocoes();
+        return $this->repositorio->obterPromocoes($filtro);
     }
 }

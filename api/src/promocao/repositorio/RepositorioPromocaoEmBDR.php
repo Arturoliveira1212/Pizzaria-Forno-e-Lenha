@@ -5,11 +5,7 @@ class RepositorioPromocaoEmBDR implements RepositorioPromocao {
         private readonly BancoDados $bancoDados,
     ) {}
 
-    public function obterPromocoesAtivasNoMomento(): array {
-        return [];
-    }
-
-    public function obterPromocoes(): array {
+    public function obterPromocoes(FiltroPromocao $filtro): array {
         return [];
     }
 }

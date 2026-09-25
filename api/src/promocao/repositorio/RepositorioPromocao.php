@@ -4,10 +4,5 @@ interface RepositorioPromocao {
     /**
      * @return Promocao[]
     */
-    public function obterPromocoesAtivasNoMomento(): array;
-
-    /**
-     * @return Promocao[]
-    */
-    public function obterPromocoes(): array;
+    public function obterPromocoes(FiltroPromocao $filtro): array;
 }

@@ -38,6 +38,7 @@
                 "src/produto-simples/dominio/",
                 "src/produto-simples/repositorio/",
                 "src/promocao/dominio/",
+                "src/promocao/dto/",
                 "src/promocao/repositorio/"
             ]
         }
