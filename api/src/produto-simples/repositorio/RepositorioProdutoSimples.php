@@ -4,5 +4,5 @@ interface RepositorioProdutoSimples {
     /**
      * @return ProdutoSimples[]
      */
-    public function obterProdutosSimplesPorTipo(TipoProdutoSimples $tipoProdutoSimples): array;
+    public function obterProdutosSimples(FiltroProdutoSimples $filtro): array;
 }

@@ -37,6 +37,7 @@
                 "src/pizza/dto/",
                 "src/pizza/repositorio/",
                 "src/produto-simples/dominio/",
+                "src/produto-simples/dto/",
                 "src/produto-simples/repositorio/",
                 "src/promocao/dominio/",
                 "src/promocao/dto/",

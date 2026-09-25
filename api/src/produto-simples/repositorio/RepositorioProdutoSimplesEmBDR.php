@@ -5,7 +5,7 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
         private readonly BancoDados $bancoDados,
     ) {}
 
-    public function obterProdutosSimplesPorTipo(TipoProdutoSimples $tipoProdutoSimples): array {
+    public function obterProdutosSimples(FiltroProdutoSimples $filtro): array {
         return [];
     }
 }

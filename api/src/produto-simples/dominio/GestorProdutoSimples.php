@@ -8,12 +8,16 @@ class GestorProdutoSimples {
     /**
      * @return ProdutoSimples[]
      */
-    public function obterProdutosSimplesPorTipo(string $tipo): array {
-        $tipoProdutoSimples = TipoProdutoSimples::tryFrom($tipo);
-        if ($tipoProdutoSimples === null) {
-            throw new DominioException("Tipo de produto simples inválido: {$tipo}");
-        }
+    public function obterProdutosSimples(RestricoesParaBuscaDeProdutosSimples $restricoes): array {
+        $filtro = new FiltroProdutoSimples(
+            identificador: trim($restricoes->identificador ?? ''),
+            tipoEmString: $restricoes->tipo,
+            paginacao: new Paginacao(
+                pagina: $restricoes->pagina ?? Paginacao::PAGINA_PADRAO,
+                limite: $restricoes->limite ?? Paginacao::LIMITE_PADRAO,
+            ),
+        );
 
-        return $this->repositorio->obterProdutosSimplesPorTipo($tipoProdutoSimples);
+        return $this->repositorio->obterProdutosSimples($filtro);
     }
 }
