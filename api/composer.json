@@ -17,6 +17,7 @@
             "": [
                 "src/",
                 "src/cliente/dominio/",
+                "src/cliente/dto/",
                 "src/cliente/repositorio/",
                 "src/configuracao-fidelidade/dominio/",
                 "src/configuracao-fidelidade/repositorio/",

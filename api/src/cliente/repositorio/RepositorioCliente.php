@@ -4,5 +4,5 @@ interface RepositorioCliente {
     /**
      * @return Cliente[]
      */
-    public function obterClientesPorNome(string $busca): array;
+    public function obterClientes(FiltroCliente $filtro): array;
 }

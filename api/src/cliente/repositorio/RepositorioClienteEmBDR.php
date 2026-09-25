@@ -5,7 +5,7 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
         private readonly BancoDados $bancoDados,
     ) {}
 
-    public function obterClientesPorNome(string $busca): array {
+    public function obterClientes(FiltroCliente $filtro): array {
         return [];
     }
 }

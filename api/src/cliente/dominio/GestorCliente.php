@@ -8,7 +8,13 @@ class GestorCliente {
     /**
      * @return Cliente[]
      */
-    public function obterClientesPorNome(string $busca): array {
-        return $this->repositorio->obterClientesPorNome($busca);
+    public function obterClientes(RestricoesParaBuscaClientes $restricoes): array {
+        $filtro = new FiltroCliente(
+            identificador: trim($restricoes->identificador ?? ''),
+            pagina: $restricoes->pagina ?? FiltroCliente::PAGINA_PADRAO,
+            tamanhoPagina: $restricoes->tamanhoPagina ?? FiltroCliente::TAMANHO_PAGINA_PADRAO,
+        );
+
+        return $this->repositorio->obterClientes($filtro);
     }
 }

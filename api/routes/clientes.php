@@ -7,10 +7,12 @@ $gestorCliente = new GestorCliente(new RepositorioClienteEmBDR($bancoDados));
 
 $app->get('/clientes', function (HttpRequest $request, HttpResponse $response) use ($gestorCliente) {
     try {
-        $busca = $request->param('busca') ?? '';
-        $clientes = $gestorCliente->obterClientesPorNome($busca);
+        $restricoes = RestricoesParaBuscaClientes::criarComArray($request->queries() ?? []);
+        $clientes = $gestorCliente->obterClientes($restricoes);
 
         $response->status(200)->json(['data' => $clientes, 'message' => 'Clientes obtidos com sucesso.']);
+    } catch (DominioException $e) {
+        $response->status(400)->json(['message' => $e->getMessage(), 'erros' => $e->erros]);
     } catch (Throwable $e) {
         $response->status(500)->json(['message' => 'Houve um erro interno no servidor.' . $e->getMessage()]);
     }
