@@ -4,10 +4,10 @@ interface RepositorioPizza {
     /**
      * @return PizzaParaCardapio[]
     */
-    public function obterPizzasParaCardapio(): array;
+    public function obterPizzasParaCardapio(FiltroPizza $filtro): array;
 
     /**
      * @return Pizza[]
     */
-    public function obterPizzas(): array;
+    public function obterPizzas(FiltroPizza $filtro): array;
 }

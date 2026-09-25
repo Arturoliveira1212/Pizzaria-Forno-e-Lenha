@@ -8,9 +8,9 @@ class PDOFactory {
         string $senha,
     ): PDO {
         return new PDO(
-            "mysql:dbname={$nomeBanco};host={$host};charset=utf8",
-            $usuario,
-            $senha,
+            dsn: "mysql:dbname={$nomeBanco};host={$host};charset=utf8",
+            username: $usuario,
+            password: $senha,
         );
     }
 }
