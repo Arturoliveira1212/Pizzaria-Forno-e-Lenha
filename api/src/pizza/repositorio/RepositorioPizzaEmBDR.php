@@ -5,11 +5,11 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
         private readonly BancoDados $bancoDados,
     ) {}
 
-    public function obterPizzasParaCardapio(): array {
+    public function obterPizzasParaCardapio(FiltroPizza $filtro): array {
         return [];
     }
 
-    public function obterPizzas(): array {
+    public function obterPizzas(FiltroPizza $filtro): array {
         return [];
     }
 }
