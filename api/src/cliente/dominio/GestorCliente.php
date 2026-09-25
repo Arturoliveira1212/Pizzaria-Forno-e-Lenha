@@ -8,7 +8,7 @@ class GestorCliente {
     /**
      * @return Cliente[]
      */
-    public function obterClientes(RestricoesParaBuscaClientes $restricoes): array {
+    public function obterClientes(RestricoesParaBuscaDeClientes $restricoes): array {
         $filtro = new FiltroCliente(
             identificador: trim($restricoes->identificador ?? ''),
             paginacao: new Paginacao(

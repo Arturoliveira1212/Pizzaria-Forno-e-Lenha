@@ -6,7 +6,7 @@ class FiltroCliente {
     public const LIMITE_PADRAO = 15;
 
     public function __construct(
-        public readonly string $identificador,
+        public readonly string $identificador, // Nome ou CPF
         public readonly Paginacao $paginacao,
     ) {
         $this->validar();

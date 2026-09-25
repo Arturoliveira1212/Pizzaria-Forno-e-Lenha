@@ -7,7 +7,7 @@ $gestorCliente = new GestorCliente(new RepositorioClienteEmBDR($bancoDados));
 
 $app->get('/clientes', function (HttpRequest $request, HttpResponse $response) use ($gestorCliente) {
     try {
-        $restricoes = RestricoesParaBuscaClientes::criarComArray($request->queries() ?? []);
+        $restricoes = RestricoesParaBuscaDeClientes::criarComArray($request->queries() ?? []);
         $clientes = $gestorCliente->obterClientes($restricoes);
 
         $response->status(200)->json(['data' => $clientes, 'message' => 'Clientes obtidos com sucesso.']);
