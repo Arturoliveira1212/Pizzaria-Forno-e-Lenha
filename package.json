@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:front": "pnpm --dir spa test",
+    "test:back": "composer -d api test",
+    "test": "pnpm run test:front && pnpm run test:back"
   },
   "lint-staged": {
     "spa/**/*.{js,ts,json,html,css,md}": "pnpm --dir spa format",
