@@ -7,7 +7,7 @@ class FiltroCliente {
 
     public function __construct(
         public readonly string $identificador, // Nome ou CPF
-        public readonly Paginacao $paginacao,
+        public readonly ?Paginacao $paginacao = null,
     ) {
         $this->validar();
     }

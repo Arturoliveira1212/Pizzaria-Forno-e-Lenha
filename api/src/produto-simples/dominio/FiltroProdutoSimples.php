@@ -8,7 +8,7 @@ class FiltroProdutoSimples {
     public function __construct(
         ?string $tipoEmString,
         public readonly string $identificador, // ID ou nome
-        public readonly Paginacao $paginacao,
+        public readonly ?Paginacao $paginacao = null,
     ) {
         $this->tipo = $tipoEmString !== null
             ? TipoProdutoSimples::tryFrom($tipoEmString)

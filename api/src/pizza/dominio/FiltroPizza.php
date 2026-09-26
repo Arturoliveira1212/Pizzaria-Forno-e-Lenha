@@ -5,7 +5,7 @@ class FiltroPizza {
 
     public function __construct(
         public readonly string $identificador, // ID ou nome
-        public readonly Paginacao $paginacao,
+        public readonly ?Paginacao $paginacao = null,
     ) {
         $this->validar();
     }
