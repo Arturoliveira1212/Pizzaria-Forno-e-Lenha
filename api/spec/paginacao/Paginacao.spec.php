@@ -38,12 +38,15 @@ describe('Paginacao', function () {
         });
 
         it('cria a paginação quando todos os campos são válidos (personalizado)', function () {
-            $paginacao = new Paginacao(pagina: Paginacao::PAGINA_MINIMA, limite: 5, limiteMinimo: 5, limiteMaximo: 50);
+            $limite = 5;
+            $limiteMinimo = 5;
+            $limiteMaximo = 50;
+            $paginacao = new Paginacao(pagina: Paginacao::PAGINA_MINIMA, limite: $limite, limiteMinimo: $limiteMinimo, limiteMaximo: $limiteMaximo);
 
-            expect($paginacao->pagina)->toBe(10);
-            expect($paginacao->limite)->toBe(5);
-            expect($paginacao->limiteMinimo)->toBe(5);
-            expect($paginacao->limiteMaximo)->toBe(50);
+            expect($paginacao->pagina)->toBe(Paginacao::PAGINA_MINIMA);
+            expect($paginacao->limite)->toBe($limite);
+            expect($paginacao->limiteMinimo)->toBe($limiteMinimo);
+            expect($paginacao->limiteMaximo)->toBe($limiteMaximo);
         });
 
         it('cria a paginação quando todos os campos são válidos', function () {
