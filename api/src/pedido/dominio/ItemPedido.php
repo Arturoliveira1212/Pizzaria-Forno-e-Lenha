@@ -32,8 +32,8 @@ abstract class ItemPedido {
     }
 
     protected function validarPrecoPraticado(): void {
-        if ($this->precoPraticado->ehMenorOuIgualA(Dinheiro::zero())) {
-            throw new DominioException('O preço praticado não pode ser menor ou igual a zero.');
+        if ($this->precoPraticado->ehIgualA(Dinheiro::zero())) {
+            throw new DominioException('O preço praticado não pode ser zero.');
         }
     }
 

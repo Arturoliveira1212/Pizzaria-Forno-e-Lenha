@@ -226,7 +226,7 @@ describe('ItemPizza', function () {
                     saboresEscolhidos: [$this->saborEscolhidoPortuguesa],
                     precoPraticado: Dinheiro::zero(),
                 );
-            })->toThrow(new DominioException('O preço praticado não pode ser menor ou igual a zero.'));
+            })->toThrow(new DominioException('O preço praticado não pode ser zero.'));
         });
 
         it('cria item pizza quando todos os campos são válidos', function () {

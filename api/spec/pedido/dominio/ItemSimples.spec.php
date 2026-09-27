@@ -35,6 +35,20 @@ describe('ItemSimples', function () {
                 );
             })->toThrow(new DominioException('A quantidade deve ser maior ou igual a ' . ItemPedido::QUANTIDADE_MINIMA_PERMITIDA . '.'));
         });
+
+        it('cria item simples quando todos os campos são válidos', function () {
+            $quantidade = 3;
+
+            $itemSimples = new ItemSimples(
+                id: ItemPedido::MENOR_ID_PERMITIDO,
+                quantidade: $quantidade,
+                produtoSimples: $this->produtoSimples,
+            );
+
+            expect($itemSimples->id)->toBe(ItemPedido::MENOR_ID_PERMITIDO);
+            expect($itemSimples->quantidade)->toBe($quantidade);
+            expect($itemSimples->precoPraticado->centavos)->toBe(1000);
+        });
     });
 
     describe('calcularPrecoTotal()', function () {
