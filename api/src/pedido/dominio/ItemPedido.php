@@ -37,6 +37,9 @@ abstract class ItemPedido {
         }
     }
 
+    /**
+     * @param string[] $erros
+     */
     protected function validarCamposComuns(array &$erros): void {
         if ($this->id < self::MENOR_ID_PERMITIDO) {
             $erros[] = 'O identificador do ingrediente escolhido deve ser maior que ' . self::MENOR_ID_PERMITIDO . '.';

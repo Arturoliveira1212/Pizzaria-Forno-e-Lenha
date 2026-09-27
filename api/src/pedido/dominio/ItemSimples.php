@@ -5,11 +5,14 @@ class ItemSimples extends ItemPedido {
         int $id,
         int $quantidade,
         public readonly ProdutoSimples $produtoSimples,
+        ?Dinheiro $precoPraticado = null,
     ) {
-        parent::__construct($id, $quantidade);
+        parent::__construct($id, $quantidade, $precoPraticado);
     }
 
-    public function calcularTotal(): Dinheiro {
-        return new Dinheiro(0);
+    protected function validarCamposEspecificos(array &$erros): void {}
+
+    protected function calcularPrecoUnitario(): Dinheiro {
+        return $this->produtoSimples->preco;
     }
 }
