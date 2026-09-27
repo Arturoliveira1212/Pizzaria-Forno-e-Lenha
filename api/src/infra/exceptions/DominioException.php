@@ -1,10 +1,11 @@
 <?php
 
 class DominioException extends RuntimeException {
-    public readonly array $erros;
+    public function erros(): array {
+        return explode('|', $this->getMessage());
+    }
 
-    public function __construct(string $mensagem, array $erros = []) {
-        parent::__construct($mensagem);
-        $this->erros = $erros;
+    public static function criarException(string ...$mensagens): self {
+        return new self(implode('|', $mensagens));
     }
 }
