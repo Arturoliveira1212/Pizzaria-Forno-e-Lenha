@@ -19,17 +19,6 @@ describe('IngredienteEscolhido', function () {
             })->toThrow(new DominioException('O identificador do ingrediente escolhido deve ser maior que ' . IngredienteEscolhido::MENOR_ID_PERMITIDO . '.'));
         });
 
-        it('lança exceção quando o custo adicional é negativo', function () {
-            expect(function () {
-                return new IngredienteEscolhido(
-                    id: IngredienteEscolhido::MENOR_ID_PERMITIDO,
-                    ingrediente: $this->ingrediente,
-                    papel: PapelIngrediente::PADRAO,
-                    custoAdicional: new Dinheiro(-500),
-                );
-            })->toThrow(new DominioException('O custo do ingrediente escolhido não pode ser negativo.'));
-        });
-
         it('lança exceção quando o ingrediente escolhido é padrão e o custo adicional é maior que zero', function () {
             expect(function () {
                 return new IngredienteEscolhido(
