@@ -1,6 +1,7 @@
 <?php
 
 enum PapelIngrediente: string {
-    case FIXO = 'FIXO';
+    case PADRAO = 'PADRAO';
+    case SUBSTITUTO = 'SUBSTITUTO';
     case ADICIONAL = 'ADICIONAL';
 }
