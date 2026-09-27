@@ -71,4 +71,14 @@ class Pizza {
 
         return null;
     }
+
+    public function temTamanho(TamanhoPizza $tamanho): bool {
+        foreach ($this->precosPorTamanho as $precoPorTamanho) {
+            if ($precoPorTamanho->tamanhoPizza === $tamanho) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

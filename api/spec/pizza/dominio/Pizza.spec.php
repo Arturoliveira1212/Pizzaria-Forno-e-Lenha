@@ -101,4 +101,16 @@ describe('Pizza', function () {
 
     });
 
+    describe('temTamanho()', function () {
+
+        it('retorna true quando o tamanho existe', function () {
+            expect($this->pizza->temTamanho(TamanhoPizza::MEDIA))->toBe(true);
+        });
+
+        it('retorna false quando o tamanho não existe', function () {
+            expect($this->pizza->temTamanho(TamanhoPizza::GRANDE))->toBe(false);
+        });
+
+    });
+
 });
