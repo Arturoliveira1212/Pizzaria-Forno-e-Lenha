@@ -267,6 +267,9 @@ importers:
       bootstrap:
         specifier: ^5.3.8
         version: 5.3.8(@popperjs/core@2.11.8)
+      crayon:
+        specifier: ^6.0.1
+        version: 6.0.1
     devDependencies:
       '@vitest/coverage-v8':
         specifier: 4.1.11
@@ -487,6 +490,9 @@ packages:
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
+
+  crayon@6.0.1:
+    resolution: {integrity: sha512-M8a2h3yoBUEF64T/wofj/6bInOu7fCji+fspROBVfvdIro0piIZUZIItKyOJxPMXK4RtoTA8M5emlWzH+jqTpQ==}
 
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
@@ -939,6 +945,8 @@ snapshots:
   chai@6.2.2: {}
 
   convert-source-map@2.0.0: {}
+
+  crayon@6.0.1: {}
 
   detect-libc@2.1.2: {}
 
