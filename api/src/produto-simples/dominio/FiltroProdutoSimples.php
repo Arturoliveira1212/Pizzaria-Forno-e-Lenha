@@ -30,7 +30,7 @@ class FiltroProdutoSimples {
         }
 
         if (!empty($erros)) {
-            throw new DominioException('Erro ao criar filtro para produtos simples.', $erros);
+            throw DominioException::criarException(...$erros);
         }
     }
 }

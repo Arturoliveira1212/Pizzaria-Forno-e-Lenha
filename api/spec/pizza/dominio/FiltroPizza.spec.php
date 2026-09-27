@@ -2,32 +2,31 @@
 
 describe('FiltroPizza', function () {
 
-    $this->mensagemErro = 'Erro ao criar filtro para pizzas.';
-    $this->paginacaoValida = new Paginacao();
+    describe('validar()', function () {
 
-    it('cria o filtro quando o identificador é vazio, representando "sem filtro" (todas as pizzas)', function () {
-        $filtro = new FiltroPizza(identificador: '', paginacao: $this->paginacaoValida);
+        $this->paginacaoValida = new Paginacao();
 
-        expect($filtro->identificador)->toBe('');
-    });
+        it('cria o filtro quando o identificador é vazio, representando "sem filtro" (todas as pizzas)', function () {
+            $filtro = new FiltroPizza(identificador: '', paginacao: $this->paginacaoValida);
 
-    it('cria o filtro quando o identificador tem quantidade de caracteres dentro do permitido', function () {
-        $filtro = new FiltroPizza(identificador: 'Artur Alves', paginacao: $this->paginacaoValida);
+            expect($filtro->identificador)->toBe('');
+        });
 
-        expect($filtro->identificador)->toBe('Artur Alves');
-    });
+        it('lança exceção quando o identificador tem mais caracteres que o máximo permitido', function () {
+            expect(function () {
+                $identificador = str_repeat('a', FiltroPizza::QUANTIDADE_MAXIMA_DE_CARACTERES_PARA_BUSCA + 1);
+                new FiltroPizza(identificador: $identificador, paginacao: $this->paginacaoValida);
+            })->toThrow(new DominioException('O identificador deve ter no máximo ' . FiltroPizza::QUANTIDADE_MAXIMA_DE_CARACTERES_PARA_BUSCA . ' caracteres.'));
+        });
 
-    it('lança exceção quando o identificador tem mais caracteres que o máximo permitido', function () {
-        expect(function () {
-            new FiltroPizza(identificador: str_repeat('a', 101), paginacao: $this->paginacaoValida);
-        })->toThrow(new DominioException($this->mensagemErro, ['O identificador deve ter entre 3 e 100 caracteres.']));
-    });
+        it('cria o filtro quando todos os campos são válidos', function () {
+            $identificador = str_repeat('a', FiltroPizza::QUANTIDADE_MAXIMA_DE_CARACTERES_PARA_BUSCA);
+            $filtro = new FiltroPizza(identificador: $identificador, paginacao: $this->paginacaoValida);
 
-    it('cria o filtro quando todos os campos são válidos', function () {
-        $filtro = new FiltroPizza(identificador: 'Artur Alves', paginacao: $this->paginacaoValida);
+            expect($filtro->identificador)->toBe($identificador);
+            expect($filtro->paginacao)->toBe($this->paginacaoValida);
+        });
 
-        expect($filtro->identificador)->toBe('Artur Alves');
-        expect($filtro->paginacao)->toBe($this->paginacaoValida);
     });
 
 });

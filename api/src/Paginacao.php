@@ -10,13 +10,13 @@ class Paginacao {
     public function __construct(
         public readonly int $pagina = self::PAGINA_PADRAO,
         public readonly int $limite = self::LIMITE_PADRAO,
-        private readonly int $limiteMinimo = self::LIMITE_MINIMO_PADRAO,
-        private readonly int $limiteMaximo = self::LIMITE_MAXIMO_PADRAO,
+        public readonly int $limiteMinimo = self::LIMITE_MINIMO_PADRAO,
+        public readonly int $limiteMaximo = self::LIMITE_MAXIMO_PADRAO,
     ) {
         $this->validar();
     }
 
-    private function validar(): void {
+    protected function validar(): void {
         $erros = [];
 
         if ($this->pagina < self::PAGINA_MINIMA) {
@@ -32,7 +32,7 @@ class Paginacao {
         }
 
         if (!empty($erros)) {
-            throw new DominioException('Erro ao criar paginação.', $erros);
+            throw DominioException::criarException(...$erros);
         }
     }
 }
