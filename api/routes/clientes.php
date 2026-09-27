@@ -12,7 +12,7 @@ $app->get('/clientes', function (HttpRequest $request, HttpResponse $response) u
 
         $response->status(200)->json(['data' => $clientes, 'message' => 'Clientes obtidos com sucesso.']);
     } catch (DominioException $e) {
-        $response->status(400)->json(['message' => $e->getMessage(), 'erros' => $e->erros]);
+        $response->status(400)->json(['message' => 'Erro ao obter clientes.', 'erros' => $e->erros()]);
     } catch (Throwable $e) {
         $response->status(500)->json(['message' => 'Houve um erro interno no servidor.' . $e->getMessage()]);
     }

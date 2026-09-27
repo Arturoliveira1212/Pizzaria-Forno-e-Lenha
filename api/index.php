@@ -1,5 +1,7 @@
 <?php
 
+header('Content-Type: application/json');
+
 use Dotenv\Dotenv;
 use phputil\router\Router;
 
@@ -12,10 +14,10 @@ try {
     $dotenv->load();
 
     $bancoDados = new BancoDados(PDOFactory::criar(
-        $_ENV['DB_NAME'],
-        $_ENV['DB_HOST'],
-        $_ENV['DB_USERNAME'],
-        $_ENV['DB_PASSWORD'],
+        nomeBanco: $_ENV['DB_NAME'],
+        host: $_ENV['DB_HOST'],
+        usuario: $_ENV['DB_USERNAME'],
+        senha: $_ENV['DB_PASSWORD'],
     ));
 
     $app = new Router();

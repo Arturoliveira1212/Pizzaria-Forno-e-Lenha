@@ -16,7 +16,7 @@ $app->get('/pizzas', function (HttpRequest $request, HttpResponse $response) use
 
         $response->status(200)->json(['data' => $pizzas, 'message' => 'Pizzas obtidas com sucesso.']);
     } catch (DominioException $e) {
-        $response->status(400)->json(['message' => $e->getMessage(), 'erros' => $e->erros]);
+        $response->status(400)->json(['message' => 'Erro ao obter pizzas.', 'erros' => $e->erros()]);
     } catch (Throwable $e) {
         $response->status(500)->json(['message' => 'Houve um erro interno no servidor.' . $e->getMessage()]);
     }
