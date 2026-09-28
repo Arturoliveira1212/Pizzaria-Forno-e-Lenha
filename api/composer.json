@@ -32,6 +32,7 @@
                 "src/ingrediente-adicional/dominio/",
                 "src/ingrediente-adicional/repositorio/",
                 "src/pedido/dominio/",
+                "src/pedido/dto/",
                 "src/pedido/repositorio/",
                 "src/pizza/dominio/",
                 "src/pizza/dto/",
