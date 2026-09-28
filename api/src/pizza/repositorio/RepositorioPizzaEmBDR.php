@@ -12,4 +12,8 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
     public function obterPizzas(FiltroPizza $filtro): array {
         return [];
     }
+
+    public function obterPizzaPorId(int $idPizza): ?Pizza {
+        return null;
+    }
 }

@@ -6,6 +6,11 @@ class Cliente {
         public readonly string $nome,
         public readonly Telefone $telefone,
         public readonly Cpf $cpf,
+        public readonly Endereco $endereco,
         public readonly ?BeneficioFidelidade $beneficioFidelidade,
     ) {}
+
+    public function temBeneficioFidelidade(): bool {
+        return $this->beneficioFidelidade !== null;
+    }
 }

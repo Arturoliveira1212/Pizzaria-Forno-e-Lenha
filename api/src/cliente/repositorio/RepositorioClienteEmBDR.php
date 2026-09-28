@@ -8,4 +8,8 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
     public function obterClientes(FiltroCliente $filtro): array {
         return [];
     }
+
+    public function obterClientePorId(string $idCliente): ?Cliente {
+        return null;
+    }
 }

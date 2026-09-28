@@ -7,4 +7,8 @@ enum StatusPedido: string {
     case PRONTO_PARA_RETIRADA = 'PRONTO_PARA_RETIRADA';
     case FINALIZADO = 'FINALIZADO';
     case CANCELADO = 'CANCELADO';
+
+    public static function inicial(): self {
+        return self::RECEBIDO;
+    }
 }

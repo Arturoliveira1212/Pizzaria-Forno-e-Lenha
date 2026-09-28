@@ -99,7 +99,7 @@ class SaborEscolhido {
         $nomeIngrediente = $ingredienteEscolhido->ingrediente->nome;
 
         $adicional = $this->pizza->obterAdicional($ingredienteEscolhido->ingrediente);
-        if ($adicional === null) {
+        if (!$adicional instanceof IngredienteAdicional) {
             $erros[] = "O ingrediente {$nomeIngrediente}({$idIngrediente}) não é permitido como adicional para a pizza.";
 
             return;

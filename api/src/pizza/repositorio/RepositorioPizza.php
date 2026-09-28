@@ -10,4 +10,6 @@ interface RepositorioPizza {
      * @return Pizza[]
     */
     public function obterPizzas(FiltroPizza $filtro): array;
+
+    public function obterPizzaPorId(int $idPizza): ?Pizza;
 }

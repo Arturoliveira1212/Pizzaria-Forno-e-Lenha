@@ -8,4 +8,10 @@ class BeneficioFidelidade {
         public readonly DateTime $validade,
         public readonly bool $utilizado,
     ) {}
+
+    public function estaValido(): bool {
+        $dataAtual = new DateTime();
+
+        return !$this->utilizado && $dataAtual <= $this->validade;
+    }
 }

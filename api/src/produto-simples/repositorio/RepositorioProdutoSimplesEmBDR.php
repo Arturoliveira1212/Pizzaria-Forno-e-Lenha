@@ -8,4 +8,8 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
     public function obterProdutosSimples(FiltroProdutoSimples $filtro): array {
         return [];
     }
+
+    public function obterProdutoSimplesPorId(int $idProduto): ?ProdutoSimples {
+        return null;
+    }
 }
