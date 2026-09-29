@@ -21,6 +21,7 @@
 	"packageManager": "pnpm@11.23.0",
 	"type": "module",
 	"devDependencies": {
+		"@types/page": "^1.11.9",
 		"@vitest/coverage-v8": "4.1.11",
 		"prettier": "^3.9.6",
 		"vite": "^8.3.0",
@@ -29,6 +30,6 @@
 	"dependencies": {
 		"@popperjs/core": "^2.11.8",
 		"bootstrap": "^5.3.8",
-		"crayon": "^6.0.1"
+		"page": "^1.11.6"
 	}
 }
