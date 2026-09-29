@@ -8,12 +8,25 @@ class GestorPedido {
         private readonly RepositorioProdutoSimples $repositorioProdutoSimples,
         private readonly RepositorioIngrediente $repositorioIngrediente,
         private readonly RepositorioPromocao $repositorioPromocao,
+        private readonly RepositorioConfiguracaoFidelidade $repositorioConfiguracaoFidelidade,
     ) {}
 
     public function registrarPedido(PedidoParaCadastro $pedidoParaCadastro): void {
         $pedido = $this->criarPedido($pedidoParaCadastro);
 
         $this->repositorioPedido->registrarPedido($pedido);
+
+        if ($pedido->temCliente()) {
+            if ($pedido->temDescontoFidelidade()) {
+                $this->repositorioCliente->marcarBeneficioFidelidadeComoUtilizado(cliente: $pedido->cliente, beneficioFidelidade: $pedido->descontoFidelidade->beneficioFidelidade);
+            }
+
+            $configuracaoFidelidade = $this->repositorioConfiguracaoFidelidade->obterConfiguracaoFidelidade();
+            if ($configuracaoFidelidade instanceof ConfiguracaoFidelidade) {
+                $beneficioFidelidade = $this->criarBeneficioFidelidadeParaCliente(cliente: $pedido->cliente, configuracaoFidelidade: $configuracaoFidelidade);
+                $this->repositorioCliente->registrarBeneficioFidelidade(cliente: $pedido->cliente, beneficioFidelidade: $beneficioFidelidade);
+            }
+        }
     }
 
     private function criarPedido(PedidoParaCadastro $pedidoParaCadastro): Pedido {
@@ -288,6 +301,16 @@ class GestorPedido {
             id: 0,
             valorDesconto: $valorDesconto,
             beneficioFidelidade: $beneficioFidelidade,
+        );
+    }
+
+    private function criarBeneficioFidelidadeParaCliente(Cliente $cliente, ConfiguracaoFidelidade $configuracaoFidelidade): BeneficioFidelidade {
+        return new BeneficioFidelidade(
+            id: 0,
+            percentualDesconto: $configuracaoFidelidade->percentual,
+            dataConcessao: new DateTime(),
+            validade: (new DateTime())->add(new DateInterval("P{$configuracaoFidelidade->validadeEmDias}D")),
+            utilizado: false,
         );
     }
 }

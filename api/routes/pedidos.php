@@ -10,6 +10,7 @@ $gestorPedido = new GestorPedido(
     new RepositorioProdutoSimplesEmBDR($bancoDados),
     new RepositorioIngredienteEmBDR($bancoDados),
     new RepositorioPromocaoEmBDR($bancoDados),
+    new RepositorioConfiguracaoFidelidadeEmBDR($bancoDados),
 );
 
 $app->post('/pedidos', function (HttpRequest $request, HttpResponse $response) use ($gestorPedido) {

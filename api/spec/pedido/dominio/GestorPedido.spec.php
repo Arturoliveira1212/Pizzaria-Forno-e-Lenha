@@ -11,6 +11,7 @@ describe('GestorPedido', function () {
         $this->repositorioProdutoSimples = Double::instance(['implements' => RepositorioProdutoSimples::class]);
         $this->repositorioIngrediente = Double::instance(['implements' => RepositorioIngrediente::class]);
         $this->repositorioPromocao = Double::instance(['implements' => RepositorioPromocao::class]);
+        $this->repositorioConfiguracaoFidelidade = Double::instance(['implements' => RepositorioConfiguracaoFidelidade::class]);
 
         $this->gestorPedido = new GestorPedido(
             repositorioPedido: $this->repositorioPedido,
@@ -19,6 +20,7 @@ describe('GestorPedido', function () {
             repositorioProdutoSimples: $this->repositorioProdutoSimples,
             repositorioIngrediente: $this->repositorioIngrediente,
             repositorioPromocao: $this->repositorioPromocao,
+            repositorioConfiguracaoFidelidade: $this->repositorioConfiguracaoFidelidade,
         );
     });
 

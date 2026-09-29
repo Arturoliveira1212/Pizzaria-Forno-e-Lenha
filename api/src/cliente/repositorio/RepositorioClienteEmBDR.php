@@ -12,4 +12,8 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
     public function obterClientePorId(string $idCliente): ?Cliente {
         return null;
     }
+
+    public function marcarBeneficioFidelidadeComoUtilizado(Cliente $cliente, BeneficioFidelidade $beneficioFidelidade): void {}
+
+    public function registrarBeneficioFidelidade(Cliente $cliente, BeneficioFidelidade $beneficioFidelidade): void {}
 }

@@ -58,6 +58,14 @@ class Pedido {
         }
     }
 
+    public function temCliente(): bool {
+        return $this->cliente instanceof Cliente;
+    }
+
+    public function temDescontoFidelidade(): bool {
+        return $this->descontoFidelidade instanceof DescontoFidelidade;
+    }
+
     public function calcularValorTotal(): Dinheiro {
         $valorTotal = Dinheiro::zero();
 
