@@ -2,6 +2,7 @@
 
 class GestorPedido {
     public function __construct(
+        private readonly UnidadeTrabalho $unidadeTrabalho,
         private readonly RepositorioPedido $repositorioPedido,
         private readonly RepositorioCliente $repositorioCliente,
         private readonly RepositorioPizza $repositorioPizza,
@@ -11,22 +12,29 @@ class GestorPedido {
         private readonly RepositorioConfiguracaoFidelidade $repositorioConfiguracaoFidelidade,
     ) {}
 
-    public function registrarPedido(PedidoParaCadastro $pedidoParaCadastro): void {
-        $pedido = $this->criarPedido($pedidoParaCadastro);
+    public function registrarPedido(PedidoParaCadastro $pedido): Pedido {
+        $pedido = $this->criarPedido($pedido);
 
-        $this->repositorioPedido->registrarPedido($pedido);
+        $this->unidadeTrabalho->executar(function () use ($pedido) {
+            $this->repositorioPedido->registrarPedido($pedido);
 
-        if ($pedido->temCliente()) {
-            if ($pedido->temDescontoFidelidade()) {
-                $this->repositorioCliente->marcarBeneficioFidelidadeComoUtilizado(cliente: $pedido->cliente, beneficioFidelidade: $pedido->descontoFidelidade->beneficioFidelidade);
+            if ($pedido->temCliente()) {
+                if ($pedido->temDescontoFidelidade()) {
+                    $this->repositorioCliente->marcarBeneficioFidelidadeComoUtilizado(
+                        cliente: $pedido->cliente,
+                        beneficioFidelidade: $pedido->descontoFidelidade->beneficioFidelidade,
+                    );
+                }
+
+                $configuracaoFidelidade = $this->repositorioConfiguracaoFidelidade->obterConfiguracaoFidelidade();
+                if ($configuracaoFidelidade instanceof ConfiguracaoFidelidade) {
+                    $beneficioFidelidade = $this->criarBeneficioFidelidadeParaCliente(cliente: $pedido->cliente, configuracaoFidelidade: $configuracaoFidelidade);
+                    $this->repositorioCliente->registrarBeneficioFidelidade(cliente: $pedido->cliente, beneficioFidelidade: $beneficioFidelidade);
+                }
             }
+        });
 
-            $configuracaoFidelidade = $this->repositorioConfiguracaoFidelidade->obterConfiguracaoFidelidade();
-            if ($configuracaoFidelidade instanceof ConfiguracaoFidelidade) {
-                $beneficioFidelidade = $this->criarBeneficioFidelidadeParaCliente(cliente: $pedido->cliente, configuracaoFidelidade: $configuracaoFidelidade);
-                $this->repositorioCliente->registrarBeneficioFidelidade(cliente: $pedido->cliente, beneficioFidelidade: $beneficioFidelidade);
-            }
-        }
+        return $pedido;
     }
 
     private function criarPedido(PedidoParaCadastro $pedidoParaCadastro): Pedido {
