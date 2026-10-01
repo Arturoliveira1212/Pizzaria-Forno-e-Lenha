@@ -4,6 +4,7 @@ use phputil\router\HttpRequest;
 use phputil\router\HttpResponse;
 
 $gestorPedido = new GestorPedido(
+    new UnidadeTrabalhoEmBDR($bancoDados),
     new RepositorioPedidoEmBDR($bancoDados),
     new RepositorioClienteEmBDR($bancoDados),
     new RepositorioPizzaEmBDR($bancoDados),
@@ -13,6 +14,23 @@ $gestorPedido = new GestorPedido(
     new RepositorioConfiguracaoFidelidadeEmBDR($bancoDados),
 );
 
+$app->post('/pedidos/descontos', function (HttpRequest $request, HttpResponse $response) use ($gestorPedido) {
+    try {
+        $pedidoParaCadastro = PedidoParaCadastro::criarComArray((array) $request->body());
+        $resumoDescontos = $gestorPedido->obterResumoDescontos($pedidoParaCadastro);
+
+        $response->status(200)->json(['message' => 'Resumo dos descontos obtido com sucesso.', 'data' => [
+            'resumoDescontos' => $resumoDescontos,
+        ]]);
+    } catch (DominioException $e) {
+        $response->status(400)->json(['message' => 'Erro ao validar pedido.', 'data' => [
+            'erros' => $e->erros(),
+        ]]);
+    } catch (Throwable $e) {
+        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
+    }
+});
+
 $app->post('/pedidos', function (HttpRequest $request, HttpResponse $response) use ($gestorPedido) {
     try {
         $pedidoParaCadastro = PedidoParaCadastro::criarComArray((array) $request->body());
@@ -20,8 +38,10 @@ $app->post('/pedidos', function (HttpRequest $request, HttpResponse $response) u
 
         $response->status(201)->json(['message' => 'Pedido registrado com sucesso.']);
     } catch (DominioException $e) {
-        $response->status(400)->json(['message' => 'Erro ao registrar pedido.', 'erros' => $e->erros()]);
+        $response->status(400)->json(['message' => 'Erro ao registrar pedido.', 'data' => [
+            'erros' => $e->erros(),
+        ]]);
     } catch (Throwable $e) {
-        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.' . $e->getMessage()]);
+        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
     }
 });

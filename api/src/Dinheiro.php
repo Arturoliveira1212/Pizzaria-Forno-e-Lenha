@@ -29,6 +29,10 @@ class Dinheiro {
         return new Dinheiro((int) round($reais * 100));
     }
 
+    public function converterParaReais(): float {
+        return $this->centavos / 100;
+    }
+
     public function somar(Dinheiro $outro): Dinheiro {
         return new Dinheiro($this->centavos + $outro->centavos);
     }

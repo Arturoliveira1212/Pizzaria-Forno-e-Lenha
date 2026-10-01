@@ -24,6 +24,12 @@ class GestorPedido {
         return $pedido;
     }
 
+    public function obterResumoDescontos(PedidoParaCadastro $pedidoParaCadastro): ResumoDescontosPedido {
+        $pedido = $this->criarPedido($pedidoParaCadastro);
+
+        return ResumoDescontosPedido::criarComEntidade($pedido);
+    }
+
     private function criarPedido(PedidoParaCadastro $pedidoParaCadastro): Pedido {
         $tipoAtendimento = TipoAtendimento::tryFrom($pedidoParaCadastro->tipo);
         if ($tipoAtendimento === null) {
