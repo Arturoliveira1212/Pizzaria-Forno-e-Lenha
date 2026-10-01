@@ -17,6 +17,61 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
         return $clientes ?? [];
     }
 
+    public function obterClientePorId(string $idCliente): ?Cliente {
+        $sql = "SELECT {$this->obterCamposParaObjetos()} FROM cliente
+            LEFT JOIN beneficio_fidelidade ON cliente.id = beneficio_fidelidade.idCliente
+            LEFT JOIN endereco ON cliente.id = endereco.idCliente
+                WHERE cliente.id = :id";
+
+        $resultado = $this->bancoDados->consultar($sql, [
+            'id' => $idCliente,
+        ]);
+        if (empty($resultado)) {
+            return null;
+        }
+
+        return $this->transformarClienteEmObjeto($resultado[0]);
+    }
+
+    private function obterCamposParaObjetos(): string {
+        return 'cliente.id,
+                cliente.nome,
+                cliente.telefone,
+                cliente.cpf,
+                endereco.id AS idEndereco,
+                endereco.logradouro,
+                endereco.numero,
+                endereco.bairro,
+                endereco.cidade,
+                endereco.estado,
+                endereco.uf,
+                beneficio_fidelidade.id AS idBeneficioFidelidade,
+                beneficio_fidelidade.percentualDesconto,
+                beneficio_fidelidade.dataConcessao,
+                beneficio_fidelidade.validade,
+                beneficio_fidelidade.utilizado';
+    }
+
+    /**
+     * @param array<string, mixed> $parametros
+     */
+    private function gerarQuery(FiltroCliente $filtro, array &$parametros): string {
+        $query = "SELECT {$this->obterCamposParaObjetos()} FROM cliente
+                LEFT JOIN beneficio_fidelidade ON cliente.id = beneficio_fidelidade.idCliente
+                LEFT JOIN endereco ON cliente.id = endereco.idCliente
+                    WHERE 1=1";
+
+        if ($filtro->identificador) {
+            $query .= ' AND cliente.id = :id OR cliente.nome LIKE :nome OR cliente.cpf LIKE :cpf';
+
+            $parametros['id'] = $filtro->identificador;
+            $parametros['nome'] = '%' . $filtro->identificador . '%';
+            $parametros['cpf'] = $filtro->identificador . '%';
+        }
+
+        return $query;
+    }
+
     /**
      * @param array<string, mixed> $linha
      */
@@ -50,47 +105,6 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
             endereco: $endereco,
             beneficioFidelidade: $beneficioFidelidade,
         );
-    }
-
-    /**
-     * @param array<string, mixed> $parametros
-     */
-    private function gerarQuery(FiltroCliente $filtro, array &$parametros): string {
-        $query = 'SELECT
-                cliente.id,
-                cliente.nome,
-                cliente.telefone,
-                cliente.cpf,
-                endereco.id AS idEndereco,
-                endereco.logradouro,
-                endereco.numero,
-                endereco.bairro,
-                endereco.cidade,
-                endereco.estado,
-                endereco.uf,
-                beneficio_fidelidade.id AS idBeneficioFidelidade,
-                beneficio_fidelidade.percentualDesconto,
-                beneficio_fidelidade.dataConcessao,
-                beneficio_fidelidade.validade,
-                beneficio_fidelidade.utilizado
-            FROM cliente
-                LEFT JOIN beneficio_fidelidade ON cliente.id = beneficio_fidelidade.idCliente
-                LEFT JOIN endereco ON cliente.id = endereco.idCliente
-                    WHERE 1=1';
-
-        if ($filtro->identificador) {
-            $query .= ' AND cliente.id = :id OR cliente.nome LIKE :nome OR cliente.cpf LIKE :cpf';
-
-            $parametros['id'] = $filtro->identificador;
-            $parametros['nome'] = '%' . $filtro->identificador . '%';
-            $parametros['cpf'] = $filtro->identificador . '%';
-        }
-
-        return $query;
-    }
-
-    public function obterClientePorId(string $idCliente): ?Cliente {
-        return null;
     }
 
     public function marcarBeneficioFidelidadeComoUtilizado(Cliente $cliente, BeneficioFidelidade $beneficioFidelidade): void {
