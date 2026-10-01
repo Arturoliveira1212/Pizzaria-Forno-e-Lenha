@@ -14,10 +14,14 @@ $app->get('/pizzas', function (HttpRequest $request, HttpResponse $response) use
             ? $gestorPizza->obterPizzasParaCardapio($restricoes)
             : $gestorPizza->obterPizzas($restricoes);
 
-        $response->status(200)->json(['data' => $pizzas, 'message' => 'Pizzas obtidas com sucesso.']);
+        $response->status(200)->json(['message' => 'Pizzas obtidas com sucesso.', 'data' => [
+            'pizzas' => $pizzas,
+        ]]);
     } catch (DominioException $e) {
-        $response->status(400)->json(['message' => 'Erro ao obter pizzas.', 'erros' => $e->erros()]);
+        $response->status(400)->json(['message' => 'Erro ao obter pizzas.', 'data' => [
+            'erros' => $e->erros(),
+        ]]);
     } catch (Throwable $e) {
-        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.' . $e->getMessage()]);
+        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
     }
 });
