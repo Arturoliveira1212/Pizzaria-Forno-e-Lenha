@@ -12,8 +12,8 @@ class GestorPedido {
         private readonly RepositorioConfiguracaoFidelidade $repositorioConfiguracaoFidelidade,
     ) {}
 
-    public function registrarPedido(PedidoParaCadastro $pedido): Pedido {
-        $pedido = $this->criarPedido($pedido);
+    public function registrarPedido(PedidoParaCadastro $pedidoParaCadastro): Pedido {
+        $pedido = $this->criarPedido($pedidoParaCadastro);
 
         $this->unidadeTrabalho->executar(function () use ($pedido) {
             $this->repositorioPedido->registrarPedido($pedido);
@@ -30,8 +30,9 @@ class GestorPedido {
             throw new DominioException("Tipo de atendimento inválido: {$pedidoParaCadastro->tipo}.");
         }
 
-        $itensPìzza = $this->criarItensPizza($pedidoParaCadastro->itensPizza);
-        $itensSimples = $this->criarItensSimples($pedidoParaCadastro->itensSimples);
+        [$itensPizzaParaCadastro, $itensSimplesParaCadastro] = $pedidoParaCadastro->obterItensPorTipo();
+        $itensPìzza = $this->criarItensPizza($itensPizzaParaCadastro);
+        $itensSimples = $this->criarItensSimples($itensSimplesParaCadastro);
 
         $itensPedido = [...$itensPìzza, ...$itensSimples];
 

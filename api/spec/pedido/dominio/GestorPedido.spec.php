@@ -80,8 +80,7 @@ describe('GestorPedido', function () {
                         new PedidoParaCadastro(
                             tipo: $tipoQueNaoExiste,
                             idCliente: 'dasdsadasdsadas',
-                            itensPizza: [],
-                            itensSimples: [],
+                            itensPedido: [],
                         ),
                     );
                 })->toThrow(new DominioException("Tipo de atendimento inválido: {$tipoQueNaoExiste}."));
@@ -98,7 +97,7 @@ describe('GestorPedido', function () {
                         new PedidoParaCadastro(
                             tipo: TipoAtendimento::BALCAO->value,
                             idCliente: 'dasdsadasdsadas',
-                            itensPizza: [
+                            itensPedido: [
                                 new ItemPizzaParaCadastro(
                                     tamanho: $tamanhoQueNaoExiste,
                                     quantidade: 1,
@@ -110,7 +109,6 @@ describe('GestorPedido', function () {
                                     ],
                                 ),
                             ],
-                            itensSimples: [],
                         ),
                     );
                 })->toThrow(new DominioException("Tamanho de pizza inválido: {$tamanhoQueNaoExiste}."));
@@ -131,7 +129,7 @@ describe('GestorPedido', function () {
                         new PedidoParaCadastro(
                             tipo: TipoAtendimento::BALCAO->value,
                             idCliente: 'dasdsadasdsadas',
-                            itensPizza: [
+                            itensPedido: [
                                 new ItemPizzaParaCadastro(
                                     tamanho: TamanhoPizza::MEDIA->value,
                                     quantidade: 1,
@@ -143,7 +141,6 @@ describe('GestorPedido', function () {
                                     ],
                                 ),
                             ],
-                            itensSimples: [],
                         ),
                     );
                 })->toThrow(new DominioException("Pizza (ID {$idInexistente}) não encontrada."));
@@ -165,7 +162,7 @@ describe('GestorPedido', function () {
                         new PedidoParaCadastro(
                             tipo: TipoAtendimento::BALCAO->value,
                             idCliente: 'dasdsadasdsadas',
-                            itensPizza: [
+                            itensPedido: [
                                 new ItemPizzaParaCadastro(
                                     tamanho: TamanhoPizza::MEDIA->value,
                                     quantidade: 1,
@@ -182,7 +179,6 @@ describe('GestorPedido', function () {
                                     ],
                                 ),
                             ],
-                            itensSimples: [],
                         ),
                     );
                 })->toThrow(new DominioException("Ingrediente (ID {$idInexistente}) não encontrado."));
@@ -199,7 +195,7 @@ describe('GestorPedido', function () {
                         new PedidoParaCadastro(
                             tipo: TipoAtendimento::BALCAO->value,
                             idCliente: 'dasdsadasdsadas',
-                            itensPizza: [
+                            itensPedido: [
                                 new ItemPizzaParaCadastro(
                                     tamanho: TamanhoPizza::MEDIA->value,
                                     quantidade: 1,
@@ -216,7 +212,6 @@ describe('GestorPedido', function () {
                                     ],
                                 ),
                             ],
-                            itensSimples: [],
                         ),
                     );
                 })->toThrow(new DominioException("Papel do ingrediente inválido: {$papelQueNaoExiste}."));
@@ -236,8 +231,7 @@ describe('GestorPedido', function () {
                         new PedidoParaCadastro(
                             tipo: TipoAtendimento::BALCAO->value,
                             idCliente: 'dasdsadasdsadas',
-                            itensPizza: [],
-                            itensSimples: [
+                            itensPedido: [
                                 new ItemSimplesParaCadastro(
                                     idProduto: $idInexistente,
                                     quantidade: 1,
@@ -262,7 +256,7 @@ describe('GestorPedido', function () {
                     new PedidoParaCadastro(
                         tipo: TipoAtendimento::BALCAO->value,
                         idCliente: '',
-                        itensPizza: [
+                        itensPedido: [
                             new ItemPizzaParaCadastro(
                                 tamanho: TamanhoPizza::MEDIA->value,
                                 quantidade: 1,
@@ -274,7 +268,6 @@ describe('GestorPedido', function () {
                                 ],
                             ),
                         ],
-                        itensSimples: [],
                     ),
                 );
 
@@ -292,7 +285,7 @@ describe('GestorPedido', function () {
                     new PedidoParaCadastro(
                         tipo: TipoAtendimento::BALCAO->value,
                         idCliente: '',
-                        itensPizza: [
+                        itensPedido: [
                             new ItemPizzaParaCadastro(
                                 tamanho: TamanhoPizza::MEDIA->value,
                                 quantidade: 1,
@@ -304,7 +297,6 @@ describe('GestorPedido', function () {
                                 ],
                             ),
                         ],
-                        itensSimples: [],
                     ),
                 );
 
@@ -340,7 +332,7 @@ describe('GestorPedido', function () {
                     new PedidoParaCadastro(
                         tipo: TipoAtendimento::BALCAO->value,
                         idCliente: 'lkjn23rij23jil234jkb',
-                        itensPizza: [
+                        itensPedido: [
                             new ItemPizzaParaCadastro(
                                 tamanho: TamanhoPizza::MEDIA->value,
                                 quantidade: 1,
@@ -352,7 +344,6 @@ describe('GestorPedido', function () {
                                 ],
                             ),
                         ],
-                        itensSimples: [],
                     ),
                 );
 
@@ -378,7 +369,7 @@ describe('GestorPedido', function () {
                     new PedidoParaCadastro(
                         tipo: TipoAtendimento::BALCAO->value,
                         idCliente: 'lkjn23rij23jil234jkb',
-                        itensPizza: [
+                        itensPedido: [
                             new ItemPizzaParaCadastro(
                                 tamanho: TamanhoPizza::MEDIA->value,
                                 quantidade: 1,
@@ -390,7 +381,6 @@ describe('GestorPedido', function () {
                                 ],
                             ),
                         ],
-                        itensSimples: [],
                     ),
                 );
 
@@ -422,7 +412,7 @@ describe('GestorPedido', function () {
                     new PedidoParaCadastro(
                         tipo: TipoAtendimento::BALCAO->value,
                         idCliente: 'lkjn23rij23jil234jkb',
-                        itensPizza: [
+                        itensPedido: [
                             new ItemPizzaParaCadastro(
                                 tamanho: TamanhoPizza::MEDIA->value,
                                 quantidade: 1,
@@ -434,7 +424,6 @@ describe('GestorPedido', function () {
                                 ],
                             ),
                         ],
-                        itensSimples: [],
                     ),
                 );
 
@@ -451,7 +440,7 @@ describe('GestorPedido', function () {
                     new PedidoParaCadastro(
                         tipo: TipoAtendimento::BALCAO->value,
                         idCliente: 'lkjn23rij23jil234jkb',
-                        itensPizza: [
+                        itensPedido: [
                             new ItemPizzaParaCadastro(
                                 tamanho: TamanhoPizza::MEDIA->value,
                                 quantidade: 1,
@@ -463,7 +452,6 @@ describe('GestorPedido', function () {
                                 ],
                             ),
                         ],
-                        itensSimples: [],
                     ),
                 );
 
@@ -493,7 +481,7 @@ describe('GestorPedido', function () {
                     new PedidoParaCadastro(
                         tipo: TipoAtendimento::BALCAO->value,
                         idCliente: 'lkjn23rij23jil234jkb',
-                        itensPizza: [
+                        itensPedido: [
                             new ItemPizzaParaCadastro(
                                 tamanho: TamanhoPizza::MEDIA->value,
                                 quantidade: 1,
@@ -504,8 +492,6 @@ describe('GestorPedido', function () {
                                     ),
                                 ],
                             ),
-                        ],
-                        itensSimples: [
                             new ItemSimplesParaCadastro(
                                 idProduto: 1,
                                 quantidade: 2,

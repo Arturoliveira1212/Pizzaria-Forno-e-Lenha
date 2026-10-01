@@ -2,33 +2,49 @@
 
 class PedidoParaCadastro {
     /**
-     * @param ItemPizzaParaCadastro[] $itensPizza
-     * @param ItemSimplesParaCadastro[] $itensSimples
+     * @param ItemPizzaParaCadastro[]|ItemSimplesParaCadastro[] $itensPedido
      */
     public function __construct(
         public readonly string $tipo,
         public readonly string $idCliente,
-        public readonly array $itensPizza,
-        public readonly array $itensSimples,
+        public readonly array $itensPedido,
     ) {}
 
     /**
      * @param array<string, mixed> $dados
      */
     public static function criarComArray(array $dados): PedidoParaCadastro {
-        $itensPizza = array_map(function (StdClass $itemPizza): ItemPizzaParaCadastro {
-            return ItemPizzaParaCadastro::criarComArray((array) $itemPizza);
-        }, $dados['itensPizza'] ?? []);
+        $itensPedido = array_map(function (StdClass $itemPedido): ItemPizzaParaCadastro|ItemSimplesParaCadastro {
+            $itemPedidoEmArray = (array) $itemPedido;
+            if (isset($itemPedidoEmArray['idProduto'])) {
+                return ItemSimplesParaCadastro::criarComArray($itemPedidoEmArray);
+            }
 
-        $itensSimples = array_map(function (StdClass $itemSimples): ItemSimplesParaCadastro {
-            return ItemSimplesParaCadastro::criarComArray((array) $itemSimples);
-        }, $dados['itensSimples'] ?? []);
+            return ItemPizzaParaCadastro::criarComArray($itemPedidoEmArray);
+        }, $dados['itensPedido'] ?? []);
 
         return new self(
             tipo: $dados['tipo'] ?? '',
             idCliente: $dados['idCliente'] ?? '',
-            itensPizza: $itensPizza,
-            itensSimples: $itensSimples,
+            itensPedido: $itensPedido,
         );
+    }
+
+    /**
+     * @return array{0: ItemPizzaParaCadastro[], 1: ItemSimplesParaCadastro[]}
+     */
+    public function obterItensPorTipo(): array {
+        $itensPizza = [];
+        $itensSimples = [];
+
+        foreach ($this->itensPedido as $itemPedido) {
+            if ($itemPedido instanceof ItemPizzaParaCadastro) {
+                $itensPizza[] = $itemPedido;
+            } elseif ($itemPedido instanceof ItemSimplesParaCadastro) {
+                $itensSimples[] = $itemPedido;
+            }
+        }
+
+        return [$itensPizza, $itensSimples];
     }
 }
