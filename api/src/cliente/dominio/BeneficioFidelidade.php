@@ -12,6 +12,6 @@ class BeneficioFidelidade {
     public function estaValidoParaUso(): bool {
         $dataAtual = new DateTime();
 
-        return !$this->utilizado && $dataAtual <= $this->validade;
+        return !$this->utilizado && $dataAtual <= $this->validade->setTime(23, 59, 59);
     }
 }

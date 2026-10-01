@@ -319,7 +319,7 @@ describe('GestorPedido', function () {
                             id: 1,
                             percentualDesconto: new Percentual(10),
                             dataConcessao: new DateTime('2024-01-01'),
-                            validade: new DateTime()->modify('+30 days'),
+                            validade: new DateTime(),
                             utilizado: false,
                         ),
                     ),
@@ -387,7 +387,7 @@ describe('GestorPedido', function () {
                 expect($pedido->descontoFidelidade)->toBe(null);
             });
 
-            it('cria pedido sem desconto de fidelidade quando o cliente tem beneficio inválido', function () {
+            it('cria pedido sem desconto de fidelidade quando o cliente tem beneficio inválido (valida expirada)', function () {
                 allow($this->repositorioCliente)->toReceive('obterClientePorId')->andReturn(
                     $this->cliente = new Cliente(
                         id: 1,
@@ -401,6 +401,49 @@ describe('GestorPedido', function () {
                             dataConcessao: new DateTime('2024-01-01'),
                             validade: new DateTime()->modify('-1 day'),
                             utilizado: false,
+                        ),
+                    ),
+                );
+                allow($this->repositorioPromocao)->toReceive('obterPromocoes')->andReturn([]);
+                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->andReturn(null);
+                allow($this->repositorioPizza)->toReceive('obterPizzaPorId')->andReturn($this->pizza);
+
+                $pedido = $this->gestorPedido->registrarPedido(
+                    new PedidoParaCadastro(
+                        tipo: TipoAtendimento::BALCAO->value,
+                        idCliente: 'lkjn23rij23jil234jkb',
+                        itensPedido: [
+                            new ItemPizzaParaCadastro(
+                                tamanho: TamanhoPizza::MEDIA->value,
+                                quantidade: 1,
+                                saboresEscolhidos: [
+                                    new SaborEscolhidoParaCadastro(
+                                        idPizza: 1,
+                                        ingredientesEscolhidos: [],
+                                    ),
+                                ],
+                            ),
+                        ],
+                    ),
+                );
+
+                expect($pedido->descontoFidelidade)->toBe(null);
+            });
+
+            it('cria pedido sem desconto de fidelidade quando o cliente tem beneficio inválido (já utilizado)', function () {
+                allow($this->repositorioCliente)->toReceive('obterClientePorId')->andReturn(
+                    $this->cliente = new Cliente(
+                        id: 1,
+                        nome: 'João da Silva',
+                        telefone: $this->telefone,
+                        cpf: $this->cpf,
+                        endereco: $this->endereco,
+                        beneficioFidelidade: new BeneficioFidelidade(
+                            id: 1,
+                            percentualDesconto: new Percentual(10),
+                            dataConcessao: new DateTime('2024-01-01'),
+                            validade: new DateTime(),
+                            utilizado: true,
                         ),
                     ),
                 );
