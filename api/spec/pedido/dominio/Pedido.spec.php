@@ -161,6 +161,7 @@ describe('Pedido', function () {
     );
 
     $this->endereco = new Endereco(
+        id: 1,
         logradouro: 'Rua Viviane Verly Pereira',
         numero: '53',
         bairro: 'Merelim',

@@ -2,6 +2,7 @@
 
 class Endereco {
     public function __construct(
+        public readonly int $id,
         public readonly string $logradouro,
         public readonly string $numero,
         public readonly string $bairro,
