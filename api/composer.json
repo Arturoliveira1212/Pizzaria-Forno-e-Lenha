@@ -5,7 +5,15 @@
     "scripts": {
         "start": "php -S localhost:8080",
         "phinx": "vendor/bin/phinx",
-        "test": "kahlan",
+        "db:test": [
+            "phinx rollback -e testing -t 0",
+            "phinx migrate -e testing",
+            "phinx seed:run -e testing"
+        ],
+        "test": [
+            "@db:test",
+            "kahlan"
+        ],
         "st": "phpstan analyze src --level=6",
         "format": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php"
     },
