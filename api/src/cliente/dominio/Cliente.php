@@ -13,4 +13,8 @@ class Cliente {
     public function temBeneficioFidelidade(): bool {
         return $this->beneficioFidelidade !== null;
     }
+
+    public function temBeneficioFidelidadeValidoParaUso(): bool {
+        return $this->temBeneficioFidelidade() && $this->beneficioFidelidade->estaValidoParaUso();
+    }
 }

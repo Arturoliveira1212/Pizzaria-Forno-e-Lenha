@@ -217,6 +217,7 @@ describe('Pedido', function () {
         entregador: $this->entregador,
         dataSaida: new DateTime('2024-01-01 10:00:00'),
         dataChegada: new DateTime('2024-01-01 10:30:00'),
+        taxa: new Dinheiro(500),
     );
 
     $this->cancelamento = new Cancelamento(

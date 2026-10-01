@@ -17,21 +17,8 @@ class GestorPedido {
 
         $this->unidadeTrabalho->executar(function () use ($pedido) {
             $this->repositorioPedido->registrarPedido($pedido);
-
-            if ($pedido->temCliente()) {
-                if ($pedido->temDescontoFidelidade()) {
-                    $this->repositorioCliente->marcarBeneficioFidelidadeComoUtilizado(
-                        cliente: $pedido->cliente,
-                        beneficioFidelidade: $pedido->descontoFidelidade->beneficioFidelidade,
-                    );
-                }
-
-                $configuracaoFidelidade = $this->repositorioConfiguracaoFidelidade->obterConfiguracaoFidelidade();
-                if ($configuracaoFidelidade instanceof ConfiguracaoFidelidade) {
-                    $beneficioFidelidade = $this->criarBeneficioFidelidadeParaCliente(cliente: $pedido->cliente, configuracaoFidelidade: $configuracaoFidelidade);
-                    $this->repositorioCliente->registrarBeneficioFidelidade(cliente: $pedido->cliente, beneficioFidelidade: $beneficioFidelidade);
-                }
-            }
+            $this->marcarBeneficioFidelidadeComoUtilizado($pedido);
+            $this->gerarNovoBeneficioFidelidade($pedido);
         });
 
         return $pedido;
@@ -52,12 +39,11 @@ class GestorPedido {
 
         $descontoFidelidade = null;
         $cliente = $this->repositorioCliente->obterClientePorId($pedidoParaCadastro->idCliente);
-        if ($cliente instanceof Cliente && $cliente->temBeneficioFidelidade()) {
+        if ($cliente instanceof Cliente && $cliente->temBeneficioFidelidadeValidoParaUso()) {
             $descontoFidelidade = $this->criarDescontoFidelidade(
                 beneficioFidelidade: $cliente->beneficioFidelidade,
                 itensPedido: $itensPedido,
                 descontosPromocao: $descontosPromocao,
-                erros: $erros,
             );
         }
 
@@ -239,86 +225,58 @@ class GestorPedido {
      */
     private function criarDescontosPromocao(array $itensPizza): array {
         $promocoesVigentes = $this->repositorioPromocao->obterPromocoes(new FiltroPromocao(apenasVigentes: true));
-        if (empty($promocoesVigentes)) {
-            return [];
-        }
 
-        $valorTotalPorTamanhos = [];
-
-        foreach ($itensPizza as $itemPizza) {
-            $tamanho = $itemPizza->tamanhoPizza;
-            if (!isset($valorTotalPorTamanhos[$tamanho->value])) {
-                $valorTotalPorTamanhos[$tamanho->value] = [
-                    'quantidade' => 0,
-                    'valor' => Dinheiro::zero(),
-                ];
-            }
-
-            $valorTotalPorTamanhos[$tamanho->value] = [
-                'quantidade' => $valorTotalPorTamanhos[$tamanho->value]['quantidade'] + $itemPizza->quantidade,
-                'valor' => $valorTotalPorTamanhos[$tamanho->value]['valor']->somar($itemPizza->calcularPrecoTotal()),
-            ];
-        }
-
-        $descontosPromocao = [];
-
-        foreach ($promocoesVigentes as $promocao) {
-            $quantidadeTotal = $valorTotalPorTamanhos[$promocao->tamanhoPizza->value]['quantidade'] ?? 0;
-            if ($quantidadeTotal < $promocao->quantidadeMinima) {
-                continue;
-            }
-
-            $valorTotal = $valorTotalPorTamanhos[$promocao->tamanhoPizza->value]['valor'];
-            $valorDesconto = $promocao->percentualDesconto->subtrairDe($valorTotal);
-
-            $descontosPromocao[] = new DescontoPromocao(
-                id: 0,
-                promocao: $promocao,
-                valorDesconto: $valorDesconto,
-            );
-        }
-
-        return $descontosPromocao;
+        return new CalculadoraDescontoPromocao()->calcularDescontos(itensPizza: $itensPizza, promocoes: $promocoesVigentes);
     }
 
     /**
      * @param ItemPedido[] $itensPedido
      * @param DescontoPromocao[] $descontosPromocao
-     * @param string[] $erros
      */
-    private function criarDescontoFidelidade(BeneficioFidelidade $beneficioFidelidade, array $itensPedido, array $descontosPromocao, array &$erros): ?DescontoFidelidade {
-        if (!$beneficioFidelidade->estaValido()) {
-            return null;
-        }
-
-        $valorTotal = Dinheiro::zero();
-
-        foreach ($itensPedido as $itemPedido) {
-            $valorTotal = $valorTotal->somar($itemPedido->calcularPrecoTotal());
-        }
-
+    private function criarDescontoFidelidade(BeneficioFidelidade $beneficioFidelidade, array $itensPedido, array $descontosPromocao): ?DescontoFidelidade {
         $valorTotalDescontoPromocao = Dinheiro::zero();
+
         foreach ($descontosPromocao as $descontoPromocao) {
             $valorTotalDescontoPromocao = $valorTotalDescontoPromocao->somar($descontoPromocao->valorDesconto);
         }
 
-        $valorTotal = $valorTotal->subtrair($valorTotalDescontoPromocao);
-        $valorDesconto = $beneficioFidelidade->percentualDesconto->subtrairDe($valorTotal);
-
-        return new DescontoFidelidade(
-            id: 0,
-            valorDesconto: $valorDesconto,
+        return new CalculadoraDescontoFidelidade()->calcularDesconto(
+            itensPedido: $itensPedido,
             beneficioFidelidade: $beneficioFidelidade,
+            valorTotalDescontoPromocao: $valorTotalDescontoPromocao,
         );
     }
 
-    private function criarBeneficioFidelidadeParaCliente(Cliente $cliente, ConfiguracaoFidelidade $configuracaoFidelidade): BeneficioFidelidade {
-        return new BeneficioFidelidade(
-            id: 0,
-            percentualDesconto: $configuracaoFidelidade->percentual,
-            dataConcessao: new DateTime(),
-            validade: (new DateTime())->add(new DateInterval("P{$configuracaoFidelidade->validadeEmDias}D")),
-            utilizado: false,
+    private function marcarBeneficioFidelidadeComoUtilizado(Pedido $pedido): void {
+        if (!$pedido->temDescontoFidelidade()) {
+            return;
+        }
+
+        $this->repositorioCliente->marcarBeneficioFidelidadeComoUtilizado(
+            cliente: $pedido->cliente,
+            beneficioFidelidade: $pedido->descontoFidelidade->beneficioFidelidade,
         );
+    }
+
+    private function gerarNovoBeneficioFidelidade(Pedido $pedido): void {
+        if (!$pedido->temCliente()) {
+            return;
+        }
+
+        $configuracaoFidelidade = $this->repositorioConfiguracaoFidelidade->obterConfiguracaoFidelidade();
+        if (!$configuracaoFidelidade instanceof ConfiguracaoFidelidade) {
+            return;
+        }
+
+        $beneficioFidelidade = new GeradorBeneficioFidelidade()->gerarBeneficioFidelidade(
+            pedido: $pedido,
+            configuracaoFidelidade: $configuracaoFidelidade,
+        );
+
+        if (!$beneficioFidelidade instanceof BeneficioFidelidade) {
+            return;
+        }
+
+        $this->repositorioCliente->registrarBeneficioFidelidade(cliente: $pedido->cliente, beneficioFidelidade: $beneficioFidelidade);
     }
 }
