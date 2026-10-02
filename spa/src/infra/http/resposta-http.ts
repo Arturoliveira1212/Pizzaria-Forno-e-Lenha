@@ -1,4 +1,4 @@
 export interface RespostaHttp {
 	status: number;
-	data: unknown;
+	data: any;
 }
