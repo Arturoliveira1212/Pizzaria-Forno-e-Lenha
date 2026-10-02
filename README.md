@@ -9,4 +9,8 @@
 
 TODO => Detalhar comandos e referências bibliográficas.
 
-https://getbootstrap.com/docs/5.3/components/navbar/
+Templates base para a tela de registrar pedido:
+- https://getbootstrap.com/docs/5.3/components/navbar/
+- https://getbootstrap.com/docs/5.3/components/navs-tabs/
+- https://getbootstrap.com/docs/5.3/components/button-group/
+- https://getbootstrap.com/docs/5.3/forms/input-group/

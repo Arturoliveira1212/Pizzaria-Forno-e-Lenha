@@ -1,0 +1,45 @@
+<div class="container pb-5">
+	<ul class="nav nav-tabs mb-4" id="etapas">
+		<li class="nav-item">
+			<button class="nav-link active" data-etapa="produtos">Produtos</button>
+		</li>
+		<li class="nav-item">
+			<button class="nav-link" data-etapa="atendimento">Atendimento</button>
+		</li>
+	</ul>
+
+	<div class="row g-4">
+		<div class="col-lg-8">
+			<div class="tab-pane" id="etapa-produtos">
+				<div class="d-flex align-items-center gap-4 mb-3" id="categorias-cardapio">
+					<div class="btn-group flex-shrink-0">
+						<button class="btn btn-outline-secondary active" data-categoria="pizza">Pizzas</button>
+						<button class="btn btn-outline-secondary" data-categoria="bebida">Bebidas</button>
+						<button class="btn btn-outline-secondary" data-categoria="sobremesa">Sobremesas</button>
+					</div>
+
+					<div class="flex-grow-1">
+						<div class="input-group" id="filtro">
+							<input autofocus type="search" class="form-control" placeholder="Buscar por ID ou nome" />
+							<button type="button" class="btn btn-primary" data-buscar>Buscar</button>
+						</div>
+					</div>
+				</div>
+
+				<div id="categoria-pizza">
+					<div class="row g-3">Pizzas</div>
+				</div>
+
+				<div id="categoria-bebida" class="d-none">
+					<div class="row g-3">Bebidas</div>
+				</div>
+
+				<div id="categoria-sobremesa" class="d-none">
+					<div class="row g-3">Sobremesas</div>
+				</div>
+			</div>
+
+			<div class="tab-pane d-none" id="etapa-atendimento">Atendimento</div>
+		</div>
+	</div>
+</div>
