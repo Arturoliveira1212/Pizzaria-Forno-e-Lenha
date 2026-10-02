@@ -6,69 +6,77 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
     ) {}
 
     public function obterClientes(FiltroCliente $filtro): array {
-        $parametros = [];
-        $sql = $this->gerarQuery($filtro, $parametros);
+        try {
+            $parametros = [];
+            $sql = $this->gerarQuery($filtro, $parametros);
 
-        $resultado = $this->bancoDados->consultar($sql, $parametros);
-        if (empty($resultado)) {
-            return [];
+            $resultado = $this->bancoDados->consultar($sql, $parametros);
+            if (empty($resultado)) {
+                return [];
+            }
+
+            $idsClientes = array_column($resultado, 'id');
+            $enderecos = $this->buscarEndereco($idsClientes);
+            $beneficiosFidelidade = $this->buscarBeneficioFidelidade($idsClientes);
+
+            $clientes = [];
+
+            foreach ($resultado as $linha) {
+                $idCliente = $linha['id'];
+
+                $endereco = $enderecos[$idCliente][0] ?? null;
+                $beneficioFidelidade = $beneficiosFidelidade[$idCliente][0] ?? null;
+
+                $clientes[] = new Cliente(
+                    id: (string) $linha['id'],
+                    nome: $linha['nome'],
+                    telefone: Telefone::criar($linha['telefone']),
+                    cpf: new Cpf($linha['cpf']),
+                    endereco: $endereco,
+                    beneficioFidelidade: $beneficioFidelidade,
+                );
+            }
+
+            return $clientes;
+        } catch (Throwable $e) {
+            throw new RepositorioException('Erro ao obter clientes.');
         }
+    }
 
-        $idsClientes = array_column($resultado, 'id');
-        $enderecos = $this->buscarEndereco($idsClientes);
-        $beneficiosFidelidade = $this->buscarBeneficioFidelidade($idsClientes);
+    public function obterClientePorId(string $idCliente): ?Cliente {
+        try {
+            $sql = 'SELECT
+                cliente.id,
+                cliente.nome,
+                cliente.telefone,
+                cliente.cpf
+                    FROM cliente
+                        WHERE cliente.id = :id';
 
-        $clientes = [];
+            $resultado = $this->bancoDados->consultar($sql, [
+                'id' => $idCliente,
+            ]);
+            if (empty($resultado)) {
+                return null;
+            }
 
-        foreach ($resultado as $linha) {
-            $idCliente = $linha['id'];
+            $linha = $resultado[0];
 
-            $endereco = $enderecos[$idCliente][0] ?? null;
-            $beneficioFidelidade = $beneficiosFidelidade[$idCliente][0] ?? null;
+            $idsClientes = [$linha['id']];
+            $enderecos = $this->buscarEndereco($idsClientes);
+            $beneficiosFidelidade = $this->buscarBeneficioFidelidade($idsClientes);
 
-            $clientes[] = new Cliente(
+            return new Cliente(
                 id: (string) $linha['id'],
                 nome: $linha['nome'],
                 telefone: Telefone::criar($linha['telefone']),
                 cpf: new Cpf($linha['cpf']),
-                endereco: $endereco,
-                beneficioFidelidade: $beneficioFidelidade,
+                endereco: $enderecos[$linha['id']][0] ?? null,
+                beneficioFidelidade: $beneficiosFidelidade[$linha['id']][0] ?? null,
             );
+        } catch (Throwable $e) {
+            throw new RepositorioException('Erro ao obter cliente por ID.');
         }
-
-        return $clientes;
-    }
-
-    public function obterClientePorId(string $idCliente): ?Cliente {
-        $sql = 'SELECT
-            cliente.id,
-            cliente.nome,
-            cliente.telefone,
-            cliente.cpf
-                FROM cliente
-                    WHERE cliente.id = :id';
-
-        $resultado = $this->bancoDados->consultar($sql, [
-            'id' => $idCliente,
-        ]);
-        if (empty($resultado)) {
-            return null;
-        }
-
-        $linha = $resultado[0];
-
-        $idsClientes = [$linha['id']];
-        $enderecos = $this->buscarEndereco($idsClientes);
-        $beneficiosFidelidade = $this->buscarBeneficioFidelidade($idsClientes);
-
-        return new Cliente(
-            id: (string) $linha['id'],
-            nome: $linha['nome'],
-            telefone: Telefone::criar($linha['telefone']),
-            cpf: new Cpf($linha['cpf']),
-            endereco: $enderecos[$linha['id']][0] ?? null,
-            beneficioFidelidade: $beneficiosFidelidade[$linha['id']][0] ?? null,
-        );
     }
 
     /**
@@ -182,38 +190,46 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
     }
 
     public function marcarBeneficioFidelidadeComoUtilizado(Cliente $cliente, BeneficioFidelidade $beneficioFidelidade): void {
-        $sql = 'UPDATE beneficio_fidelidade SET utilizado = :utilizado
-            WHERE idCliente = :idCliente
-            AND id = :id';
+        try {
+            $sql = 'UPDATE beneficio_fidelidade SET utilizado = :utilizado
+                WHERE idCliente = :idCliente
+                AND id = :id';
 
-        $this->bancoDados->executar($sql, [
-            'id' => $beneficioFidelidade->id,
-            'idCliente' => $cliente->id,
-            'utilizado' => 1,
-        ]);
+            $this->bancoDados->executar($sql, [
+                'id' => $beneficioFidelidade->id,
+                'idCliente' => $cliente->id,
+                'utilizado' => 1,
+            ]);
+        } catch (Throwable $th) {
+            throw new RepositorioException('Erro ao marcar benefício de fidelidade como utilizado.');
+        }
     }
 
     public function registrarBeneficioFidelidade(Cliente $cliente, BeneficioFidelidade $beneficioFidelidade): void {
-        $sql = 'INSERT INTO beneficio_fidelidade (
-                idCliente,
-                percentualDesconto,
-                dataConcessao,
-                validade,
-                utilizado
-            ) VALUES (
-                :idCliente,
-                :percentualDesconto,
-                :dataConcessao,
-                :validade,
-                :utilizado
-            )';
+        try {
+            $sql = 'INSERT INTO beneficio_fidelidade (
+                    idCliente,
+                    percentualDesconto,
+                    dataConcessao,
+                    validade,
+                    utilizado
+                ) VALUES (
+                    :idCliente,
+                    :percentualDesconto,
+                    :dataConcessao,
+                    :validade,
+                    :utilizado
+                )';
 
-        $this->bancoDados->executar($sql, [
-            'idCliente' => $cliente->id,
-            'percentualDesconto' => $beneficioFidelidade->percentualDesconto->valor,
-            'dataConcessao' => $beneficioFidelidade->dataConcessao->format('Y-m-d H:i:s'),
-            'validade' => $beneficioFidelidade->validade->format('Y-m-d H:i:s'),
-            'utilizado' => (int) $beneficioFidelidade->utilizado,
-        ]);
+            $this->bancoDados->executar($sql, [
+                'idCliente' => $cliente->id,
+                'percentualDesconto' => $beneficioFidelidade->percentualDesconto->valor,
+                'dataConcessao' => $beneficioFidelidade->dataConcessao->format('Y-m-d H:i:s'),
+                'validade' => $beneficioFidelidade->validade->format('Y-m-d H:i:s'),
+                'utilizado' => (int) $beneficioFidelidade->utilizado,
+            ]);
+        } catch (Throwable $th) {
+            throw new RepositorioException('Erro ao registrar benefício de fidelidade.');
+        }
     }
 }
