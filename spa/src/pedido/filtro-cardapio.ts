@@ -1,4 +1,4 @@
-import { CategoriaCardapio } from './dominio/categoria-cardapio';
+import { CategoriaCardapio } from './categoria-cardapio';
 
 export type FiltroCardapio = {
 	categoria: CategoriaCardapio;

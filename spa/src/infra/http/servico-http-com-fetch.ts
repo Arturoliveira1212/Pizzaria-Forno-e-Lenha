@@ -39,7 +39,7 @@ export class ServicoHttpComFetch implements ServicoHttp {
 		const data = await resposta.json();
 
 		if (!resposta.ok) {
-			throw new HttpError(`Erro ao realizar requisição`, resposta.status, data);
+			throw new HttpError(`Erro ao realizar requisição`, resposta.status, data.data);
 		}
 
 		return { status: resposta.status, data: data?.data };

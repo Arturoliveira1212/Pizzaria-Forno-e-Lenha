@@ -4,6 +4,7 @@ import { ServicoHttp } from '../../infra/http/servico-http';
 import { RepositorioError } from '../../infra/exceptions/repositorio-error';
 import { API } from '../../infra/constantes';
 import { PrecoPorTamanho } from '../dominio/preco-por-tamanho';
+import { HttpError } from '../../infra/exceptions/http-error';
 
 export class RepositorioPizzaNoServidor implements RepositorioPizza {
 	constructor(private readonly servicoHttp: ServicoHttp) {}
@@ -29,7 +30,8 @@ export class RepositorioPizzaNoServidor implements RepositorioPizza {
 				);
 			});
 		} catch (error) {
-			throw new RepositorioError(`Erro ao obter pizzas para cardápio: ${error}`);
+			const mensagemErro = error instanceof HttpError ? error.data?.erros?.join(', ') : 'Ocorreu um erro ao obter as pizzas para o cardápio.';
+			throw new RepositorioError(mensagemErro);
 		}
 
 		return pizzasParaCardapio;

@@ -11,11 +11,17 @@
 	<div class="row g-4">
 		<div class="col-lg-8">
 			<div class="tab-pane" id="etapa-produtos">
+				<p class="fw-medium small text-body-secondary mb-2">Cardápio</p>
 				<div class="d-flex align-items-center gap-4 mb-3" id="categorias-cardapio">
 					<div class="btn-group flex-shrink-0">
-						<button class="btn btn-outline-secondary active" data-categoria="pizza">Pizzas</button>
-						<button class="btn btn-outline-secondary" data-categoria="bebida">Bebidas</button>
-						<button class="btn btn-outline-secondary" data-categoria="sobremesa">Sobremesas</button>
+						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-pizza-radio" value="pizza" data-categoria="pizza" autocomplete="off" checked />
+						<label class="btn btn-outline-secondary" for="categoria-pizza-radio" data-categoria="pizza">Pizzas</label>
+
+						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-bebida-radio" value="bebida" data-categoria="bebida" autocomplete="off" />
+						<label class="btn btn-outline-secondary" for="categoria-bebida-radio" data-categoria="bebida">Bebidas</label>
+
+						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-sobremesa-radio" value="sobremesa" data-categoria="sobremesa" autocomplete="off" />
+						<label class="btn btn-outline-secondary" for="categoria-sobremesa-radio" data-categoria="sobremesa">Sobremesas</label>
 					</div>
 
 					<form id="formulario-filtro-cardapio">
@@ -41,7 +47,43 @@
 				</div>
 			</div>
 
-			<div class="tab-pane d-none" id="etapa-atendimento">Atendimento</div>
+			<div class="tab-pane d-none" id="etapa-atendimento">
+				<p class="fw-medium small text-body-secondary mb-2">Tipo atendimento</p>
+				<div class="btn-group mb-4" id="tipos-atendimento">
+					<input type="radio" class="btn-check" name="tipo-atendimento" id="tipo-balcao" value="BALCAO" autocomplete="off" checked />
+					<label class="btn btn-outline-secondary" for="tipo-balcao"> Balcão </label>
+
+					<input type="radio" class="btn-check" name="tipo-atendimento" id="tipo-entrega" value="ENTREGA" autocomplete="off" />
+					<label class="btn btn-outline-secondary" for="tipo-entrega"> Entrega </label>
+
+					<input type="radio" class="btn-check" name="tipo-atendimento" id="tipo-retirada" value="RETIRADA" autocomplete="off" />
+					<label class="btn btn-outline-secondary" for="tipo-retirada"> Retirada </label>
+				</div>
+
+				<p class="fw-medium small text-body-secondary mb-2">Cliente</p>
+				<div class="btn-group mb-3" id="tipos-cliente">
+					<input type="radio" class="btn-check" name="tipo-cliente" id="tipo-cliente-identificado" value="cliente-identificado" autocomplete="off" checked />
+					<label class="btn btn-outline-secondary" for="tipo-cliente-identificado"> Cliente </label>
+
+					<input type="radio" class="btn-check" name="tipo-cliente" id="tipo-consumidor-final" value="consumidor-final" autocomplete="off" />
+					<label class="btn btn-outline-secondary" for="tipo-consumidor-final"> Consumidor Final </label>
+				</div>
+
+				<div id="secao-cliente">
+					<form id="formulario-filtro-cliente" class="mb-3">
+						<div class="flex-grow-1">
+							<div class="input-group">
+								<input autofocus type="search" class="form-control" placeholder="Buscar por CPF ou nome" id="filtro-cliente" />
+								<button type="submit" class="btn btn-primary" id="botao-filtrar-cliente">Buscar</button>
+							</div>
+						</div>
+					</form>
+
+					<div class="list-group" id="lista-clientes"></div>
+				</div>
+
+				<div id="secao-consumidor-final" class="text-body-secondary small mb-3 d-none">Pedido sem cliente vinculado.</div>
+			</div>
 		</div>
 	</div>
 </div>
@@ -91,5 +133,19 @@
 		<div class="alert alert-secondary text-center mb-0">
 			<span class="mensagem"></span>
 		</div>
+	</div>
+</template>
+
+<template id="template-cliente">
+	<label class="list-group-item d-flex align-items-center gap-3">
+		<input class="form-check-input flex-shrink-0" type="radio" name="cliente" value="" />
+		<span class="flex-grow-1"></span>
+		<small class="text-body-secondary"></small>
+	</label>
+</template>
+
+<template id="template-cliente-erro">
+	<div class="alert alert-secondary text-center mb-0">
+		<span class="mensagem"></span>
 	</div>
 </template>
