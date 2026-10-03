@@ -14,3 +14,5 @@ Templates base para a tela de registrar pedido:
 - https://getbootstrap.com/docs/5.3/components/navs-tabs/
 - https://getbootstrap.com/docs/5.3/components/button-group/
 - https://getbootstrap.com/docs/5.3/forms/input-group/
+- https://getbootstrap.com/docs/5.3/components/card/
+- https://getbootstrap.com/docs/5.3/components/buttons/

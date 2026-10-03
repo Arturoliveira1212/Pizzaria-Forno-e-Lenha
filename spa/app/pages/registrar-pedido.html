@@ -18,24 +18,26 @@
 						<button class="btn btn-outline-secondary" data-categoria="sobremesa">Sobremesas</button>
 					</div>
 
-					<div class="flex-grow-1">
-						<div class="input-group" id="filtro">
-							<input autofocus type="search" class="form-control" placeholder="Buscar por ID ou nome" />
-							<button type="button" class="btn btn-primary" data-buscar>Buscar</button>
+					<form id="formulario-filtro-cardapio">
+						<div class="flex-grow-1">
+							<div class="input-group">
+								<input autofocus type="search" class="form-control" placeholder="Buscar por ID ou nome" id="filtro-cardapio" />
+								<button type="submit" class="btn btn-primary" id="botao-filtrar-cardapio">Buscar</button>
+							</div>
 						</div>
-					</div>
+					</form>
 				</div>
 
 				<div id="categoria-pizza">
-					<div class="row g-3">Pizzas</div>
+					<div class="row g-3"></div>
 				</div>
 
 				<div id="categoria-bebida" class="d-none">
-					<div class="row g-3">Bebidas</div>
+					<div class="row g-3"></div>
 				</div>
 
 				<div id="categoria-sobremesa" class="d-none">
-					<div class="row g-3">Sobremesas</div>
+					<div class="row g-3"></div>
 				</div>
 			</div>
 
@@ -43,3 +45,51 @@
 		</div>
 	</div>
 </div>
+
+<template id="template-card-pizza">
+	<div class="col-6">
+		<div class="card card-item h-100">
+			<img class="card-img-top" alt="" />
+			<div class="card-body d-flex flex-column">
+				<h5 class="card-title"></h5>
+				<p class="card-text text-muted"></p>
+
+				<div class="btn-group w-100 mb-3 tamanhos-pizza" role="group"></div>
+
+				<div class="d-flex justify-content-between align-items-center mt-auto">
+					<span class="fw-semibold"></span>
+					<button type="button" class="btn btn-primary btn-sm">+ Adicionar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template id="template-tamanho-pizza">
+	<input type="radio" class="btn-check" autocomplete="off" />
+	<label class="btn btn-outline-secondary btn-sm" for=""></label>
+</template>
+
+<template id="template-card-produto-simples">
+	<div class="col-6">
+		<div class="card card-item h-100">
+			<img class="card-img-top" alt="" />
+			<div class="card-body d-flex flex-column">
+				<h5 class="card-title"></h5>
+
+				<div class="d-flex justify-content-between align-items-center mt-auto">
+					<span class="fw-semibold"></span>
+					<button type="button" class="btn btn-primary btn-sm">+ Adicionar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template id="template-cardapio-erro">
+	<div class="col-12">
+		<div class="alert alert-secondary text-center mb-0">
+			<span class="mensagem"></span>
+		</div>
+	</div>
+</template>

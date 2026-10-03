@@ -26,12 +26,7 @@ export class ServicoHttpComFetch implements ServicoHttp {
 		return this.realizarRequisicao('DELETE', url, undefined, headers);
 	}
 
-	private async realizarRequisicao(
-		metodo: string,
-		url: string,
-		body?: unknown,
-		headers?: Record<string, string>,
-	): Promise<RespostaHttp> {
+	private async realizarRequisicao(metodo: string, url: string, body?: unknown, headers?: Record<string, string>): Promise<RespostaHttp> {
 		const resposta = await fetch(url, {
 			method: metodo,
 			headers: {

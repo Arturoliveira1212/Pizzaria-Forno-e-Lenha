@@ -24,10 +24,7 @@ export class RepositorioPizzaNoServidor implements RepositorioPizza {
 						pizza.id,
 						pizza.nome,
 						pizza.descricao,
-						pizza.precosPorTamanho.map(
-							(preco: any) => new PrecoPorTamanho(preco.id, preco.tamanho, preco.preco),
-						),
-						pizza.imagem,
+						pizza.precosPorTamanho.map((preco: any) => new PrecoPorTamanho(preco.id, preco.tamanhoPizza, preco.preco)),
 					),
 				);
 			});
