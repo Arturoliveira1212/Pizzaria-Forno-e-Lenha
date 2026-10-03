@@ -1,6 +1,7 @@
 import { ControladoraRegistroPedido } from '../controller/controladora-registro-pedido';
 import { CategoriaCardapio } from '../dominio/categoria-cardapio';
 import { EtapaPedido } from '../dominio/etapa-pedido';
+
 export class VisaoRegistroPedido {
 	private readonly controladoraRegistroPedido: ControladoraRegistroPedido;
 	private readonly menuEtapas = document.querySelector<HTMLElement>('#etapas')!;

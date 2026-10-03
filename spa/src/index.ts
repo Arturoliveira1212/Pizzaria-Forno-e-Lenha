@@ -3,7 +3,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import page from 'page';
 
-async function carregarHtml(arquivo: string): Promise<void> {
+async function carregarConteudo(arquivo: string, script?: () => void): Promise<void> {
 	const main = document.querySelector<HTMLElement>('main');
 	if (!main) {
 		console.error('Elemento não encontrado.');
@@ -17,24 +17,27 @@ async function carregarHtml(arquivo: string): Promise<void> {
 		}
 		const html = await response.text();
 		main.innerHTML = html;
+
+		if (script) {
+			script();
+		}
 	} catch (error) {
 		main.innerHTML = 'Não foi possível carregar o conteúdo.';
 	}
 }
 
 page('/', async () => {
-	await carregarHtml('/app/pages/home.html');
+	await carregarConteudo('/app/pages/home.html');
 });
 
 page.redirect('/home', '/');
 
 page('/pedido/registrar', async () => {
-	await carregarHtml('/app/pages/registrar-pedido.html');
-	await import('../app/js/registro-pedido.js');
+	await carregarConteudo('/app/pages/registrar-pedido.html', (await import('../app/js/registro-pedido.js')).default);
 });
 
 page('*', async () => {
-	await carregarHtml('/app/pages/404.html');
+	await carregarConteudo('/app/pages/404.html');
 });
 
 page();
