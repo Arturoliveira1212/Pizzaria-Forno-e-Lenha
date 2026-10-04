@@ -1,6 +1,6 @@
 <?php
 
-class Telefone {
+class Telefone implements JsonSerializable {
     public const TAMANHO_NUMERO_DE_TELEFONE_FIXO = 10;
     public const TAMANHO_NUMERO_DE_TELEFONE_CELULAR = 11;
 
@@ -21,5 +21,13 @@ class Telefone {
         $numero = substr($telefone, 2);
 
         return new self($ddd, $numero);
+    }
+
+    public function formatar(): string {
+        return "({$this->ddd}) {$this->numero}";
+    }
+
+    public function jsonSerialize(): mixed {
+        return $this->formatar();
     }
 }

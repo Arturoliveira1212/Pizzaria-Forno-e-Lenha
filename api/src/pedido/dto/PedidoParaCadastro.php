@@ -5,7 +5,7 @@ class PedidoParaCadastro {
      * @param ItemPizzaParaCadastro[]|ItemSimplesParaCadastro[] $itensPedido
      */
     public function __construct(
-        public readonly string $tipo,
+        public readonly string $tipoAtendimento,
         public readonly string $idCliente,
         public readonly array $itensPedido,
     ) {}
@@ -24,7 +24,7 @@ class PedidoParaCadastro {
         }, $dados['itensPedido'] ?? []);
 
         return new self(
-            tipo: $dados['tipo'] ?? '',
+            tipoAtendimento: $dados['tipoAtendimento'] ?? '',
             idCliente: $dados['idCliente'] ?? '',
             itensPedido: $itensPedido,
         );

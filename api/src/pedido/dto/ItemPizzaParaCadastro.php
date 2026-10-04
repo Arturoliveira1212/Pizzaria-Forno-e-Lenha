@@ -19,7 +19,7 @@ class ItemPizzaParaCadastro {
         }, $dados['saboresEscolhidos'] ?? []);
 
         return new self(
-            tamanho: $dados['tamanho'] ?? '',
+            tamanho: $dados['tamanhoPizza'] ?? '',
             quantidade: isset($dados['quantidade']) ? (int) $dados['quantidade'] : 0,
             saboresEscolhidos: $saboresEscolhidos,
         );

@@ -31,9 +31,9 @@ class GestorPedido {
     }
 
     private function criarPedido(PedidoParaCadastro $pedidoParaCadastro): Pedido {
-        $tipoAtendimento = TipoAtendimento::tryFrom($pedidoParaCadastro->tipo);
+        $tipoAtendimento = TipoAtendimento::tryFrom($pedidoParaCadastro->tipoAtendimento);
         if ($tipoAtendimento === null) {
-            throw new DominioException("Tipo de atendimento inválido: {$pedidoParaCadastro->tipo}.");
+            throw new DominioException("Tipo de atendimento inválido: {$pedidoParaCadastro->tipoAtendimento}.");
         }
 
         [$itensPizzaParaCadastro, $itensSimplesParaCadastro] = $pedidoParaCadastro->obterItensPorTipo();
@@ -120,10 +120,26 @@ class GestorPedido {
                 continue;
             }
 
+            $ingredientesEscolhidos = [];
+
+            foreach ($pizza->ingredientesPadrao as $ingredientePadrao) {
+                $ingredientesEscolhidos[] = new IngredienteEscolhido(
+                    id: 0,
+                    ingrediente: $ingredientePadrao->ingrediente,
+                    papel: PapelIngrediente::PADRAO,
+                    custoAdicional: Dinheiro::zero(),
+                );
+            }
+
+            /*
+            FIXME => Código comentado temporarriamente pois no escopo da P1, não tem mais personalização, então preenchemos com os ingredientes padrão da pizza.
+                Na P2, descomentar o trecho abaixo e os testes.
+
             $ingredientesEscolhidos = $this->criarIngredientesEscolhidos(
                 pizza: $pizza,
                 ingredientesEscolhidosParaCadastro: $saborEscolhidoParaCadastro->ingredientesEscolhidos,
             );
+            */
 
             try {
                 $saborEscolhido = new SaborEscolhido(

@@ -2,7 +2,7 @@
 
 class PizzaParaCardapio {
     /**
-     * @param PrecoPorTamanhoParaCardapio[] $precosPorTamanho
+     * @param PrecoPorTamanho[] $precosPorTamanho
      */
     public function __construct(
         public readonly int $id,

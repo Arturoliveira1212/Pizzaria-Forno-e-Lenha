@@ -1,6 +1,9 @@
 <?php
 
 class DominioException extends RuntimeException {
+    /**
+     * @return string[]
+     */
     public function erros(): array {
         return explode('|', $this->getMessage());
     }

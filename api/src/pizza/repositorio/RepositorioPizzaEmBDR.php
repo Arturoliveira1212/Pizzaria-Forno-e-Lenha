@@ -23,7 +23,7 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
                     id: $idPizza,
                     nome: $linha['nome'],
                     descricao: $linha['descricao'],
-                    precosPorTamanho: $this->criarPrecosParaCardapio($precos[$idPizza] ?? []),
+                    precosPorTamanho: $precos[$idPizza] ?? [],
                 );
             }
 
@@ -149,21 +149,6 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
                 preco: new Dinheiro((int) $linha['preco']),
             );
         });
-    }
-
-    /**
-     * @param PrecoPorTamanho[] $precos
-     * @return PrecoPorTamanhoParaCardapio[]
-     */
-    private function criarPrecosParaCardapio(array $precos): array {
-        return array_map(
-            fn(PrecoPorTamanho $preco): PrecoPorTamanhoParaCardapio => new PrecoPorTamanhoParaCardapio(
-                id: $preco->id,
-                tamanhoPizza: $preco->tamanhoPizza->value,
-                preco: $preco->preco->converterParaReais(),
-            ),
-            $precos,
-        );
     }
 
     /**

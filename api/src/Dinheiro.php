@@ -1,6 +1,6 @@
 <?php
 
-class Dinheiro {
+class Dinheiro implements JsonSerializable {
     public const MENOR_VALOR_PERMITIDO = 0;
 
     public function __construct(
@@ -81,5 +81,9 @@ class Dinheiro {
 
     public function formatar(): string {
         return 'R$ ' . number_format($this->centavos / 100, 2, ',', '.');
+    }
+
+    public function jsonSerialize(): mixed {
+        return $this->converterParaReais();
     }
 }
