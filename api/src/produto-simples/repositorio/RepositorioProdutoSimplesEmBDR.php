@@ -6,10 +6,98 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
     ) {}
 
     public function obterProdutosSimples(FiltroProdutoSimples $filtro): array {
-        return [];
+        try {
+            $parametros = [];
+            $resultado = $this->bancoDados->consultar($this->gerarQuery($filtro, $parametros), $parametros);
+            if (empty($resultado)) {
+                return [];
+            }
+
+            $produtosSimples = [];
+            foreach ($resultado as $linha) {
+                $produtosSimples[] = new ProdutoSimples(
+                    id: (int) $linha['id'],
+                    nome: $linha['nome'],
+                    descricao: $linha['descricao'],
+                    tipo: TipoProdutoSimples::from($linha['tipo']),
+                    preco: new Dinheiro((int) $linha['preco']),
+                );
+            }
+
+            return $produtosSimples;
+        } catch (Throwable $e) {
+            throw new RepositorioException('Erro ao obter os produtos.');
+        }
     }
 
+    /**
+     * @param int $idProduto
+     * @return ProdutoSimples|null
+     */
     public function obterProdutoSimplesPorId(int $idProduto): ?ProdutoSimples {
-        return null;
+        try {
+            $sql = 'SELECT
+                produto_simples.id,
+                produto_simples.nome,
+                produto_simples.descricao,
+                produto_simples.tipo,
+                produto_simples.preco
+                    FROM produto_simples
+                        WHERE produto_simples.id = :id';
+
+            $resultado = $this->bancoDados->consultar($sql, [
+                'id' => $idProduto,
+            ]);
+            if (empty($resultado)) {
+                return null;
+            }
+
+            $linha = $resultado[0];
+
+            return new ProdutoSimples(
+                id: (int) $linha['id'],
+                nome: $linha['nome'],
+                descricao: $linha['descricao'],
+                tipo: TipoProdutoSimples::from($linha['tipo']),
+                preco: new Dinheiro((int) $linha['preco']),
+            );
+        } catch (Throwable $e) {
+            throw new RepositorioException('Erro ao obter produto por ID.');
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $parametros
+     */
+    private function gerarQuery(FiltroProdutoSimples $filtro, array &$parametros): string {
+        $query = 'SELECT
+            produto_simples.id,
+            produto_simples.nome,
+            produto_simples.descricao,
+            produto_simples.tipo,
+            produto_simples.preco
+                FROM produto_simples
+                    WHERE 1=1';
+
+        if ($filtro->identificador !== '') {
+            $query .= ' AND (produto_simples.nome LIKE :nome OR produto_simples.id = :id)';
+
+            $parametros['nome'] = "%{$filtro->identificador}%";
+            $parametros['id'] = $filtro->identificador;
+        }
+
+        if ($filtro->tipo !== null) {
+            $query .= ' AND produto_simples.tipo = :tipo';
+            $parametros['tipo'] = $filtro->tipo->value;
+        }
+
+        if ($filtro->paginacao !== null) {
+            $limite = $filtro->paginacao->limite;
+            $offset = ($filtro->paginacao->pagina - 1) * $limite;
+
+            $query .= " LIMIT {$limite} OFFSET {$offset}";
+        }
+
+        return $query;
     }
 }
