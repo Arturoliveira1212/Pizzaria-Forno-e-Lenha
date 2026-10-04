@@ -14,13 +14,13 @@ $gestorPedido = new GestorPedido(
     new RepositorioConfiguracaoFidelidadeEmBDR($bancoDados),
 );
 
-$app->post('/pedidos/descontos', function (HttpRequest $request, HttpResponse $response) use ($gestorPedido) {
+$app->post('/pedidos/valores', function (HttpRequest $request, HttpResponse $response) use ($gestorPedido) {
     try {
         $pedidoParaCadastro = PedidoParaCadastro::criarComArray((array) $request->body());
-        $resumoDescontos = $gestorPedido->obterResumoDescontos($pedidoParaCadastro);
+        $resumoValores = $gestorPedido->obterResumoValores($pedidoParaCadastro);
 
         $response->status(200)->json(['message' => 'Resumo dos descontos obtido com sucesso.', 'data' => [
-            'resumoDescontos' => $resumoDescontos,
+            'resumoValores' => $resumoValores,
         ]]);
     } catch (DominioException $e) {
         $response->status(400)->json(['message' => 'Erro ao validar pedido.', 'data' => [

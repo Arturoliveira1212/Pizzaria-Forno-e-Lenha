@@ -9,7 +9,7 @@ class ResumoValoresPedido {
         public readonly Dinheiro $taxaEntrega,
         public readonly Dinheiro $valorTotal,
         public readonly array $promocoes = [],
-        public readonly ?ResumoDescontoFidelidade $fidelidade,
+        public readonly ?ResumoDescontoFidelidade $fidelidade = null,
     ) {}
 
     public static function criarComEntidade(Pedido $pedido, Dinheiro $taxaEntrega): ResumoValoresPedido {

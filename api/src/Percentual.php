@@ -1,6 +1,6 @@
 <?php
 
-class Percentual {
+class Percentual implements JsonSerializable {
     public const MENOR_VALOR_PERMITIDO = 1;
     public const MAIOR_VALOR_PERMITIDO = 100;
 
@@ -36,5 +36,9 @@ class Percentual {
 
     public function subtrairDe(Dinheiro $valor): Dinheiro {
         return $valor->subtrair($this->calcularSobre($valor));
+    }
+
+    public function jsonSerialize(): mixed {
+        return $this->valor;
     }
 }

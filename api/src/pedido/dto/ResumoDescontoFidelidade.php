@@ -2,14 +2,14 @@
 
 class ResumoDescontoFidelidade {
     public function __construct(
-        public readonly float $valorDesconto,
-        public readonly int $percentualDesconto,
+        public readonly Dinheiro $valorDesconto,
+        public readonly Percentual $percentualDesconto,
     ) {}
 
     public static function criarComEntidade(DescontoFidelidade $descontoFidelidade): ResumoDescontoFidelidade {
         return new self(
-            valorDesconto: $descontoFidelidade->valorDesconto->converterParaReais(),
-            percentualDesconto: $descontoFidelidade->beneficioFidelidade->percentualDesconto->valor,
+            valorDesconto: $descontoFidelidade->valorDesconto,
+            percentualDesconto: $descontoFidelidade->beneficioFidelidade->percentualDesconto,
         );
     }
 }
