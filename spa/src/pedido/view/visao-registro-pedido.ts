@@ -445,6 +445,8 @@ export class VisaoRegistroPedido {
 	}
 
 	exibirErroNoPedido(mensagem: string): void {
+		this.tituloCarrinho.querySelector('.alert')?.remove();
+
 		const template = document.querySelector<HTMLTemplateElement>('#template-pedido-erro')!.content.cloneNode(true) as DocumentFragment;
 		const mensagemErro = template.querySelector<HTMLElement>('.mensagem')!;
 		mensagemErro.textContent = mensagem;
