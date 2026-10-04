@@ -5,3 +5,4 @@ output/
 .env
 .php-cs-fixer.cache
 teste.php
+test-results/
