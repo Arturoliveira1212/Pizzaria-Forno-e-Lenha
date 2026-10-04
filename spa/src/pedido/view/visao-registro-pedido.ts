@@ -14,6 +14,7 @@ import { ItemPizza } from '../dominio/item-pizza';
 import { ItemSimples } from '../dominio/item-simples';
 import { Pedido } from '../dominio/pedido';
 import { formatarDinheiro } from '../../util/dinheiro';
+import page from 'page';
 
 export class VisaoRegistroPedido {
 	private readonly controladoraRegistroPedido: ControladoraRegistroPedido;
@@ -169,6 +170,7 @@ export class VisaoRegistroPedido {
 				return;
 			}
 
+			this.botaoRegistrarPedido.disabled = true;
 			this.controladoraRegistroPedido.registrarPedido();
 		});
 	}
@@ -453,6 +455,10 @@ export class VisaoRegistroPedido {
 		}, 5000);
 	}
 
+	habilitarRegistroPedido(): void {
+		this.botaoRegistrarPedido.disabled = false;
+	}
+
 	exibirResumoPedido(pedido: Pedido): void {
 		const itensPedido = pedido.itensPedido;
 		const avisoCarrinhoVazio = document.querySelector<HTMLElement>('#aviso-vazio')!;
@@ -549,6 +555,13 @@ export class VisaoRegistroPedido {
 	}
 
 	exibirPedidoRegistrado(): void {
-		alert('Pedido registrado com sucesso.');
+		const template = document.querySelector<HTMLTemplateElement>('#template-pedido-sucesso')!.content.cloneNode(true) as DocumentFragment;
+		const aviso = template.querySelector<HTMLElement>('.mensagem')!;
+		aviso.textContent = 'Pedido registrado com sucesso.';
+		this.tituloCarrinho.append(template);
+
+		window.setTimeout(() => {
+			page('/home');
+		}, 1000);
 	}
 }

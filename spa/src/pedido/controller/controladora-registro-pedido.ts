@@ -153,6 +153,7 @@ export class ControladoraRegistroPedido {
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível registrar o pedido.';
 			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+			this.visaoRegistroPedido.habilitarRegistroPedido();
 		}
 	}
 }
