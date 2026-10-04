@@ -10,6 +10,6 @@ export class Pizza {
 		public readonly descricao: string = '',
 		public readonly precosPorTamanho: PrecoPorTamanho[] = [],
 	) {
-		this.imagem = `${API}/produto.webp`;
+		this.imagem = `${API}/assets/pizza/${id}.jpg`;
 	}
 }
