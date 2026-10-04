@@ -13,6 +13,7 @@ import { Cliente } from '../../cliente/dominio/cliente';
 import { ItemPizza } from '../dominio/item-pizza';
 import { ItemSimples } from '../dominio/item-simples';
 import { Pedido } from '../dominio/pedido';
+import { formatarDinheiro } from '../../util/dinheiro';
 
 export class VisaoRegistroPedido {
 	private readonly controladoraRegistroPedido: ControladoraRegistroPedido;
@@ -298,7 +299,7 @@ export class VisaoRegistroPedido {
 
 		const label = template.querySelector<HTMLLabelElement>('label')!;
 		label.htmlFor = input.id;
-		label.textContent = `${rotuloTamanho(precoPorTamanho.tamanhoPizza)} - R$ ${precoPorTamanho.preco.toFixed(2)}`;
+		label.textContent = `${rotuloTamanho(precoPorTamanho.tamanhoPizza)} - ${formatarDinheiro(precoPorTamanho.preco)}`;
 
 		return template;
 	}
@@ -338,7 +339,7 @@ export class VisaoRegistroPedido {
 		card.querySelector('.card-title')!.textContent = produto.nome;
 
 		const precoSpan = card.querySelector<HTMLElement>('.preco')!;
-		precoSpan.textContent = `R$ ${produto.preco.toFixed(2)}`;
+		precoSpan.textContent = formatarDinheiro(produto.preco);
 
 		return template;
 	}
@@ -466,19 +467,19 @@ export class VisaoRegistroPedido {
 		}, 0);
 
 		const divSubtotal = document.querySelector<HTMLElement>('#subtotal')!;
-		divSubtotal.textContent = `R$ ${subtotal.toFixed(2)}`;
+		divSubtotal.textContent = formatarDinheiro(subtotal);
 
 		const divValorDescontoPromocao = document.querySelector<HTMLElement>('#valor-desconto-promocao')!;
-		divValorDescontoPromocao.textContent = `-${pedido.valorDescontoPromocao.toFixed(2)}`;
+		divValorDescontoPromocao.textContent = `-${formatarDinheiro(pedido.valorDescontoPromocao)}`;
 
 		const divValorDescontoFidelidade = document.querySelector<HTMLElement>('#valor-desconto-fidelidade')!;
-		divValorDescontoFidelidade.textContent = `-${pedido.valorDescontoFidelidade.toFixed(2)}`;
+		divValorDescontoFidelidade.textContent = `-${formatarDinheiro(pedido.valorDescontoFidelidade)}`;
 
 		const divTaxaEntrega = document.querySelector<HTMLElement>('#valor-entrega')!;
-		divTaxaEntrega.textContent = `R$ ${pedido.taxaEntrega.toFixed(2)}`;
+		divTaxaEntrega.textContent = formatarDinheiro(pedido.taxaEntrega);
 
 		const divValorTotal = document.querySelector<HTMLElement>('#valor-total')!;
-		divValorTotal.textContent = `R$ ${pedido.valorTotal.toFixed(2)}`;
+		divValorTotal.textContent = formatarDinheiro(pedido.valorTotal);
 
 		const secaoEntrega = document.querySelector<HTMLElement>('#secao-entrega')!;
 		secaoEntrega.classList.toggle('d-none', pedido.tipoAtendimento !== TipoAtendimento.ENTREGA);
@@ -507,7 +508,7 @@ export class VisaoRegistroPedido {
 		inputQuantidade.value = String(item.quantidade);
 
 		const divPrecoItem = elemento.querySelector<HTMLElement>('.preco-item')!;
-		divPrecoItem.textContent = `R$ ${item.preco.toFixed(2)}`;
+		divPrecoItem.textContent = formatarDinheiro(item.preco);
 
 		return template;
 	}
@@ -527,7 +528,7 @@ export class VisaoRegistroPedido {
 		inputQuantidade.value = String(item.quantidade);
 
 		const divPrecoItem = elemento.querySelector<HTMLElement>('.preco-item')!;
-		divPrecoItem.textContent = `R$ ${item.preco.toFixed(2)}`;
+		divPrecoItem.textContent = formatarDinheiro(item.preco);
 
 		return template;
 	}
