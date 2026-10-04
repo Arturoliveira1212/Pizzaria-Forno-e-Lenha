@@ -87,7 +87,7 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
             cliente.id,
             cliente.nome,
             cliente.telefone,
-            cliente.cpf,
+            cliente.cpf
                 FROM cliente
                     WHERE 1=1';
 
