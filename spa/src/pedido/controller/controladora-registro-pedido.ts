@@ -145,4 +145,14 @@ export class ControladoraRegistroPedido {
 			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
 		}
 	}
+
+	async registrarPedido(): Promise<void> {
+		try {
+			await this.gestorPedido.registrarPedido();
+			this.visaoRegistroPedido.exibirPedidoRegistrado();
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível registrar o pedido.';
+			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+		}
+	}
 }

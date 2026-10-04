@@ -26,6 +26,15 @@ export class RepositorioPedidoNoServidor implements RepositorioPedido {
 		}
 	}
 
+	async registrarPedido(pedido: Pedido): Promise<void> {
+		try {
+			await this.servicoHttp.post(`${API}/pedidos`, this.obterCorpoRequisicaoParaPedido(pedido));
+		} catch (error) {
+			const mensagemErro = error instanceof HttpError ? error.data?.erros?.join(', ') : 'Ocorreu um erro ao registrar o pedido.';
+			throw new RepositorioError(mensagemErro);
+		}
+	}
+
 	private obterCorpoRequisicaoParaPedido(pedido: Pedido): any {
 		const itensPedido = pedido.itensPedido.map((item) => {
 			if (item instanceof ItemPizza) {

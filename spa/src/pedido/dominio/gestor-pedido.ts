@@ -8,6 +8,7 @@ import { ResumoValoresPedido } from './resumo-valores-pedido';
 import { Pizza } from '../../pizza/dominio/pizza';
 import { Cliente } from '../../cliente/dominio/cliente';
 import { TipoAtendimento } from './tipo-atendimento';
+import { DominioError } from '../../infra/exceptions/dominio-error';
 
 export class GestorPedido {
 	private pedidoAtual: Pedido = new Pedido();
@@ -73,8 +74,17 @@ export class GestorPedido {
 		return this.pedidoAtual;
 	}
 
+	async registrarPedido(): Promise<void> {
+		if (this.pedidoAtual.estaVazio()) {
+			throw new DominioError('Não é possível registrar um pedido sem itens.');
+		}
+
+		await this.repositorioPedido.registrarPedido(this.pedidoAtual);
+	}
+
 	private async atualizarPedido(): Promise<void> {
 		if (this.pedidoAtual.estaVazio()) {
+			this.pedidoAtual = this.pedidoAtual.criarNovoPedidoComValores(new ResumoValoresPedido(0, 0, 0, 0, 0));
 			return;
 		}
 

@@ -17,6 +17,7 @@ import { formatarDinheiro } from '../../util/dinheiro';
 
 export class VisaoRegistroPedido {
 	private readonly controladoraRegistroPedido: ControladoraRegistroPedido;
+	private etapaAtual: EtapaPedido = EtapaPedido.PRODUTOS;
 	private readonly menuEtapas = document.querySelector<HTMLElement>('#etapas')!;
 	private readonly menuCategoriasCardapio = document.querySelector<HTMLElement>('#categorias-cardapio')!;
 	private readonly inputFiltroCardapio = this.menuCategoriasCardapio.querySelector<HTMLInputElement>('#filtro-cardapio')!;
@@ -28,6 +29,7 @@ export class VisaoRegistroPedido {
 	private readonly listaItensPedido = document.querySelector<HTMLElement>('#lista-itens-pedido')!;
 	private readonly tituloCarrinho = document.querySelector<HTMLElement>('#titulo-carrinho')!;
 	private readonly listaClientes = document.querySelector<HTMLElement>('#lista-clientes')!;
+	private readonly botaoRegistrarPedido = document.querySelector<HTMLButtonElement>('#botao-registrar-pedido')!;
 
 	constructor() {
 		this.controladoraRegistroPedido = new ControladoraRegistroPedido(this);
@@ -160,12 +162,25 @@ export class VisaoRegistroPedido {
 				this.controladoraRegistroPedido.removerItem(indice);
 			}
 		});
+
+		this.botaoRegistrarPedido.addEventListener('click', () => {
+			if (this.etapaAtual !== EtapaPedido.ATENDIMENTO) {
+				this.exibirErroNoPedido('Avance para a etapa de atendimento para registrar o pedido.');
+				return;
+			}
+
+			this.controladoraRegistroPedido.registrarPedido();
+		});
 	}
 
 	private exibirEtapa(etapa: EtapaPedido) {
+		this.etapaAtual = etapa;
+
 		this.menuEtapas.querySelectorAll<HTMLElement>('[data-etapa]').forEach((btn) => {
 			btn.classList.toggle('active', btn.dataset.etapa === etapa);
 		});
+
+		this.botaoRegistrarPedido.disabled = etapa !== EtapaPedido.ATENDIMENTO;
 
 		Object.values(EtapaPedido).forEach((valor) => {
 			document.querySelector(`#etapa-${valor}`)?.classList.toggle('d-none', valor !== etapa);
@@ -531,5 +546,9 @@ export class VisaoRegistroPedido {
 		divPrecoItem.textContent = formatarDinheiro(item.preco);
 
 		return template;
+	}
+
+	exibirPedidoRegistrado(): void {
+		alert('Pedido registrado com sucesso.');
 	}
 }
