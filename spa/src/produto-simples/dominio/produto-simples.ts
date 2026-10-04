@@ -11,6 +11,6 @@ export class ProdutoSimples {
 		public readonly tipo: TipoProdutoSimples,
 		public readonly preco: number,
 	) {
-		this.imagem = `${API}/produto.webp`;
+		this.imagem = `${API}/assets/produto-simples/${id}.jpg`;
 	}
 }

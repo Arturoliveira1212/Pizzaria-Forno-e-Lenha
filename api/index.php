@@ -10,6 +10,28 @@ use function phputil\cors\cors;
 require_once 'vendor/autoload.php';
 
 try {
+    $caminho = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+
+    if (
+        is_string($caminho) && str_starts_with($caminho, '/assets/') && !str_contains($caminho, '..')
+    ) {
+        $arquivo = __DIR__ . $caminho;
+
+        if (!is_file($arquivo)) {
+            http_response_code(404);
+            exit;
+        }
+
+        header('Content-Type: image/jpeg');
+        readfile($arquivo);
+        exit;
+    }
+} catch (Throwable $e) {
+    http_response_code(404);
+    exit;
+}
+
+try {
     $dotenv = Dotenv::createImmutable(__DIR__);
     $dotenv->load();
 
