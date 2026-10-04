@@ -85,7 +85,7 @@ test.describe('Registro de pedido', () => {
 	//     Dado que estou na tela de registro de pedido
 	//     Quando acesso a etapa "Produtos", filtro pela categoria "Pizzas" e por "Catupiry" e seleciono o tamanho "Grande" e clico em adicionar
 	//     Então deve aparecer no resumo lateral a pizza "Frango com Catupiry" no tamanho "Grande"
-	test.only('Adição de pizza com tamanho diferente do padrão', async () => {
+	test('Adição de pizza com tamanho diferente do padrão', async () => {
 		await tela.selecionarEtapaProdutos();
 		await tela.buscarPizza('Catupiry');
 		await tela.selecionarTamanhoPizza('Frango com Catupiry', 'G');
