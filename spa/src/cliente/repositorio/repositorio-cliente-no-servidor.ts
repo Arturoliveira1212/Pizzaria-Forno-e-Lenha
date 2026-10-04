@@ -14,7 +14,6 @@ export class RepositorioClienteNoServidor implements RepositorioCliente {
 		try {
 			const parametros = new URLSearchParams();
 			parametros.set('identificador', identificador);
-			parametros.set('cardapio', '1');
 
 			const resultado = await this.servicoHttp.get(`${API}/clientes?${parametros.toString()}`);
 

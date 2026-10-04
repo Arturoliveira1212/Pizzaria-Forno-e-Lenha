@@ -10,6 +10,9 @@ import { FiltroCardapio } from '../filtro-cardapio';
 import { TipoAtendimento } from '../dominio/tipo-atendimento';
 import { TipoCliente } from '../tipo-cliente';
 import { Cliente } from '../../cliente/dominio/cliente';
+import { ItemPizza } from '../dominio/item-pizza';
+import { ItemSimples } from '../dominio/item-simples';
+import { Pedido } from '../dominio/pedido';
 
 export class VisaoRegistroPedido {
 	private readonly controladoraRegistroPedido: ControladoraRegistroPedido;
@@ -21,6 +24,8 @@ export class VisaoRegistroPedido {
 	private readonly secaoCliente = document.querySelector<HTMLElement>('#secao-cliente')!;
 	private readonly inputFiltroCliente = this.secaoCliente.querySelector<HTMLInputElement>('#filtro-cliente')!;
 	private readonly secaoConsumidorFinal = document.querySelector<HTMLElement>('#secao-consumidor-final')!;
+	private readonly listaItensPedido = document.querySelector<HTMLElement>('#lista-itens-pedido')!;
+	private readonly tituloCarrinho = document.querySelector<HTMLElement>('#titulo-carrinho')!;
 
 	constructor() {
 		this.controladoraRegistroPedido = new ControladoraRegistroPedido(this);
@@ -89,6 +94,70 @@ export class VisaoRegistroPedido {
 			event.preventDefault();
 			this.controladoraRegistroPedido.obterClientes();
 		});
+
+		const secaoPizza = document.querySelector<HTMLElement>('#secao-pizza')!;
+		secaoPizza.addEventListener('click', (event: Event) => {
+			const elementoClicado = event.target as HTMLElement;
+			const botao = elementoClicado.closest<HTMLButtonElement>('.adicionar-item');
+			if (!botao) {
+				return;
+			}
+
+			const card = botao.closest<HTMLElement>('.card-item')!;
+			const itemPizza = this.obterDadosDoItemPizza(card);
+			if (!itemPizza) {
+				return;
+			}
+
+			this.controladoraRegistroPedido.adicionarItemPizza(itemPizza);
+		});
+
+		const secoesProdutosSimples = ['#secao-bebida', '#secao-sobremesa'];
+		secoesProdutosSimples.forEach((seletorSecao) => {
+			document.querySelector<HTMLElement>(seletorSecao)!.addEventListener('click', (event: Event) => {
+				const elementoClicado = event.target as HTMLElement;
+				const botao = elementoClicado.closest<HTMLButtonElement>('.adicionar-item');
+				if (!botao) {
+					return;
+				}
+
+				const card = botao.closest<HTMLElement>('.card-item')!;
+				const itemSimples = this.obterDadosDoItemSimples(card);
+				if (!itemSimples) {
+					return;
+				}
+
+				this.controladoraRegistroPedido.adicionarItemSimples(itemSimples);
+			});
+		});
+
+		const listaClientes = document.querySelector<HTMLElement>('#lista-clientes')!;
+		listaClientes.addEventListener('change', (event: Event) => {
+			const radio = event.target as HTMLInputElement;
+			if (radio.name !== 'cliente' || !radio.checked) {
+				return;
+			}
+
+			const idCliente = radio.value;
+			this.controladoraRegistroPedido.adicionarCliente(idCliente);
+		});
+
+		this.listaItensPedido.addEventListener('click', (event: Event) => {
+			const elementoClicado = event.target as HTMLElement;
+			const item = elementoClicado.closest<HTMLElement>('.item-pedido');
+			if (!item) {
+				return;
+			}
+
+			const indice = Number(item.dataset.indice);
+			if (elementoClicado.closest('.aumentar-quantidade')) {
+				this.controladoraRegistroPedido.alterarQuantidade(indice, 1);
+			} else if (elementoClicado.closest('.diminuir-quantidade')) {
+				this.controladoraRegistroPedido.alterarQuantidade(indice, -1);
+			} else if (elementoClicado.closest('.remover')) {
+				this.controladoraRegistroPedido.removerItem(indice);
+			}
+		});
 	}
 
 	private exibirEtapa(etapa: EtapaPedido) {
@@ -107,7 +176,7 @@ export class VisaoRegistroPedido {
 		this.limparInputEAdicionarFoco(this.inputFiltroCardapio);
 
 		Object.values(CategoriaCardapio).forEach((valor) => {
-			document.querySelector(`#categoria-${valor}`)?.classList.toggle('d-none', valor !== categoria);
+			document.querySelector(`#secao-${valor}`)?.classList.toggle('d-none', valor !== categoria);
 		});
 	}
 
@@ -130,6 +199,10 @@ export class VisaoRegistroPedido {
 		const ehConsumidorFinal = tipoCliente === TipoCliente.CONSUMIDOR_FINAL;
 		this.secaoCliente.classList.toggle('d-none', ehConsumidorFinal);
 		this.secaoConsumidorFinal.classList.toggle('d-none', !ehConsumidorFinal);
+
+		if (tipoCliente === TipoCliente.CONSUMIDOR_FINAL) {
+			this.controladoraRegistroPedido.removerCliente();
+		}
 	}
 
 	private limparInputEAdicionarFoco(input: HTMLInputElement): void {
@@ -178,14 +251,14 @@ export class VisaoRegistroPedido {
 
 	exibirPizzasNoCardapio(pizzas: Pizza[]) {
 		this.exibirCardsNoCardapio(
-			'#categoria-pizza > .row',
+			'#secao-pizza > .row',
 			pizzas.map((pizza) => this.criarCardPizza(pizza)),
 			'Nenhuma pizza encontrada.',
 		);
 	}
 
 	exibirErroAoObterPizzasParaCardapio(mensagem: string) {
-		this.exibirErroNoCardapio('#categoria-pizza > .row', mensagem);
+		this.exibirErroNoCardapio('#secao-pizza > .row', mensagem);
 	}
 
 	private criarCardPizza(pizza: Pizza): DocumentFragment {
@@ -193,6 +266,7 @@ export class VisaoRegistroPedido {
 
 		const card = template.querySelector<HTMLElement>('.card-item')!;
 		card.dataset.idPizza = String(pizza.id);
+		card.dataset.nome = pizza.nome;
 
 		const img = card.querySelector<HTMLImageElement>('.card-img-top')!;
 		img.src = pizza.imagem;
@@ -213,10 +287,11 @@ export class VisaoRegistroPedido {
 		const template = document.querySelector<HTMLTemplateElement>('#template-tamanho-pizza')!.content.cloneNode(true) as DocumentFragment;
 
 		const input = template.querySelector<HTMLInputElement>('input[type="radio"]')!;
-		input.id = `tamamnho-${idPizza}-${precoPorTamanho.tamanhoPizza}`;
+		input.id = `tamanho-${idPizza}-${precoPorTamanho.tamanhoPizza}`;
 		input.name = `tamanho-pizza-${idPizza}`;
 		input.value = precoPorTamanho.tamanhoPizza;
 		input.checked = selecionado;
+		input.dataset.preco = String(precoPorTamanho.preco);
 
 		const label = template.querySelector<HTMLLabelElement>('label')!;
 		label.htmlFor = input.id;
@@ -242,7 +317,7 @@ export class VisaoRegistroPedido {
 	}
 
 	private obterSeletorDivCardapioProdutosSimples(tipo: TipoProdutoSimples): string {
-		return tipo === TipoProdutoSimples.BEBIDA ? '#categoria-bebida' : '#categoria-sobremesa';
+		return tipo === TipoProdutoSimples.BEBIDA ? '#secao-bebida' : '#secao-sobremesa';
 	}
 
 	private criarCardProdutoSimples(produto: ProdutoSimples): DocumentFragment {
@@ -250,6 +325,8 @@ export class VisaoRegistroPedido {
 
 		const card = template.querySelector<HTMLElement>('.card-item')!;
 		card.dataset.idProduto = String(produto.id);
+		card.dataset.nome = produto.nome;
+		card.dataset.preco = String(produto.preco);
 
 		const img = card.querySelector<HTMLImageElement>('.card-img-top')!;
 		img.src = produto.imagem;
@@ -257,7 +334,7 @@ export class VisaoRegistroPedido {
 
 		card.querySelector('.card-title')!.textContent = produto.nome;
 
-		const precoSpan = card.querySelector<HTMLElement>('.fw-semibold')!;
+		const precoSpan = card.querySelector<HTMLElement>('.preco')!;
 		precoSpan.textContent = `R$ ${produto.preco.toFixed(2)}`;
 
 		return template;
@@ -303,6 +380,9 @@ export class VisaoRegistroPedido {
 		input.id = `cliente-${cliente.id}`;
 		input.name = 'cliente';
 		input.value = String(cliente.id);
+		input.dataset.nome = cliente.nome;
+		input.dataset.telefone = cliente.telefone;
+		input.dataset.cpf = cliente.cpf;
 
 		const label = template.querySelector<HTMLLabelElement>('label')!;
 		const span = label.querySelector<HTMLSpanElement>('span')!;
@@ -310,6 +390,135 @@ export class VisaoRegistroPedido {
 
 		const small = label.querySelector<HTMLSpanElement>('small')!;
 		small.textContent = cliente.telefone;
+
+		return template;
+	}
+
+	private obterDadosDoItemPizza(card: HTMLElement) {
+		const tamanhoSelecionado = card.querySelector<HTMLInputElement>('input[name^="tamanho-pizza-"]:checked');
+		if (!tamanhoSelecionado) {
+			return;
+		}
+
+		return {
+			quantidade: 1,
+			tamanho: tamanhoSelecionado.value,
+			preco: Number(tamanhoSelecionado.dataset.preco),
+			saboresEscolhidos: [
+				{
+					idPizza: Number(card.dataset.idPizza),
+					nome: card.dataset.nome ?? '',
+				},
+			],
+		};
+	}
+
+	private obterDadosDoItemSimples(card: HTMLElement) {
+		return {
+			quantidade: 1,
+			idProduto: Number(card.dataset.idProduto),
+			nome: card.dataset.nome ?? '',
+			preco: Number(card.dataset.preco),
+		};
+	}
+
+	exibirErroNoPedido(mensagem: string): void {
+		const template = document.querySelector<HTMLTemplateElement>('#template-pedido-erro')!.content.cloneNode(true) as DocumentFragment;
+		const mensagemErro = template.querySelector<HTMLElement>('.mensagem')!;
+		mensagemErro.textContent = mensagem;
+
+		this.tituloCarrinho.append(template);
+
+		window.setTimeout(() => {
+			this.tituloCarrinho.querySelector('.alert')?.remove();
+		}, 5000);
+	}
+
+	exibirResumoPedido(pedido: Pedido): void {
+		const itensPedido = pedido.itensPedido;
+		const avisoCarrinhoVazio = document.querySelector<HTMLElement>('#aviso-vazio')!;
+
+		this.listaItensPedido.innerHTML = '';
+		avisoCarrinhoVazio.classList.toggle('d-none', itensPedido.length > 0);
+
+		const totalUnidades = itensPedido.reduce((soma, item) => soma + item.quantidade, 0);
+		this.tituloCarrinho.textContent = `Carrinho (${totalUnidades} ${totalUnidades === 1 ? 'item' : 'itens'})`;
+
+		const fragmento = document.createDocumentFragment();
+		itensPedido.forEach((item, indice) => {
+			if (item instanceof ItemPizza) {
+				fragmento.appendChild(this.criarItemPizzaNoResumo(item, indice));
+			} else if (item instanceof ItemSimples) {
+				fragmento.appendChild(this.criarItemSimplesNoResumo(item, indice));
+			}
+		});
+
+		this.listaItensPedido.appendChild(fragmento);
+		this.atualizarValoresResumo(pedido);
+	}
+
+	private atualizarValoresResumo(pedido: Pedido): void {
+		const subtotal = pedido.itensPedido.reduce((total, item) => {
+			return total + (item instanceof ItemPizza || item instanceof ItemSimples ? item.preco * item.quantidade : 0);
+		}, 0);
+
+		const divSubtotal = document.querySelector<HTMLElement>('#subtotal')!;
+		divSubtotal.textContent = `R$ ${subtotal.toFixed(2)}`;
+
+		const divValorDescontoPromocao = document.querySelector<HTMLElement>('#valor-desconto-promocao')!;
+		divValorDescontoPromocao.textContent = `-${pedido.valorDescontoPromocao.toFixed(2)}`;
+
+		const divValorDescontoFidelidade = document.querySelector<HTMLElement>('#valor-desconto-fidelidade')!;
+		divValorDescontoFidelidade.textContent = `-${pedido.valorDescontoFidelidade.toFixed(2)}`;
+
+		const divValorTotal = document.querySelector<HTMLElement>('#valor-total')!;
+		divValorTotal.textContent = `R$ ${pedido.valorTotal.toFixed(2)}`;
+
+		const secaoPromocoes = document.querySelector<HTMLElement>('#secao-promocoes')!;
+		secaoPromocoes.classList.toggle('d-none', pedido.valorDescontoPromocao <= 0);
+
+		const secaoFidelidade = document.querySelector<HTMLElement>('#secao-fidelidade')!;
+		secaoFidelidade.classList.toggle('d-none', pedido.valorDescontoFidelidade <= 0);
+	}
+
+	private criarItemPizzaNoResumo(item: ItemPizza, indice: number): DocumentFragment {
+		const template = document.querySelector<HTMLTemplateElement>('#template-item-pedido')!.content.cloneNode(true) as DocumentFragment;
+		const elemento = template.querySelector<HTMLElement>('.item-pedido')!;
+		elemento.dataset.indice = String(indice);
+
+		const pizzas = item.saboresEscolhidos.map((sabor) => sabor.pizza.nome);
+
+		const divNomeItem = elemento.querySelector<HTMLElement>('.nome-item')!;
+		divNomeItem.textContent = `Pizza ${rotuloTamanho(item.tamanhoPizza)}`;
+
+		const divSaboresItem = elemento.querySelector<HTMLElement>('.sabores-item')!;
+		divSaboresItem.textContent = pizzas.join(' / ');
+
+		const inputQuantidade = elemento.querySelector<HTMLInputElement>('.quantidade-item')!;
+		inputQuantidade.value = String(item.quantidade);
+
+		const divPrecoItem = elemento.querySelector<HTMLElement>('.preco-item')!;
+		divPrecoItem.textContent = `R$ ${item.preco.toFixed(2)}`;
+
+		return template;
+	}
+
+	private criarItemSimplesNoResumo(item: ItemSimples, indice: number): DocumentFragment {
+		const template = document.querySelector<HTMLTemplateElement>('#template-item-pedido')!.content.cloneNode(true) as DocumentFragment;
+		const elemento = template.querySelector<HTMLElement>('.item-pedido')!;
+		elemento.dataset.indice = String(indice);
+
+		const divNomeItem = elemento.querySelector<HTMLElement>('.nome-item')!;
+		divNomeItem.textContent = item.nome;
+
+		const divSaboresItem = elemento.querySelector<HTMLElement>('.sabores-item')!;
+		divSaboresItem.textContent = '';
+
+		const inputQuantidade = elemento.querySelector<HTMLInputElement>('.quantidade-item')!;
+		inputQuantidade.value = String(item.quantidade);
+
+		const divPrecoItem = elemento.querySelector<HTMLElement>('.preco-item')!;
+		divPrecoItem.textContent = `R$ ${item.preco.toFixed(2)}`;
 
 		return template;
 	}

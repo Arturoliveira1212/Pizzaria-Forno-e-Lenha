@@ -10,6 +10,7 @@ import { GestorProdutoSimples } from '../../produto-simples/dominio/gestor-produ
 import { RepositorioProdutoSimplesNoServidor } from '../../produto-simples/repositorio/repositorio-produto-simples-no-servidor';
 import { GestorCliente } from '../../cliente/dominio/gestor-cliente';
 import { RepositorioClienteNoServidor } from '../../cliente/repositorio/repositorio-cliente-no-servidor';
+
 export class ControladoraRegistroPedido {
 	private readonly visaoRegistroPedido: VisaoRegistroPedido;
 	private readonly gestorPedido: GestorPedido;
@@ -71,6 +72,66 @@ export class ControladoraRegistroPedido {
 		} catch (erro) {
 			const mensagemErro = erro instanceof Error ? erro.message : 'Ocorreu um erro ao obter as pizzas para o cardápio.';
 			this.visaoRegistroPedido.exibirErroAoObterClientes(mensagemErro);
+		}
+	}
+
+	async adicionarItemPizza(item: { quantidade: number; tamanho: string; preco: number; saboresEscolhidos: { idPizza: number; nome: string }[] }): Promise<void> {
+		try {
+			const pedido = await this.gestorPedido.adicionarItemPizza(item);
+			this.visaoRegistroPedido.exibirResumoPedido(pedido);
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar o produto ao pedido.';
+			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+		}
+	}
+
+	async adicionarItemSimples(item: { quantidade: number; idProduto: number; nome: string; preco: number }): Promise<void> {
+		try {
+			const pedido = await this.gestorPedido.adicionarItemSimples(item);
+			this.visaoRegistroPedido.exibirResumoPedido(pedido);
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar o produto ao pedido.';
+			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+		}
+	}
+
+	async adicionarCliente(idCliente: string): Promise<void> {
+		try {
+			const pedido = await this.gestorPedido.adicionarCliente(idCliente);
+			this.visaoRegistroPedido.exibirResumoPedido(pedido);
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar o cliente ao pedido.';
+			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+		}
+	}
+
+	async removerCliente(): Promise<void> {
+		try {
+			const pedido = await this.gestorPedido.removerCliente();
+			this.visaoRegistroPedido.exibirResumoPedido(pedido);
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível remover o cliente do pedido.';
+			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+		}
+	}
+
+	async alterarQuantidade(indice: number, delta: number): Promise<void> {
+		try {
+			const pedido = await this.gestorPedido.alterarQuantidade(indice, delta);
+			this.visaoRegistroPedido.exibirResumoPedido(pedido);
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível alterar a quantidade do item.';
+			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+		}
+	}
+
+	async removerItem(indice: number): Promise<void> {
+		try {
+			const pedido = await this.gestorPedido.removerItem(indice);
+			this.visaoRegistroPedido.exibirResumoPedido(pedido);
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível remover o item.';
+			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
 		}
 	}
 }

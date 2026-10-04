@@ -34,15 +34,15 @@
 					</form>
 				</div>
 
-				<div id="categoria-pizza">
+				<div id="secao-pizza">
 					<div class="row g-3"></div>
 				</div>
 
-				<div id="categoria-bebida" class="d-none">
+				<div id="secao-bebida" class="d-none">
 					<div class="row g-3"></div>
 				</div>
 
-				<div id="categoria-sobremesa" class="d-none">
+				<div id="secao-sobremesa" class="d-none">
 					<div class="row g-3"></div>
 				</div>
 			</div>
@@ -85,6 +85,42 @@
 				<div id="secao-consumidor-final" class="text-body-secondary small mb-3 d-none">Pedido sem cliente vinculado.</div>
 			</div>
 		</div>
+
+		<div class="col-lg-4">
+			<div class="card shadow-sm sticky-top">
+				<div class="card-body">
+					<p class="fw-medium small text-body-secondary mb-2" id="titulo-carrinho">Carrinho (0 itens)</p>
+
+					<div id="lista-itens-pedido" class="mb-2"></div>
+					<div id="aviso-vazio" class="text-body-secondary small py-3 text-center">Nenhum item adicionado</div>
+
+					<div class="border-top pt-2 mt-2 small">
+						<div class="d-flex justify-content-between">
+							<span class="text-body-secondary">Subtotal</span>
+							<span id="subtotal">R$ 0,00</span>
+						</div>
+						<div class="d-flex justify-content-between d-none" id="secao-entrega">
+							<span class="text-body-secondary">Taxa de entrega</span>
+							<span id="valor-entrega">R$ 10,00</span>
+						</div>
+						<div class="d-flex justify-content-between text-success d-none" id="secao-promocoes">
+							<span>Desconto Promoção</span>
+							<span id="valor-desconto-promocao">-R$ 0,00</span>
+						</div>
+						<div class="d-flex justify-content-between text-success d-none" id="secao-fidelidade">
+							<span>Desconto Fidelidade</span>
+							<span id="valor-desconto-fidelidade">-R$ 0,00</span>
+						</div>
+					</div>
+					<div class="d-flex justify-content-between fw-semibold fs-5 border-top pt-2 mt-2">
+						<span>Total</span>
+						<span id="valor-total">R$ 0,00</span>
+					</div>
+
+					<button class="btn btn-primary w-100 mt-3" id="botao-registrar-pedido">Registrar pedido</button>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -100,7 +136,7 @@
 
 				<div class="d-flex justify-content-between align-items-center mt-auto">
 					<span class="fw-semibold"></span>
-					<button type="button" class="btn btn-primary btn-sm">+ Adicionar</button>
+					<button type="button" class="btn btn-primary btn-sm adicionar-item">+ Adicionar</button>
 				</div>
 			</div>
 		</div>
@@ -120,8 +156,8 @@
 				<h5 class="card-title"></h5>
 
 				<div class="d-flex justify-content-between align-items-center mt-auto">
-					<span class="fw-semibold"></span>
-					<button type="button" class="btn btn-primary btn-sm">+ Adicionar</button>
+					<span class="fw-semibold preco"></span>
+					<button type="button" class="btn btn-primary btn-sm adicionar-item">+ Adicionar</button>
 				</div>
 			</div>
 		</div>
@@ -146,6 +182,45 @@
 
 <template id="template-cliente-erro">
 	<div class="alert alert-secondary text-center mb-0">
+		<span class="mensagem"></span>
+	</div>
+</template>
+
+<template id="template-mensagem-erro">
+	<div class="toast text-bg-danger border-0">
+		<div class="d-flex">
+			<div class="toast-body mensagem"></div>
+			<button type="button" class="btn-close btn-close-white me-2 m-auto"></button>
+		</div>
+	</div>
+</template>
+
+<template id="template-item-pedido">
+	<div class="border rounded p-2 mb-2 item-pedido">
+		<div class="row align-items-center g-2">
+			<div class="col-4 small text-start text-truncate">
+				<div class="fw-medium nome-item"></div>
+				<div class="text-body-secondary sabores-item text-truncate"></div>
+			</div>
+
+			<div class="col-4 d-flex justify-content-center">
+				<div class="input-group input-group-sm w-100">
+					<button type="button" class="btn btn-outline-secondary diminuir-quantidade">&minus;</button>
+					<input type="text" class="form-control text-center px-1 quantidade-item" readonly />
+					<button type="button" class="btn btn-outline-secondary aumentar-quantidade">+</button>
+				</div>
+			</div>
+
+			<div class="col-4 d-flex flex-column align-items-end text-end">
+				<button type="button" class="btn btn-sm btn-outline-danger border-0 p-0 remover">&times;</button>
+				<span class="small fw-medium text-nowrap preco-item"></span>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template id="template-pedido-erro">
+	<div class="alert alert-secondary text-center mb-2">
 		<span class="mensagem"></span>
 	</div>
 </template>
