@@ -18,9 +18,9 @@ final class CriaTabelaPedido extends AbstractMigration {
                     'CANCELADO'
                 ) NOT NULL DEFAULT 'RECEBIDO',
                 tipoAtendimento ENUM('BALCAO', 'ENTREGA', 'RETIRADA') NOT NULL,
-                clienteId INT NULL,
+                idCliente INT NULL,
                 CONSTRAINT fk_pedido_cliente
-                    FOREIGN KEY (clienteId) REFERENCES cliente(id)
+                    FOREIGN KEY (idCliente) REFERENCES cliente(id)
                     ON DELETE SET NULL ON UPDATE CASCADE
             ) ENGINE=INNODB;
         SQL;

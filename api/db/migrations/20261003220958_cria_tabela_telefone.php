@@ -7,12 +7,12 @@ final class CriaTabelaTelefone extends AbstractMigration {
         $sql = <<<'SQL'
             CREATE TABLE telefone (
                 id INT PRIMARY KEY AUTO_INCREMENT,
-                clienteId INT NOT NULL,
+                idCliente INT NOT NULL,
                 ddd VARCHAR(3) NOT NULL,
                 numero VARCHAR(20) NOT NULL,
-                UNIQUE KEY uq_telefone_cliente (clienteId),
+                UNIQUE KEY uq_telefone_cliente (idCliente),
                 CONSTRAINT fk_telefone_cliente
-                    FOREIGN KEY (clienteId) REFERENCES cliente(id)
+                    FOREIGN KEY (idCliente) REFERENCES cliente(id)
                     ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=INNODB;
         SQL;
