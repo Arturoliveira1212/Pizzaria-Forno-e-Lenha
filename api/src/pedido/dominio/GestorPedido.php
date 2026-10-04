@@ -24,10 +24,13 @@ class GestorPedido {
         return $pedido;
     }
 
-    public function obterResumoDescontos(PedidoParaCadastro $pedidoParaCadastro): ResumoDescontosPedido {
+    public function obterResumoValores(PedidoParaCadastro $pedidoParaCadastro): ResumoValoresPedido {
         $pedido = $this->criarPedido($pedidoParaCadastro);
+        $taxaEntrega = $pedido->tipoAtendimento === TipoAtendimento::ENTREGA
+            ? new Dinheiro(Entrega::TAXA_ENTREGA_FIXA_EM_CENTAVOS)
+            : Dinheiro::zero();
 
-        return ResumoDescontosPedido::criarComEntidade($pedido);
+        return ResumoValoresPedido::criarComEntidade($pedido, $taxaEntrega);
     }
 
     private function criarPedido(PedidoParaCadastro $pedidoParaCadastro): Pedido {

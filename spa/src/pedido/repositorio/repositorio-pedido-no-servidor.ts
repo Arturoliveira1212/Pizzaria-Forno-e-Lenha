@@ -4,22 +4,22 @@ import { API } from '../../infra/constantes';
 import { RepositorioError } from '../../infra/exceptions/repositorio-error';
 import { HttpError } from '../../infra/exceptions/http-error';
 import { Pedido } from '../dominio/pedido';
-import { ResumoDescontosPedido } from '../dominio/resumo-descontos-pedido';
 import { ItemPizza } from '../dominio/item-pizza';
 import { ItemSimples } from '../dominio/item-simples';
+import { ResumoValoresPedido } from '../dominio/resumo-valores-pedido';
 
 export class RepositorioPedidoNoServidor implements RepositorioPedido {
 	constructor(private readonly servicoHttp: ServicoHttp) {}
 
-	async obterResumoDescontos(pedido: Pedido): Promise<ResumoDescontosPedido> {
+	async obterResumoValores(pedido: Pedido): Promise<ResumoValoresPedido> {
 		try {
-			const resultado = await this.servicoHttp.post(`${API}/pedidos/descontos`, this.obterCorpoRequisicaoParaPedido(pedido));
+			const resultado = await this.servicoHttp.post(`${API}/pedidos/valores`, this.obterCorpoRequisicaoParaPedido(pedido));
 
-			const resumo = resultado.data.resumoDescontos;
+			const resumo = resultado.data.resumoValores;
 			const valorTotalPromocao = resumo.promocoes.map((promocao: { valorDesconto: number }) => promocao.valorDesconto).reduce((total: number, valor: number) => total + valor, 0);
 			const valorTotalFidelidade = resumo.fidelidade?.valorDesconto ?? 0;
 
-			return new ResumoDescontosPedido(valorTotalPromocao, valorTotalFidelidade, resumo.valorTotal);
+			return new ResumoValoresPedido(valorTotalPromocao, valorTotalFidelidade, resumo.valorTotalDescontos, resumo.taxaEntrega, resumo.valorTotal);
 		} catch (error) {
 			const mensagemErro = error instanceof HttpError ? error.data?.erros?.join(', ') : 'Ocorreu um erro ao obter o resumo de descontos do pedido.';
 			throw new RepositorioError(mensagemErro);

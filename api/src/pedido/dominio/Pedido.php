@@ -66,6 +66,20 @@ class Pedido {
         return $this->descontoFidelidade instanceof DescontoFidelidade;
     }
 
+    public function calcularValorDescontos(): Dinheiro {
+        $valorDescontos = Dinheiro::zero();
+
+        foreach ($this->descontosPromocao as $descontoPromocao) {
+            $valorDescontos = $valorDescontos->somar($descontoPromocao->valorDesconto);
+        }
+
+        if ($this->descontoFidelidade instanceof DescontoFidelidade) {
+            $valorDescontos = $valorDescontos->somar($this->descontoFidelidade->valorDesconto);
+        }
+
+        return $valorDescontos;
+    }
+
     public function calcularValorTotal(): Dinheiro {
         $valorTotal = Dinheiro::zero();
 
@@ -73,13 +87,7 @@ class Pedido {
             $valorTotal = $valorTotal->somar($itemPedido->calcularPrecoTotal());
         }
 
-        foreach ($this->descontosPromocao as $descontoPromocao) {
-            $valorTotal = $valorTotal->subtrair($descontoPromocao->valorDesconto);
-        }
-
-        if ($this->descontoFidelidade instanceof DescontoFidelidade) {
-            $valorTotal = $valorTotal->subtrair($this->descontoFidelidade->valorDesconto);
-        }
+        $valorTotal = $valorTotal->subtrair($this->calcularValorDescontos());
 
         return $valorTotal;
     }

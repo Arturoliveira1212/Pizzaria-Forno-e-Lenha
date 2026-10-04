@@ -4,7 +4,7 @@ import { ItemPizza } from './item-pizza';
 import { ItemSimples } from './item-simples';
 import { SaborEscolhido } from './sabor-escolhido';
 import { TamanhoPizza } from '../../pizza/dominio/tamanho-pizza';
-import { ResumoDescontosPedido } from './resumo-descontos-pedido';
+import { ResumoValoresPedido } from './resumo-valores-pedido';
 import { Pizza } from '../../pizza/dominio/pizza';
 import { Cliente } from '../../cliente/dominio/cliente';
 
@@ -70,11 +70,11 @@ export class GestorPedido {
 			return;
 		}
 
-		const resumoDescontos = await this.obterResumoDescontos(this.pedidoAtual);
-		this.pedidoAtual = this.pedidoAtual.criarNovoPedidoComDescontos(resumoDescontos);
+		const resumoValores = await this.obterResumoValores(this.pedidoAtual);
+		this.pedidoAtual = this.pedidoAtual.criarNovoPedidoComValores(resumoValores);
 	}
 
-	private obterResumoDescontos(pedido: Pedido): Promise<ResumoDescontosPedido> {
-		return this.repositorioPedido.obterResumoDescontos(pedido);
+	private obterResumoValores(pedido: Pedido): Promise<ResumoValoresPedido> {
+		return this.repositorioPedido.obterResumoValores(pedido);
 	}
 }

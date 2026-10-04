@@ -1,6 +1,6 @@
 import { Pedido } from '../dominio/pedido';
-import { ResumoDescontosPedido } from '../dominio/resumo-descontos-pedido';
+import { ResumoValoresPedido } from '../dominio/resumo-valores-pedido';
 
 export interface RepositorioPedido {
-	obterResumoDescontos(Pedido: Pedido): Promise<ResumoDescontosPedido>;
+	obterResumoValores(pedido: Pedido): Promise<ResumoValoresPedido>;
 }

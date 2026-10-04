@@ -2,7 +2,7 @@ import { Cliente } from '../../cliente/dominio/cliente';
 import { ItemPedido } from './item-pedido';
 import { ItemPizza } from './item-pizza';
 import { ItemSimples } from './item-simples';
-import { ResumoDescontosPedido } from './resumo-descontos-pedido';
+import { ResumoValoresPedido } from './resumo-valores-pedido';
 import { TipoAtendimento } from './tipo-atendimento';
 import { DominioError } from '../../infra/exceptions/dominio-error';
 
@@ -101,15 +101,8 @@ export class Pedido {
 		return new Pedido(this.tipoAtendimento, cliente, this.itensPedido, this.valorDescontoPromocao, this.valorDescontoFidelidade, this.valorTotal);
 	}
 
-	criarNovoPedidoComDescontos(resumoDescontosPedido: ResumoDescontosPedido): Pedido {
-		return new Pedido(
-			this.tipoAtendimento,
-			this.cliente,
-			this.itensPedido,
-			resumoDescontosPedido.valorDescontoPromocao,
-			resumoDescontosPedido.valorDescontoFidelidade,
-			resumoDescontosPedido.valorTotal,
-		);
+	criarNovoPedidoComValores(resumoValoresPedido: ResumoValoresPedido): Pedido {
+		return new Pedido(this.tipoAtendimento, this.cliente, this.itensPedido, resumoValoresPedido.valorDescontoPromocao, resumoValoresPedido.valorDescontoFidelidade, resumoValoresPedido.valorTotal);
 	}
 
 	estaVazio(): boolean {
