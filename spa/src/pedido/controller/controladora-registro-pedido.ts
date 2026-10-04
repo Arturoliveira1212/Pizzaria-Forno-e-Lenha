@@ -10,6 +10,7 @@ import { GestorProdutoSimples } from '../../produto-simples/dominio/gestor-produ
 import { RepositorioProdutoSimplesNoServidor } from '../../produto-simples/repositorio/repositorio-produto-simples-no-servidor';
 import { GestorCliente } from '../../cliente/dominio/gestor-cliente';
 import { RepositorioClienteNoServidor } from '../../cliente/repositorio/repositorio-cliente-no-servidor';
+import { TipoAtendimento } from '../dominio/tipo-atendimento';
 
 export class ControladoraRegistroPedido {
 	private readonly visaoRegistroPedido: VisaoRegistroPedido;
@@ -131,6 +132,16 @@ export class ControladoraRegistroPedido {
 			this.visaoRegistroPedido.exibirResumoPedido(pedido);
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível remover o item.';
+			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+		}
+	}
+
+	async atualizarTipoAtendimento(tipoAtendimento: TipoAtendimento): Promise<void> {
+		try {
+			const pedido = await this.gestorPedido.atualizarTipoAtendimento(tipoAtendimento);
+			this.visaoRegistroPedido.exibirResumoPedido(pedido);
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível atualizar o tipo de atendimento.';
 			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
 		}
 	}

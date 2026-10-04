@@ -1,7 +1,7 @@
 <?php
 
 class Entrega {
-    public const TAXA_ENTREGA_FIXA_EM_CENTAVOS = 100;
+    public const TAXA_ENTREGA_FIXA_EM_CENTAVOS = 1000;
 
     public function __construct(
         public readonly int $id,

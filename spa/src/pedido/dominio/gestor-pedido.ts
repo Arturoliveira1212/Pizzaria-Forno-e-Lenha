@@ -7,9 +7,10 @@ import { TamanhoPizza } from '../../pizza/dominio/tamanho-pizza';
 import { ResumoValoresPedido } from './resumo-valores-pedido';
 import { Pizza } from '../../pizza/dominio/pizza';
 import { Cliente } from '../../cliente/dominio/cliente';
+import { TipoAtendimento } from './tipo-atendimento';
 
 export class GestorPedido {
-	private pedidoAtual = new Pedido();
+	private pedidoAtual: Pedido = new Pedido();
 
 	constructor(private readonly repositorioPedido: RepositorioPedido) {}
 
@@ -60,6 +61,13 @@ export class GestorPedido {
 
 	async removerItem(indice: number): Promise<Pedido> {
 		this.pedidoAtual.removerItem(indice);
+		await this.atualizarPedido();
+
+		return this.pedidoAtual;
+	}
+
+	async atualizarTipoAtendimento(tipoAtendimento: TipoAtendimento): Promise<Pedido> {
+		this.pedidoAtual = this.pedidoAtual.criarNovoPedidoComTipoAtendimento(tipoAtendimento);
 		await this.atualizarPedido();
 
 		return this.pedidoAtual;

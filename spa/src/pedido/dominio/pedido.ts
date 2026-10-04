@@ -12,6 +12,7 @@ export class Pedido {
 	public readonly itensPedido: ItemPedido[] = [];
 	public readonly valorDescontoPromocao: number = 0;
 	public readonly valorDescontoFidelidade: number = 0;
+	public readonly taxaEntrega: number = 0;
 	public readonly valorTotal: number = 0;
 
 	constructor(
@@ -20,6 +21,7 @@ export class Pedido {
 		itensPedido: ItemPedido[] = [],
 		valorDescontoPromocao: number = 0,
 		valorDescontoFidelidade: number = 0,
+		taxaEntrega: number = 0,
 		valorTotal: number = 0,
 	) {
 		this.tipoAtendimento = tipoAtendimento;
@@ -27,6 +29,7 @@ export class Pedido {
 		this.itensPedido = itensPedido;
 		this.valorDescontoPromocao = valorDescontoPromocao;
 		this.valorDescontoFidelidade = valorDescontoFidelidade;
+		this.taxaEntrega = taxaEntrega;
 		this.valorTotal = valorTotal;
 	}
 
@@ -98,11 +101,23 @@ export class Pedido {
 	}
 
 	criarNovoPedidoComCliente(cliente?: Cliente): Pedido {
-		return new Pedido(this.tipoAtendimento, cliente, this.itensPedido, this.valorDescontoPromocao, this.valorDescontoFidelidade, this.valorTotal);
+		return new Pedido(this.tipoAtendimento, cliente, this.itensPedido, this.valorDescontoPromocao, this.valorDescontoFidelidade, this.taxaEntrega, this.valorTotal);
 	}
 
 	criarNovoPedidoComValores(resumoValoresPedido: ResumoValoresPedido): Pedido {
-		return new Pedido(this.tipoAtendimento, this.cliente, this.itensPedido, resumoValoresPedido.valorDescontoPromocao, resumoValoresPedido.valorDescontoFidelidade, resumoValoresPedido.valorTotal);
+		return new Pedido(
+			this.tipoAtendimento,
+			this.cliente,
+			this.itensPedido,
+			resumoValoresPedido.valorDescontoPromocao,
+			resumoValoresPedido.valorDescontoFidelidade,
+			resumoValoresPedido.taxaEntrega,
+			resumoValoresPedido.valorTotal,
+		);
+	}
+
+	criarNovoPedidoComTipoAtendimento(tipoAtendimento: TipoAtendimento): Pedido {
+		return new Pedido(tipoAtendimento, this.cliente, this.itensPedido, this.valorDescontoPromocao, this.valorDescontoFidelidade, this.taxaEntrega, this.valorTotal);
 	}
 
 	estaVazio(): boolean {

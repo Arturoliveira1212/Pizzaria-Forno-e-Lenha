@@ -26,6 +26,7 @@ export class VisaoRegistroPedido {
 	private readonly secaoConsumidorFinal = document.querySelector<HTMLElement>('#secao-consumidor-final')!;
 	private readonly listaItensPedido = document.querySelector<HTMLElement>('#lista-itens-pedido')!;
 	private readonly tituloCarrinho = document.querySelector<HTMLElement>('#titulo-carrinho')!;
+	private readonly listaClientes = document.querySelector<HTMLElement>('#lista-clientes')!;
 
 	constructor() {
 		this.controladoraRegistroPedido = new ControladoraRegistroPedido(this);
@@ -74,6 +75,7 @@ export class VisaoRegistroPedido {
 
 			this.atualizarRestricoesTipoAtendimento();
 			this.limparInputEAdicionarFoco(this.inputFiltroCliente);
+			this.controladoraRegistroPedido.atualizarTipoAtendimento(radio.value as TipoAtendimento);
 		});
 
 		this.menuTiposCliente.addEventListener('change', (event: Event) => {
@@ -131,8 +133,7 @@ export class VisaoRegistroPedido {
 			});
 		});
 
-		const listaClientes = document.querySelector<HTMLElement>('#lista-clientes')!;
-		listaClientes.addEventListener('change', (event: Event) => {
+		this.listaClientes.addEventListener('change', (event: Event) => {
 			const radio = event.target as HTMLInputElement;
 			if (radio.name !== 'cliente' || !radio.checked) {
 				return;
@@ -202,6 +203,8 @@ export class VisaoRegistroPedido {
 
 		if (tipoCliente === TipoCliente.CONSUMIDOR_FINAL) {
 			this.controladoraRegistroPedido.removerCliente();
+		} else {
+			this.listaClientes.textContent = '';
 		}
 	}
 
@@ -471,8 +474,14 @@ export class VisaoRegistroPedido {
 		const divValorDescontoFidelidade = document.querySelector<HTMLElement>('#valor-desconto-fidelidade')!;
 		divValorDescontoFidelidade.textContent = `-${pedido.valorDescontoFidelidade.toFixed(2)}`;
 
+		const divTaxaEntrega = document.querySelector<HTMLElement>('#valor-entrega')!;
+		divTaxaEntrega.textContent = `R$ ${pedido.taxaEntrega.toFixed(2)}`;
+
 		const divValorTotal = document.querySelector<HTMLElement>('#valor-total')!;
 		divValorTotal.textContent = `R$ ${pedido.valorTotal.toFixed(2)}`;
+
+		const secaoEntrega = document.querySelector<HTMLElement>('#secao-entrega')!;
+		secaoEntrega.classList.toggle('d-none', pedido.tipoAtendimento !== TipoAtendimento.ENTREGA);
 
 		const secaoPromocoes = document.querySelector<HTMLElement>('#secao-promocoes')!;
 		secaoPromocoes.classList.toggle('d-none', pedido.valorDescontoPromocao <= 0);

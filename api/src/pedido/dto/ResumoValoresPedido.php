@@ -20,13 +20,14 @@ class ResumoValoresPedido {
         $resumoFidelidade = $pedido->descontoFidelidade
             ? ResumoDescontoFidelidade::criarComEntidade($pedido->descontoFidelidade)
             : null;
+        $valorTotal = $pedido->calcularValorTotal()->somar($taxaEntrega);
 
         return new self(
             promocoes: $resumoDescontosPromocao,
             fidelidade: $resumoFidelidade,
             valorTotalDescontos: $pedido->calcularValorDescontos(),
             taxaEntrega: $taxaEntrega,
-            valorTotal: $pedido->calcularValorTotal(),
+            valorTotal: $valorTotal,
         );
     }
 }
