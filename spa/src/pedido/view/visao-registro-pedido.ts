@@ -38,6 +38,7 @@ export class VisaoRegistroPedido {
 
 	iniciar() {
 		this.registrarEventos();
+		this.limparInputEAdicionarFoco(this.inputFiltroCardapio);
 		this.controladoraRegistroPedido.obterCardapio();
 	}
 
