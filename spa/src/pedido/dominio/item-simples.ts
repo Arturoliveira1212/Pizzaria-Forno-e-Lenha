@@ -5,9 +5,9 @@ export class ItemSimples extends ItemPedido {
 		quantidade: number,
 		public readonly idProduto: number,
 		public readonly nome: string,
-		public readonly preco: number,
+		preco: number,
 	) {
-		super(quantidade);
+		super(quantidade, preco);
 	}
 
 	criarItemSimplesComNovaQuantidade(quantidade: number): ItemSimples {

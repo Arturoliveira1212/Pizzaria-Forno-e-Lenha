@@ -7,9 +7,9 @@ export class ItemPizza extends ItemPedido {
 		quantidade: number,
 		public readonly saboresEscolhidos: SaborEscolhido[],
 		public readonly tamanhoPizza: TamanhoPizza,
-		public readonly preco: number,
+		preco: number,
 	) {
-		super(quantidade);
+		super(quantidade, preco);
 	}
 
 	criarItemPizzaComNovaQuantidade(quantidade: number): ItemPizza {
