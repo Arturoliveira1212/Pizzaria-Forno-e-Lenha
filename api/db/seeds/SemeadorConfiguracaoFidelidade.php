@@ -10,7 +10,7 @@ class SemeadorConfiguracaoFidelidade extends AbstractSeed {
     public function run(): void {
         $sql = <<<SQL
             INSERT INTO configuracao_fidelidade (valorMinimo, percentualDesconto, validadeEmDias) VALUES
-                (5000, 10, 30);
+                (10000, 5, 7);
         SQL;
         $this->execute($sql);
     }
