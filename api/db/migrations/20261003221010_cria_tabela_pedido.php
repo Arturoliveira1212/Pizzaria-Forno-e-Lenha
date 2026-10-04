@@ -9,6 +9,7 @@ final class CriaTabelaPedido extends AbstractMigration {
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 data DATETIME NOT NULL,
                 valorTotal INT NOT NULL DEFAULT 0,
+                taxaEntrega INT NOT NULL DEFAULT 0,
                 status ENUM(
                     'RECEBIDO',
                     'EM_PREPARACAO',

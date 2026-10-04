@@ -18,6 +18,7 @@ class Pedido {
         public readonly ?DescontoFidelidade $descontoFidelidade = null,
         public readonly ?Entrega $entrega = null,
         public readonly ?Cancelamento $cancelamento = null,
+        public readonly ?Dinheiro $taxaEntrega = null,
     ) {
         $this->validar();
     }
@@ -80,6 +81,12 @@ class Pedido {
         return $valorDescontos;
     }
 
+    public function calcularValorEntrega(): Dinheiro {
+        return $this->tipoAtendimento === TipoAtendimento::ENTREGA
+            ? new Dinheiro(Entrega::TAXA_ENTREGA_FIXA_EM_CENTAVOS)
+            : Dinheiro::zero();
+    }
+
     public function calcularValorTotal(): Dinheiro {
         $valorTotal = Dinheiro::zero();
 
@@ -88,6 +95,7 @@ class Pedido {
         }
 
         $valorTotal = $valorTotal->subtrair($this->calcularValorDescontos());
+        $valorTotal = $valorTotal->somar($this->calcularValorEntrega());
 
         return $valorTotal;
     }

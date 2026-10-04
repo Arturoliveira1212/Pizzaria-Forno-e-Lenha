@@ -10,7 +10,7 @@ final class CriaTabelaIngredienteEscolhido extends AbstractMigration {
                 saborEscolhidoId INT NOT NULL,
                 ingredienteId INT NOT NULL,
                 custo INT NOT NULL,
-                papel ENUM('FIXO', 'ADICIONAL') NOT NULL,
+                papel ENUM('PADRAO', 'SUBSTITUTO', 'ADICIONAL') NOT NULL,
                 CONSTRAINT fk_ingrediente_escolhido_sabor
                     FOREIGN KEY (saborEscolhidoId) REFERENCES sabor_escolhido(id)
                     ON DELETE CASCADE ON UPDATE CASCADE,

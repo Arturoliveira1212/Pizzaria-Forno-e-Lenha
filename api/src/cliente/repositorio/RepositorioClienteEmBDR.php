@@ -228,8 +228,8 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
             $this->bancoDados->executar($sql, [
                 'idCliente' => $cliente->id,
                 'percentualDesconto' => $beneficioFidelidade->percentualDesconto->valor,
-                'dataConcessao' => $beneficioFidelidade->dataConcessao->format('Y-m-d H:i:s'),
-                'validade' => $beneficioFidelidade->validade->format('Y-m-d H:i:s'),
+                'dataConcessao' => $beneficioFidelidade->dataConcessao->format('Y-m-d'),
+                'validade' => $beneficioFidelidade->validade->format('Y-m-d'),
                 'utilizado' => (int) $beneficioFidelidade->utilizado,
             ]);
         } catch (Throwable $th) {

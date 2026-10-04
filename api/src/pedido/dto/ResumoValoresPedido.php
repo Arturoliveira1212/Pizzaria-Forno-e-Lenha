@@ -12,7 +12,7 @@ class ResumoValoresPedido {
         public readonly ?ResumoDescontoFidelidade $fidelidade = null,
     ) {}
 
-    public static function criarComEntidade(Pedido $pedido, Dinheiro $taxaEntrega): ResumoValoresPedido {
+    public static function criarComEntidade(Pedido $pedido): ResumoValoresPedido {
         $resumoDescontosPromocao = array_map(function (DescontoPromocao $desconto): ResumoDescontoPromocao {
             return ResumoDescontoPromocao::criarComEntidade($desconto);
         }, $pedido->descontosPromocao);
@@ -20,14 +20,13 @@ class ResumoValoresPedido {
         $resumoFidelidade = $pedido->descontoFidelidade
             ? ResumoDescontoFidelidade::criarComEntidade($pedido->descontoFidelidade)
             : null;
-        $valorTotal = $pedido->calcularValorTotal()->somar($taxaEntrega);
 
         return new self(
             promocoes: $resumoDescontosPromocao,
             fidelidade: $resumoFidelidade,
             valorTotalDescontos: $pedido->calcularValorDescontos(),
-            taxaEntrega: $taxaEntrega,
-            valorTotal: $valorTotal,
+            taxaEntrega: $pedido->calcularValorEntrega(),
+            valorTotal: $pedido->calcularValorTotal(),
         );
     }
 }

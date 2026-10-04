@@ -10,6 +10,7 @@ final class CriaTabelaItemPedidoSimples extends AbstractMigration {
                 pedidoId INT NOT NULL,
                 quantidade INT NOT NULL,
                 produtoSimplesId INT NOT NULL,
+                precoPraticado INT NOT NULL DEFAULT 0,
                 CONSTRAINT fk_item_pedido_simples_pedido
                     FOREIGN KEY (pedidoId) REFERENCES pedido(id)
                     ON DELETE CASCADE ON UPDATE CASCADE,
