@@ -508,7 +508,7 @@ describe('GestorPedido', function () {
             it('cria pedido com todos os campos válidos', function () {
                 allow($this->repositorioCliente)->toReceive('obterClientePorId')->andReturn(
                     $this->cliente = new Cliente(
-                        id: 'lkjn23rij23jil234jkb',
+                        id: 1,
                         nome: 'João da Silva',
                         telefone: $this->telefone,
                         cpf: $this->cpf,
@@ -523,7 +523,7 @@ describe('GestorPedido', function () {
                 $pedido = $this->gestorPedido->registrarPedido(
                     new PedidoParaCadastro(
                         tipoAtendimento: TipoAtendimento::BALCAO->value,
-                        idCliente: 'lkjn23rij23jil234jkb',
+                        idCliente: 1,
                         itensPedido: [
                             new ItemPizzaParaCadastro(
                                 tamanho: TamanhoPizza::MEDIA->value,
@@ -546,7 +546,7 @@ describe('GestorPedido', function () {
                 expect($pedido)->toBeAnInstanceOf(Pedido::class);
                 expect($pedido->data)->toBeAnInstanceOf(DateTime::class);
                 expect($pedido->tipoAtendimento)->toBe(TipoAtendimento::BALCAO);
-                expect($pedido->cliente->id)->toBe('lkjn23rij23jil234jkb');
+                expect($pedido->cliente->id)->toBe(1);
                 expect($pedido->itensPedido)->toHaveLength(2);
                 expect($pedido->itensPedido[0]->tamanhoPizza)->toBe(TamanhoPizza::MEDIA);
                 expect($pedido->itensPedido[1]->produtoSimples->id)->toBe(1);

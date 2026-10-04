@@ -143,7 +143,7 @@ export class VisaoRegistroPedido {
 				return;
 			}
 
-			const idCliente = radio.value;
+			const idCliente = Number(radio.value);
 			this.controladoraRegistroPedido.adicionarCliente(idCliente);
 		});
 

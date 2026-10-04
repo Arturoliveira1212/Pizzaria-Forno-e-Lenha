@@ -39,7 +39,7 @@ export class GestorPedido {
 		return this.pedidoAtual;
 	}
 
-	async adicionarCliente(idCliente: string): Promise<Pedido> {
+	async adicionarCliente(idCliente: number): Promise<Pedido> {
 		this.pedidoAtual = this.pedidoAtual.criarNovoPedidoComCliente(new Cliente(idCliente));
 		await this.atualizarPedido();
 

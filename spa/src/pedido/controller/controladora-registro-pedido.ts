@@ -96,7 +96,7 @@ export class ControladoraRegistroPedido {
 		}
 	}
 
-	async adicionarCliente(idCliente: string): Promise<void> {
+	async adicionarCliente(idCliente: number): Promise<void> {
 		try {
 			const pedido = await this.gestorPedido.adicionarCliente(idCliente);
 			this.visaoRegistroPedido.exibirResumoPedido(pedido);

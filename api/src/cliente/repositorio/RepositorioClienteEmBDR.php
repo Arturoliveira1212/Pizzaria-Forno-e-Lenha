@@ -28,7 +28,7 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
                 $beneficioFidelidade = $beneficiosFidelidade[$idCliente][0] ?? null;
 
                 $clientes[] = new Cliente(
-                    id: (string) $linha['id'],
+                    id: (int) $linha['id'],
                     nome: $linha['nome'],
                     telefone: Telefone::criar($linha['ddd'] . $linha['numero']),
                     cpf: new Cpf($linha['cpf']),
@@ -69,7 +69,7 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
             $beneficiosFidelidade = $this->buscarBeneficioFidelidade($idsClientes);
 
             return new Cliente(
-                id: (string) $linha['id'],
+                id: (int) $linha['id'],
                 nome: $linha['nome'],
                 telefone: Telefone::criar($linha['ddd'] . $linha['numero']),
                 cpf: new Cpf($linha['cpf']),
