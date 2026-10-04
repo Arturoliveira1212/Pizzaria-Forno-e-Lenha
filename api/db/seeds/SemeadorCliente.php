@@ -4,17 +4,15 @@ use Phinx\Seed\AbstractSeed;
 
 class SemeadorCliente extends AbstractSeed {
     public function getDependencies(): array {
-        return [
-            'SemeadorEndereco',
-        ];
+        return [];
     }
 
     public function run(): void {
         $sql = <<<SQL
-            INSERT INTO cliente (nome, enderecoId) VALUES
-                ('Ana Beatriz Souza', 1),
-                ('Carlos Eduardo Lima', 2),
-                ('Fernanda Oliveira Costa', 3);
+            INSERT INTO cliente (nome, cpf) VALUES
+                ('Ana Beatriz Souza', '12345678901'),
+                ('Carlos Eduardo Lima', '23456789012'),
+                ('Fernanda Oliveira Costa', '34567890123');
         SQL;
         $this->execute($sql);
     }

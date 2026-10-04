@@ -30,7 +30,7 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
                 $clientes[] = new Cliente(
                     id: (string) $linha['id'],
                     nome: $linha['nome'],
-                    telefone: Telefone::criar($linha['telefone']),
+                    telefone: Telefone::criar($linha['ddd'] . $linha['numero']),
                     cpf: new Cpf($linha['cpf']),
                     endereco: $endereco,
                     beneficioFidelidade: $beneficioFidelidade,
@@ -48,9 +48,11 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
             $sql = 'SELECT
                 cliente.id,
                 cliente.nome,
-                cliente.telefone,
-                cliente.cpf
+                cliente.cpf,
+                telefone.ddd,
+                telefone.numero
                     FROM cliente
+                        INNER JOIN telefone ON telefone.idCliente = cliente.id
                         WHERE cliente.id = :id';
 
             $resultado = $this->bancoDados->consultar($sql, [
@@ -69,7 +71,7 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
             return new Cliente(
                 id: (string) $linha['id'],
                 nome: $linha['nome'],
-                telefone: Telefone::criar($linha['telefone']),
+                telefone: Telefone::criar($linha['ddd'] . $linha['numero']),
                 cpf: new Cpf($linha['cpf']),
                 endereco: $enderecos[$linha['id']][0] ?? null,
                 beneficioFidelidade: $beneficiosFidelidade[$linha['id']][0] ?? null,
@@ -86,9 +88,11 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
         $query = 'SELECT
             cliente.id,
             cliente.nome,
-            cliente.telefone,
             cliente.cpf,
+            telefone.ddd,
+            telefone.numero
                 FROM cliente
+                    INNER JOIN telefone ON telefone.idCliente = cliente.id
                     WHERE 1=1';
 
         if ($filtro->identificador !== '') {

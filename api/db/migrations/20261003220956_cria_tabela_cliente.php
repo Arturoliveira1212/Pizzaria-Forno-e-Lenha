@@ -8,10 +8,7 @@ final class CriaTabelaCliente extends AbstractMigration {
             CREATE TABLE cliente (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 nome VARCHAR(150) NOT NULL,
-                enderecoId INT NULL,
-                CONSTRAINT fk_cliente_endereco
-                    FOREIGN KEY (enderecoId) REFERENCES endereco(id)
-                    ON DELETE SET NULL ON UPDATE CASCADE
+                cpf VARCHAR(11) NOT NULL UNIQUE
             ) ENGINE=INNODB;
         SQL;
         $this->execute($sql);
