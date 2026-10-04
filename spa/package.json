@@ -4,7 +4,8 @@
 	"description": "Projeto para avaliação da disciplina de Projeto Integrador de Sistemas",
 	"main": "index.js",
 	"scripts": {
-		"test": "vitest run",
+		"test": "vitest run test",
+		"test:e2e": "playwright test",
 		"start": "vite",
 		"format": "prettier --write"
 	},
@@ -21,6 +22,7 @@
 	"packageManager": "pnpm@11.23.0",
 	"type": "module",
 	"devDependencies": {
+		"@playwright/test": "^1.63.0",
 		"@rolldown/binding-win32-x64-msvc": "^1.2.11",
 		"@types/page": "^1.11.9",
 		"@vitest/coverage-v8": "4.1.11",

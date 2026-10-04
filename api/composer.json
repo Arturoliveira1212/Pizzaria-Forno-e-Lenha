@@ -4,6 +4,10 @@
     "type": "project",
     "scripts": {
         "start": "php -S localhost:8080",
+        "start:test" : [
+            "@putenv APP_ENV=testing",
+            "php -S localhost:8081"
+        ],
         "phinx": "vendor/bin/phinx",
         "db:test": [
             "phinx rollback -e testing -t 0",

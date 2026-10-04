@@ -10,42 +10,24 @@ use function phputil\cors\cors;
 require_once 'vendor/autoload.php';
 
 try {
-    $caminho = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
-
-    if (
-        is_string($caminho) && str_starts_with($caminho, '/assets/') && !str_contains($caminho, '..')
-    ) {
-        $arquivo = __DIR__ . $caminho;
-
-        if (!is_file($arquivo)) {
-            http_response_code(404);
-            exit;
-        }
-
-        header('Content-Type: image/jpeg');
-        readfile($arquivo);
-        exit;
-    }
-} catch (Throwable $e) {
-    http_response_code(404);
-    exit;
-}
-
-try {
     $dotenv = Dotenv::createImmutable(__DIR__);
     $dotenv->load();
 
+    $nomeAmbiente = getenv('APP_ENV') ?: ($_ENV['APP_ENV'] ?? 'development');
+    $ambiente = $nomeAmbiente === 'testing' ? 'TEST' : '';
+    $sufixo = $ambiente === 'TEST' ? '_TEST' : '';
+
     $bancoDados = new BancoDados(PDOFactory::criar(
-        nomeBanco: $_ENV['DB_NAME'],
-        host: $_ENV['DB_HOST'],
-        usuario: $_ENV['DB_USERNAME'],
-        senha: $_ENV['DB_PASSWORD'],
+        nomeBanco: $_ENV["DB_NAME{$sufixo}"],
+        host: $_ENV["DB_HOST{$sufixo}"],
+        usuario: $_ENV["DB_USERNAME{$sufixo}"],
+        senha: $_ENV["DB_PASSWORD{$sufixo}"],
     ));
 
     $app = new Router();
 
     $app->use(cors([
-        'origin' => ['http://localhost:8080', 'http://localhost:5173'],
+        'origin' => ['http://localhost:5174', 'http://localhost:5173'],
         'credentials' => true,
         'allowedHeaders' => ['Accept', 'Authorization', 'Cookie', 'Content-Length', 'Content-Type', 'Host', 'Origin', 'Referer'],
         'exposeHeaders' => ['Content-Length', 'Content-Type', 'Set-Cookie'],
