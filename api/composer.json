@@ -8,6 +8,11 @@
             "@putenv APP_ENV=testing",
             "php -S localhost:8081"
         ],
+        "setup" : [
+            "composer i",
+            "php setup-bd.php",
+            "@db:reset"
+        ],
         "phinx": "vendor/bin/phinx",
         "db:reset": [
             "phinx rollback -t 0",

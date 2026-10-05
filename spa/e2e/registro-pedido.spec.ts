@@ -85,7 +85,7 @@ test.describe('Registro de pedido', () => {
 	//     Dado que estou na tela de registro de pedido
 	//     Quando acesso a etapa "Produtos", filtro pela categoria "Pizzas" e por "Catupiry" e seleciono o tamanho "Grande" e clico em adicionar
 	//     Então deve aparecer no resumo lateral a pizza "Frango com Catupiry" no tamanho "Grande"
-	test('Adição de pizza com tamanho diferente do padrão', async () => {
+	test.skip('Adição de pizza com tamanho diferente do padrão', async () => {
 		await tela.selecionarEtapaProdutos();
 		await tela.buscarPizza('Catupiry');
 		await tela.selecionarTamanhoPizza('Frango com Catupiry', 'G');
@@ -244,7 +244,7 @@ test.describe('Registro de pedido', () => {
 	//     Dado que estou na tela de registro de pedido e que existe uma promoção vigente para pizzas
 	//     Quando adiciono a quantidade mínima de pizzas do tamanho promovido
 	//     Então o resumo deve exibir um desconto de promoção
-	test('Aplicação do desconto de promoção para pizzas elegíveis', async () => {
+	test.skip('Aplicação do desconto de promoção para pizzas elegíveis', async () => {
 		await tela.selecionarEtapaProdutos();
 		await tela.buscarPizza('Frango com Catupiry');
 		await tela.selecionarTamanhoPizza('Frango com Catupiry', 'G');

@@ -5,7 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "vitest run test",
-		"test:e2e": "playwright test",
+		"test:e2e": "composer --working-dir=../api db:reset-test && playwright test",
 		"start": "vite",
 		"format": "prettier --write"
 	},

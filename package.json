@@ -6,7 +6,7 @@
   "scripts": {
     "prepare": "husky",
     "setup:front": "pnpm i --dir spa",
-    "setup:back": "composer -d api i && php api/setup-bd.php && composer -d api db:reset",
+    "setup:back": "composer -d api setup",
     "setup": "pnpm i && pnpm run setup:front && pnpm run setup:back",
     "start": "concurrently \"composer -d api start\" \"pnpm --dir spa start\"",
     "test:front": "pnpm --dir spa test",
