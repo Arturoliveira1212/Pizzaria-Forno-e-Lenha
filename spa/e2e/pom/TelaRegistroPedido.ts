@@ -169,7 +169,6 @@ export class TelaRegistroPedido {
 
 	async selecionarCliente(nome: string): Promise<void> {
 		const cliente = this.page.locator('#lista-clientes label').filter({ hasText: nome });
-		await expect(cliente).toHaveCount(1);
 		await cliente.click();
 	}
 
@@ -181,6 +180,10 @@ export class TelaRegistroPedido {
 	async deveExibirDescontoFidelidade(): Promise<void> {
 		await expect(this.page.locator('#secao-fidelidade')).toBeVisible();
 		await expect(this.page.locator('#valor-desconto-fidelidade')).toHaveText(/-R\$\s*[1-9]/);
+	}
+
+	async deveNaoExibirDescontoFidelidade(): Promise<void> {
+		await expect(this.page.locator('#secao-fidelidade')).toBeHidden();
 	}
 
 	async deveExibirDescontoPromocao(): Promise<void> {

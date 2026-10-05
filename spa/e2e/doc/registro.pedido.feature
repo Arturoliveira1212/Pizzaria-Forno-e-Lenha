@@ -74,10 +74,15 @@ Funcionalidade: Registrar Novo Pedido para Pizzaria.
         Quando acesso a etapa "Atendimento" e seleciono o tipo cliente "Cliente"
         A seção de clientes aparece.
 
-    Cenário: Alteração de quantidade
+    Cenário: Alteração de quantidade (aumentar)
         Dado que estou na tela de registro de pedido com a pizza "Calabresa" adicionada
         Quando aumento a quantidade para "2"
         Então o resumo deve ficar com "Calabresa" e quantidade "2"
+
+    Cenário: Alteração de quantidade (diminuir)
+        Dado que estou na tela de registro de pedido com a pizza "Portuguesa" adicionada 3 vezes
+        Quando diminuo a quantidade para "2"
+        Então o resumo deve ficar com "Portuguesa" e quantidade "2"
 
     Cenário: Remoção de item no resumo
         Dado que estou na tela de registro de pedido com a pizza "Calabresa" adicionada
@@ -89,17 +94,32 @@ Funcionalidade: Registrar Novo Pedido para Pizzaria.
         Quando acesso a etapa "Atendimento" e clico em "Registrar pedido"
         Então deve aparecer a mensagem de erro "Não é possível registrar um pedido sem itens."
 
+    Cenário: Finalização de pedido com sucesso
+        Dado que estou na tela de registro de pedido
+        Quando acesso a etapa "Produtos", seleciona uma pizza de "Bacon", acesso a etapa "Atendimento", seleciono o cliente "Artur Alves" e clico em registrar pedido
+        Então deve aparecer a mensagem de pedido realizado e redirecionar para home
+
     Cenário: Aplicação da taxa de entrega com produtos no pedido
         Dado que estou na tela de registro de pedido com a pizza "Calabresa" adicionada
         Quando acesso a etapa "Atendimento" e seleciono o tipo atendimento "Entrega"
         Então o resumo deve exibir a taxa de entrega de "R$ 10,00"
 
     Cenário: Aplicação do desconto de fidelidade para cliente elegível
-        Dado que registrei duas pizzas para o cliente "Carlos Eduardo Lima"
-        Quando inicio outro pedido, adiciono uma pizza e seleciono o cliente "Carlos Eduardo Lima"
-        Então o resumo deve exibir um desconto de fidelidade
+        Dado que estou na tela de registro de pedido e que o cliente "Artur Alves" possui um benefício de fidelidade
+        Quando adiciono uma pizza de "Frango com Catupiry" no pedido e vinculo o cliente "Artur Alves"
+        Então deve aparecer no resumo lateral o desconto fidelidade
+
+    Cenário: Aplicação do desconto de filidade para cliente não elegível
+        Dado que estou na tela de registro de pedido e que o cliente "Gabriel Santos Rocha" não possui um benefício de fidelidade
+        Quando adiciono uma pizza de "Pepperoni" no pedido e vinculo o cliente "Gabriel Santos Rocha"
+        Então não deve aparecer no resumo lateral o desconto fidelidade
 
     Cenário: Aplicação do desconto de promoção para pizzas elegíveis
-        Dado que existe uma promoção vigente para pizzas
+        Dado que estou na tela de registro de pedido e que existe uma promoção vigente para pizzas
         Quando adiciono a quantidade mínima de pizzas do tamanho promovido
         Então o resumo deve exibir um desconto de promoção
+
+    Cenário: Aplicação do desconto de promoção para pizzas não elegíveis
+        Dado que estou na tela de registro de pedido e que existe uma promoção vigente para pizzas
+        Quando não adiciono a quantidade mínima de pizzas do tamanho promovido
+        Então o resumo não deve exibir um desconto de promoção

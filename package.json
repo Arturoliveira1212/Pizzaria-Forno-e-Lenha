@@ -1,13 +1,14 @@
 {
-  "name": "g5",
+  "name": "pizzaria-forno-e-lenha/spa",
   "version": "1.0.0",
-  "description": "",
+  "description": "Projeto para avaliação da disciplina de Projeto Integrador de Sistemas",
   "main": "index.js",
   "scripts": {
     "prepare": "husky",
     "test:front": "pnpm --dir spa test",
+    "test:e2e": "pnpm --dir spa test:e2e",
     "test:back": "composer -d api test",
-    "test": "pnpm run test:front && pnpm run test:back"
+    "test": "pnpm run test:back && pnpm run test:front && pnpm run test:e2e"
   },
   "lint-staged": {
     "spa/**/*.{js,ts,json,html,css,md}": "pnpm --dir spa format",

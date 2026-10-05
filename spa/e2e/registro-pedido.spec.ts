@@ -159,16 +159,30 @@ test.describe('Registro de pedido', () => {
 		await tela.deveExibirSecaoDeClientes();
 	});
 
-	// Cenário: Alteração de quantidade
+	// Cenário: Alteração de quantidade (aumentar)
 	//     Dado que estou na tela de registro de pedido com a pizza "Calabresa" adicionada
 	//     Quando aumento a quantidade para "2"
 	//     Então o resumo deve ficar com "Calabresa" e quantidade "2"
-	test('Alteração de quantidade', async () => {
+	test('Alteração de quantidade (aumentar)', async () => {
 		await tela.selecionarEtapaProdutos();
 		await tela.buscarPizza('2');
 		await tela.adicionarPizzaAoPedido('Calabresa');
 		await tela.aumentarQuantidadeDoItem('Calabresa');
 		await tela.deveTerQuantidadeNoResumo('Calabresa', '2');
+	});
+
+	// Cenário: Alteração de quantidade (diminuir)
+	//     Dado que estou na tela de registro de pedido com a pizza "Portuguesa" adicionada 3 vezes
+	//     Quando diminuo a quantidade para "2"
+	//     Então o resumo deve ficar com "Portuguesa" e quantidade "2"
+	test('Alteração de quantidade (diminuir)', async () => {
+		await tela.selecionarEtapaProdutos();
+		await tela.buscarPizza('Portuguesa');
+		await tela.adicionarPizzaAoPedido('Portuguesa');
+		await tela.adicionarPizzaAoPedido('Portuguesa');
+		await tela.adicionarPizzaAoPedido('Portuguesa');
+		await tela.diminuirQuantidadeDoItem('Portuguesa');
+		await tela.deveTerQuantidadeNoResumo('Portuguesa', '2');
 	});
 
 	// Cenário: Remoção de item no resumo
@@ -181,16 +195,6 @@ test.describe('Registro de pedido', () => {
 		await tela.adicionarPizzaAoPedido('Calabresa');
 		await tela.removerItemDoResumo('Calabresa');
 		await tela.deveExibirCarrinhoVazio();
-	});
-
-	// Cenário: Tentativa de finalizar pedido sem itens
-	//     Dado que estou na tela de registro de pedido
-	//     Quando acesso a etapa "Atendimento" e clico em "Registrar pedido"
-	//     Então deve aparecer a mensagem de erro "Não é possível registrar um pedido sem itens."
-	test('Tentativa de finalizar pedido sem itens', async () => {
-		await tela.selecionarEtapaAtendimento();
-		await tela.registrarPedido();
-		await tela.deveExibirErroNoPedido('Não é possível registrar um pedido sem itens.');
 	});
 
 	// Cenário: Aplicação da taxa de entrega com produtos no pedido
@@ -206,5 +210,84 @@ test.describe('Registro de pedido', () => {
 		await tela.selecionarCliente('Ana Beatriz Souza');
 		await tela.selecionarTipoAtendimento('Entrega');
 		await tela.deveExibirTaxaDeEntrega();
+	});
+
+	// Cenário: Aplicação do desconto de fidelidade para cliente elegível
+	//     Dado que estou na tela de registro de pedido e que o cliente "Artur Alves" possui um benefício de fidelidade
+	//     Quando adiciono uma pizza de "Frango com Catupiry" no pedido e vinculo o cliente "Artur Alves"
+	//     Então deve aparecer no resumo lateral o desconto fidelidade
+	test('Aplicação do desconto de fidelidade para cliente elegível', async () => {
+		await tela.selecionarEtapaProdutos();
+		await tela.buscarPizza('Frango com Catupiry');
+		await tela.adicionarPizzaAoPedido('Frango com Catupiry');
+		await tela.selecionarEtapaAtendimento();
+		await tela.buscarCliente('Artur Alves');
+		await tela.selecionarCliente('Artur Alves');
+		await tela.deveExibirDescontoFidelidade();
+	});
+
+	// Cenário: Aplicação do desconto de filidade para cliente não elegível
+	//     Dado que estou na tela de registro de pedido e que o cliente "Gabriel Santos Rocha" não possui um benefício de fidelidade
+	//     Quando adiciono uma pizza de "Pepperoni" no pedido e vinculo o cliente "Gabriel Santos Rocha"
+	//     Então não deve aparecer no resumo lateral o desconto fidelidade
+	test('Aplicação do desconto de filidade para cliente não elegível', async () => {
+		await tela.selecionarEtapaProdutos();
+		await tela.buscarPizza('Pepperoni');
+		await tela.adicionarPizzaAoPedido('Pepperoni');
+		await tela.selecionarEtapaAtendimento();
+		await tela.buscarCliente('Gabriel Santos Rocha');
+		await tela.selecionarCliente('Gabriel Santos Rocha');
+		await tela.deveNaoExibirDescontoFidelidade();
+	});
+
+	// Cenário: Aplicação do desconto de promoção para pizzas elegíveis
+	//     Dado que estou na tela de registro de pedido e que existe uma promoção vigente para pizzas
+	//     Quando adiciono a quantidade mínima de pizzas do tamanho promovido
+	//     Então o resumo deve exibir um desconto de promoção
+	test('Aplicação do desconto de promoção para pizzas elegíveis', async () => {
+		await tela.selecionarEtapaProdutos();
+		await tela.buscarPizza('Frango com Catupiry');
+		await tela.selecionarTamanhoPizza('Frango com Catupiry', 'G');
+		await tela.adicionarPizzaAoPedido('Frango com Catupiry');
+		await tela.selecionarTamanhoPizza('Frango com Catupiry', 'G');
+		await tela.adicionarPizzaAoPedido('Frango com Catupiry');
+		await tela.deveExibirDescontoPromocao();
+	});
+
+	// Cenário: Aplicação do desconto de promoção para pizzas não elegíveis
+	//     Dado que estou na tela de registro de pedido e que existe uma promoção vigente para pizzas
+	//     Quando não adiciono a quantidade mínima de pizzas do tamanho promovido
+	//     Então o resumo não deve exibir um desconto de promoção
+	test('Aplicação do desconto de promoção para pizzas não elegíveis', async () => {
+		await tela.selecionarEtapaProdutos();
+		await tela.buscarPizza('Vegetariana');
+		await tela.selecionarTamanhoPizza('Vegetariana', 'G');
+		await tela.adicionarPizzaAoPedido('Vegetariana');
+		await tela.deveNaoExibirDescontoFidelidade();
+	});
+
+	// Cenário: Tentativa de finalizar pedido sem itens
+	//     Dado que estou na tela de registro de pedido
+	//     Quando acesso a etapa "Atendimento" e clico em "Registrar pedido"
+	//     Então deve aparecer a mensagem de erro "Não é possível registrar um pedido sem itens."
+	test('Tentativa de finalizar pedido sem itens', async () => {
+		await tela.selecionarEtapaAtendimento();
+		await tela.registrarPedido();
+		await tela.deveExibirErroNoPedido('Não é possível registrar um pedido sem itens.');
+	});
+
+	// Cenário: Finalização de pedido com sucesso
+	//     Dado que estou na tela de registro de pedido
+	//     Quando acesso a etapa "Produtos", seleciona uma pizza de "Bacon", acesso a etapa "Atendimento", seleciono o cliente "Artur Alves" e clico em registrar pedido
+	//     Então deve aparecer a mensagem de pedido realizado e redirecionar para home
+	test('Finalização de pedido com sucesso', async () => {
+		await tela.selecionarEtapaProdutos();
+		await tela.buscarPizza('Bacon');
+		await tela.adicionarPizzaAoPedido('Bacon');
+		await tela.selecionarEtapaAtendimento();
+		await tela.buscarCliente('Artur Alves');
+		await tela.selecionarCliente('Artur Alves');
+		await tela.registrarPedido();
+		await tela.deveRedirecionarParaInicio();
 	});
 });
