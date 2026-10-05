@@ -9,7 +9,6 @@ $gestorPedido = new GestorPedido(
     new RepositorioClienteEmBDR($bancoDados),
     new RepositorioPizzaEmBDR($bancoDados),
     new RepositorioProdutoSimplesEmBDR($bancoDados),
-    new RepositorioIngredienteEmBDR($bancoDados),
     new RepositorioPromocaoEmBDR($bancoDados),
     new RepositorioConfiguracaoFidelidadeEmBDR($bancoDados),
 );

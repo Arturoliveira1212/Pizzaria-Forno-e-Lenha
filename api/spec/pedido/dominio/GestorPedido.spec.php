@@ -10,7 +10,6 @@ describe('GestorPedido', function () {
         $this->repositorioCliente = Double::instance(['implements' => RepositorioCliente::class]);
         $this->repositorioPizza = Double::instance(['implements' => RepositorioPizza::class]);
         $this->repositorioProdutoSimples = Double::instance(['implements' => RepositorioProdutoSimples::class]);
-        $this->repositorioIngrediente = Double::instance(['implements' => RepositorioIngrediente::class]);
         $this->repositorioPromocao = Double::instance(['implements' => RepositorioPromocao::class]);
         $this->repositorioConfiguracaoFidelidade = Double::instance(['implements' => RepositorioConfiguracaoFidelidade::class]);
 
@@ -20,7 +19,6 @@ describe('GestorPedido', function () {
             repositorioCliente: $this->repositorioCliente,
             repositorioPizza: $this->repositorioPizza,
             repositorioProdutoSimples: $this->repositorioProdutoSimples,
-            repositorioIngrediente: $this->repositorioIngrediente,
             repositorioPromocao: $this->repositorioPromocao,
             repositorioConfiguracaoFidelidade: $this->repositorioConfiguracaoFidelidade,
         );
