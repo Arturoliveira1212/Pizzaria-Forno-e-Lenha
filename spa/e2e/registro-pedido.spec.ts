@@ -249,7 +249,6 @@ test.describe('Registro de pedido', () => {
 		await tela.buscarPizza('Frango com Catupiry');
 		await tela.selecionarTamanhoPizza('Frango com Catupiry', 'G');
 		await tela.adicionarPizzaAoPedido('Frango com Catupiry');
-		await tela.selecionarTamanhoPizza('Frango com Catupiry', 'G');
 		await tela.adicionarPizzaAoPedido('Frango com Catupiry');
 		await tela.deveExibirDescontoPromocao();
 	});
