@@ -555,3 +555,134 @@ describe('GestorPedido', function () {
     });
 
 });
+
+describe('GestorPedido - integração com banco de dados', function () {
+
+    beforeAll(function () {
+        $this->bancoDados = new BancoDados(PDOFactory::criar(
+            nomeBanco: $_ENV['DB_NAME_TEST'],
+            host: $_ENV['DB_HOST_TEST'],
+            usuario: $_ENV['DB_USERNAME_TEST'],
+            senha: $_ENV['DB_PASSWORD_TEST'],
+        ));
+
+        $this->gestorPedido = new GestorPedido(
+            unidadeTrabalho: new UnidadeTrabalhoEmBDR($this->bancoDados),
+            repositorioPedido: new RepositorioPedidoEmBDR($this->bancoDados),
+            repositorioCliente: new RepositorioClienteEmBDR($this->bancoDados),
+            repositorioPizza: new RepositorioPizzaEmBDR($this->bancoDados),
+            repositorioProdutoSimples: new RepositorioProdutoSimplesEmBDR($this->bancoDados),
+            repositorioPromocao: new RepositorioPromocaoEmBDR($this->bancoDados),
+            repositorioConfiguracaoFidelidade: new RepositorioConfiguracaoFidelidadeEmBDR($this->bancoDados),
+        );
+    });
+
+    describe('registrarPedido()', function () {
+
+        it('marca o benefício como utilizado quando o pedido tem desconto fidelidade', function () {
+            $beneficioAntes = $this->bancoDados->consultar(
+                'SELECT id, utilizado FROM beneficio_fidelidade WHERE idCliente = :idCliente ORDER BY id',
+                ['idCliente' => 11],
+            )[0] ?? null;
+
+            $pedido = $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
+                tipoAtendimento: TipoAtendimento::BALCAO->value,
+                idCliente: '11',
+                itensPedido: [
+                    new ItemSimplesParaCadastro(
+                        idProduto: 1,
+                        quantidade: 10,
+                    ),
+                ],
+            ));
+
+            $beneficioDepois = $this->bancoDados->consultar(
+                'SELECT id, utilizado FROM beneficio_fidelidade
+                    WHERE id = :id
+                    ORDER BY id',
+                ['id' => $beneficioAntes['id']],
+            )[0] ?? null;
+
+            expect($beneficioDepois)->toBe([
+                'id' => $beneficioAntes['id'],
+                'utilizado' => 1,
+            ]);
+        });
+
+        it('gera um novo benefício de fidelidade para o cliente quando o pedido atinge as regras', function () {
+            $quantidadeAntes = $this->bancoDados->consultar(
+                'SELECT COUNT(*) AS total FROM beneficio_fidelidade WHERE idCliente = :idCliente',
+                ['idCliente' => 11],
+            )[0]['total'] ?? 0;
+
+            $pedido = $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
+                tipoAtendimento: TipoAtendimento::BALCAO->value,
+                idCliente: '11',
+                itensPedido: [
+                    new ItemSimplesParaCadastro(
+                        idProduto: 1,
+                        quantidade: 10,
+                    ),
+                    new ItemPizzaParaCadastro(
+                        tamanho: TamanhoPizza::MEDIA->value,
+                        quantidade: 4,
+                        saboresEscolhidos: [
+                            new SaborEscolhidoParaCadastro(
+                                idPizza: 1,
+                                ingredientesEscolhidos: [],
+                            ),
+                        ],
+                    ),
+                ],
+            ));
+
+            $beneficiosDepois = $this->bancoDados->consultar(
+                'SELECT id, percentualDesconto, dataConcessao, validade, utilizado
+                    FROM beneficio_fidelidade
+                    WHERE idCliente = :idCliente
+                    ORDER BY id DESC',
+                ['idCliente' => 11],
+            );
+
+            $beneficioDepois = $beneficiosDepois[0] ?? null;
+            $novaQuantidade = $quantidadeAntes + 1;
+            $quantidadeDepois = count($beneficiosDepois);
+
+            expect($quantidadeDepois)->toBe($novaQuantidade);
+            expect($beneficioDepois)->toBe([
+                'id' => $beneficioDepois['id'],
+                'percentualDesconto' => $beneficioDepois['percentualDesconto'],
+                'dataConcessao' => $beneficioDepois['dataConcessao'],
+                'validade' => $beneficioDepois['validade'],
+                'utilizado' => 0,
+            ]);
+        });
+
+        it('não gera um novo benefício de fidelidade para o cliente quando o pedido não atinge as regras', function () {
+            $quantidadeAntes = $this->bancoDados->consultar(
+                'SELECT COUNT(*) AS total FROM beneficio_fidelidade WHERE idCliente = :idCliente',
+                ['idCliente' => 11],
+            )[0]['total'] ?? 0;
+
+            $pedido = $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
+                tipoAtendimento: TipoAtendimento::BALCAO->value,
+                idCliente: '11',
+                itensPedido: [
+                    new ItemSimplesParaCadastro(
+                        idProduto: 1,
+                        quantidade: 1,
+                    ),
+                ],
+            ));
+
+            $quantidadeDepois = $this->bancoDados->consultar(
+                'SELECT COUNT(*) AS total FROM beneficio_fidelidade WHERE idCliente = :idCliente',
+                ['idCliente' => 11],
+            )[0]['total'] ?? 0;
+
+            expect($quantidadeDepois)->toBe($quantidadeAntes);
+        });
+
+    });
+
+});
