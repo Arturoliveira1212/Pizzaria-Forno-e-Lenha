@@ -9,13 +9,18 @@
             "php -S localhost:8081"
         ],
         "phinx": "vendor/bin/phinx",
-        "db:test": [
+        "db:reset": [
+            "phinx rollback -t 0",
+            "phinx migrate",
+            "phinx seed:run"
+        ],
+        "db:reset-test": [
             "phinx rollback -e testing -t 0",
             "phinx migrate -e testing",
             "phinx seed:run -e testing"
         ],
         "test": [
-            "@db:test",
+            "@db:reset-test",
             "kahlan"
         ],
         "st": "phpstan analyze src --level=6",
