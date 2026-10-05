@@ -5,6 +5,10 @@
   "main": "index.js",
   "scripts": {
     "prepare": "husky",
+    "setup:front": "pnpm i --dir spa",
+    "setup:back": "composer -d api i && php api/setup-bd.php && composer -d api db:reset",
+    "setup": "pnpm i && pnpm run setup:front && pnpm run setup:back",
+    "start": "concurrently \"composer -d api start\" \"pnpm --dir spa start\"",
     "test:front": "pnpm --dir spa test",
     "test:e2e": "pnpm --dir spa test:e2e",
     "test:back": "composer -d api test",
@@ -27,6 +31,7 @@
   "packageManager": "pnpm@11.23.0",
   "type": "module",
   "devDependencies": {
+    "concurrently": "^10.0.5",
     "husky": "^9.1.7",
     "lint-staged": "^17.5.1"
   }
