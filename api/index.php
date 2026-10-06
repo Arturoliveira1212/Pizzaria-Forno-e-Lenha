@@ -9,6 +9,8 @@ use function phputil\cors\cors;
 
 require_once 'vendor/autoload.php';
 
+date_default_timezone_set('America/Sao_Paulo');
+
 try {
     $dotenv = Dotenv::createImmutable(__DIR__);
     $dotenv->load();
