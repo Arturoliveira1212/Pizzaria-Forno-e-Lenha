@@ -7,23 +7,25 @@
 - Artur Alves de Oliveira.
 - Guilherme Carvalho da Rosa.
 
+OBS: Os comandos de instalação e execução devem ser rodados na raiz do projeto.
+
 ## Instalação
 
 1. Criar e preencher `.env`:
 
-````
+```bash
 cd api/ && cp .env.example .env
-````
+```
 
 2. Instalar as dependências e construir o banco de dados:
 
-````
+````bash
 pnpm setup
 ````
 
 3. Instalar os navegadores que o Playwright utiliza no teste E2E:
 
-````
+````bash
 cd spa/ && pnpm exec playwright install
 ````
 
@@ -31,19 +33,19 @@ cd spa/ && pnpm exec playwright install
 
 - Para levantar a aplicação:
 
-````
+````bash
 pnpm start
 ````
 
 - Para rodar os testes
 
-````
+````bash
 pnpm test
 ````
 
 ## Referências Bibliográficas
 
-Templates Bootstrap usados na tela de registrar pedido:
+Templates Bootstrap usados:
 - https://getbootstrap.com/docs/5.3/components/navbar/
 - https://getbootstrap.com/docs/5.3/components/navs-tabs/
 - https://getbootstrap.com/docs/5.3/components/button-group/
@@ -59,3 +61,5 @@ Imagens dos produtos obtidas em:
 Documentação de ferramentas extras usadas:
 - https://github.com/php-cs-fixer/php-cs-fixer
 - https://phinx.org/
+- https://getbootstrap.com/
+- https://github.com/visionmedia/page.js
