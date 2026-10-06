@@ -30,8 +30,9 @@ page('/', async () => {
 	await carregarConteudo('/app/pages/monitor-pedidos.html', (await import('../app/js/monitor-pedidos.js')).default);
 });
 
-page.exit('/', async () => {
+page.exit('/', async (ctx, next) => {
 	(await import('../app/js/monitor-pedidos.js')).pararMonitorPedidos();
+	next();
 });
 
 page.redirect('/home', '/');
