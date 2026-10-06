@@ -66,7 +66,11 @@ export class VisaoListagemPedidos implements VisaoPedidos {
 		linha.querySelector<HTMLElement>('.pedido-status')!.textContent = pedido.status;
 		linha.querySelector<HTMLElement>('.pedido-total')!.textContent = pedido.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 		const botao = linha.querySelector<HTMLButtonElement>('.botao-alterar-status')!;
-		botao.addEventListener('click', () => this.abrirModalStatus(pedido));
+		if (pedido.proximosStatus.length === 0) {
+			botao.disabled = true;
+		} else {
+			botao.addEventListener('click', () => this.abrirModalStatus(pedido));
+		}
 
 		return template;
 	}
