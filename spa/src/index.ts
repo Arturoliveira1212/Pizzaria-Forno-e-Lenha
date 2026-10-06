@@ -36,6 +36,10 @@ page('/pedido/registrar', async () => {
 	await carregarConteudo('/app/pages/registrar-pedido.html', (await import('../app/js/registro-pedido.js')).default);
 });
 
+page('/pedido', async () => {
+	await carregarConteudo('/app/pages/listagem-pedidos.html', (await import('../app/js/listagem-pedidos.js')).default);
+});
+
 page('*', async () => {
 	await carregarConteudo('/app/pages/404.html');
 });

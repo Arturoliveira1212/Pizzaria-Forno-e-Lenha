@@ -7,9 +7,38 @@ import { Pedido } from '../dominio/pedido';
 import { ItemPizza } from '../dominio/item-pizza';
 import { ItemSimples } from '../dominio/item-simples';
 import { ResumoValoresPedido } from '../dominio/resumo-valores-pedido';
+import { PedidoListagem } from '../dominio/pedido-listagem';
 
 export class RepositorioPedidoNoServidor implements RepositorioPedido {
 	constructor(private readonly servicoHttp: ServicoHttp) {}
+
+	async obterPedidos(identificador: string = ''): Promise<PedidoListagem[]> {
+		try {
+			const parametros = new URLSearchParams();
+			if (identificador !== '') {
+				parametros.set('identificador', identificador);
+			}
+
+			const resultado = await this.servicoHttp.get(`${API}/pedidos?${parametros.toString()}`);
+
+			return resultado.data.pedidos.map(
+				(pedido: { id: number; data: string; nomeCliente: string | null; tipoAtendimento: string; status: string; proximosStatus: string[]; valorTotal: number }) =>
+					new PedidoListagem(pedido.id, pedido.data, pedido.nomeCliente, pedido.tipoAtendimento, pedido.status, pedido.proximosStatus, pedido.valorTotal),
+			);
+		} catch (error) {
+			const mensagemErro = error instanceof HttpError ? error.data?.erros?.join(', ') : 'Ocorreu um erro ao obter os pedidos.';
+			throw new RepositorioError(mensagemErro);
+		}
+	}
+
+	async alterarStatus(idPedido: number, status: string): Promise<void> {
+		try {
+			await this.servicoHttp.patch(`${API}/pedidos/status`, { idPedido, status });
+		} catch (error) {
+			const mensagemErro = error instanceof HttpError ? error.data?.erros?.join(', ') : 'Ocorreu um erro ao alterar o status do pedido.';
+			throw new RepositorioError(mensagemErro);
+		}
+	}
 
 	async obterResumoValores(pedido: Pedido): Promise<ResumoValoresPedido> {
 		try {

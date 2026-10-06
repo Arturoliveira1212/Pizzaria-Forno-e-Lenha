@@ -11,6 +11,22 @@ class GestorPedido {
         private readonly RepositorioConfiguracaoFidelidade $repositorioConfiguracaoFidelidade,
     ) {}
 
+    /**
+     * @return PedidoParaListagem[]
+     */
+    public function obterPedidos(?int $idPedido = null): array {
+        return $this->repositorioPedido->obterPedidos($idPedido);
+    }
+
+    public function alterarStatus(int $idPedido, string $novoStatus): void {
+        $status = StatusPedido::tryFrom($novoStatus);
+        if ($status === null) {
+            throw new DominioException("Status de pedido inválido: {$novoStatus}.");
+        }
+
+        $this->repositorioPedido->alterarStatus($idPedido, $status);
+    }
+
     public function registrarPedido(PedidoParaCadastro $pedidoParaCadastro): Pedido {
         $pedido = $this->criarPedido($pedidoParaCadastro);
 

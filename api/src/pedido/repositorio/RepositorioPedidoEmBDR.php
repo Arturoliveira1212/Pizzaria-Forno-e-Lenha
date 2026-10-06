@@ -5,6 +5,85 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
         private readonly BancoDados $bancoDados,
     ) {}
 
+    public function obterPedidos(?int $idPedido = null): array {
+        try {
+            $parametros = [];
+            $sql = 'SELECT
+                pedido.id,
+                pedido.data,
+                pedido.valorTotal,
+                pedido.tipoAtendimento,
+                pedido.status,
+                cliente.nome AS nomeCliente
+                    FROM pedido
+                        LEFT JOIN cliente ON cliente.id = pedido.idCliente
+                            WHERE 1=1';
+
+            if ($idPedido !== null) {
+                $sql .= ' AND pedido.id = :id';
+                $parametros['id'] = $idPedido;
+            }
+
+            $sql .= ' ORDER BY pedido.id DESC LIMIT 50';
+
+            $resultado = $this->bancoDados->consultar($sql, $parametros);
+            if (empty($resultado)) {
+                return [];
+            }
+
+            $pedidos = [];
+            foreach ($resultado as $linha) {
+                $tipoAtendimento = TipoAtendimento::from($linha['tipoAtendimento']);
+                $status = StatusPedido::from($linha['status']);
+                $pedidos[] = new PedidoParaListagem(
+                    id: (int) $linha['id'],
+                    data: $linha['data'],
+                    nomeCliente: $linha['nomeCliente'],
+                    tipoAtendimento: $tipoAtendimento->value,
+                    status: $status->value,
+                    proximosStatus: array_map(
+                        fn(StatusPedido $status): string => $status->value,
+                        $status->proximos($tipoAtendimento),
+                    ),
+                    valorTotalCentavos: (int) $linha['valorTotal'],
+                );
+            }
+
+            return $pedidos;
+        } catch (Throwable $e) {
+            throw new RepositorioException('Erro ao obter pedidos.');
+        }
+    }
+
+    public function alterarStatus(int $idPedido, StatusPedido $novoStatus): void {
+        try {
+            $resultado = $this->bancoDados->consultar(
+                'SELECT status, tipoAtendimento FROM pedido WHERE id = :id',
+                ['id' => $idPedido],
+            );
+            if (empty($resultado)) {
+                throw new DominioException("Pedido (ID {$idPedido}) não encontrado.");
+            }
+
+            $linha = $resultado[0];
+            $statusAtual = StatusPedido::from($linha['status']);
+            $tipoAtendimento = TipoAtendimento::from($linha['tipoAtendimento']);
+
+            if (!in_array($novoStatus, $statusAtual->proximos($tipoAtendimento), true)) {
+                throw new DominioException("Não é possível alterar o pedido de {$statusAtual->value} para {$novoStatus->value}.");
+            }
+
+            $this->bancoDados->executar(
+                'UPDATE pedido SET status = :status WHERE id = :id',
+                ['status' => $novoStatus->value, 'id' => $idPedido],
+            );
+        } catch (DominioException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            throw new RepositorioException('Erro ao alterar status do pedido.');
+        }
+    }
+
     public function registrarPedido(Pedido $pedido): void {
         try {
             $idPedido = $this->salvarPedido($pedido);

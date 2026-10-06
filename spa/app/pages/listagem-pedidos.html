@@ -1,0 +1,60 @@
+<section class="container pb-5" id="pagina-listagem-pedidos">
+	<h1 class="mb-4">Pedidos</h1>
+
+	<form id="formulario-filtro-pedidos">
+		<div class="input-group">
+			<input type="search" class="form-control" placeholder="Buscar por ID" id="filtro-pedidos" autocomplete="off" />
+			<button type="submit" class="btn btn-primary" id="botao-filtrar-pedidos">Buscar</button>
+		</div>
+	</form>
+
+	<div class="table-responsive mt-4">
+		<table class="table align-middle">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Data</th>
+					<th>Cliente</th>
+					<th>Atendimento</th>
+					<th>Status</th>
+					<th>Total</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody id="lista-pedidos"></tbody>
+		</table>
+	</div>
+
+	<template id="template-pedido-listagem">
+		<tr>
+			<td class="pedido-id"></td>
+			<td class="pedido-data"></td>
+			<td class="pedido-cliente"></td>
+			<td class="pedido-atendimento"></td>
+			<td class="pedido-status"></td>
+			<td class="pedido-total"></td>
+			<td><button type="button" class="btn btn-outline-secondary btn-sm botao-alterar-status">Alterar status</button></td>
+		</tr>
+	</template>
+
+	<div class="modal fade" id="modal-status-pedido" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form id="formulario-status-pedido">
+					<div class="modal-header">
+						<h2 class="modal-title fs-5" id="titulo-modal-status">Alterar status</h2>
+						<button type="button" class="btn-close" aria-label="Fechar" id="botao-fechar-modal-status"></button>
+					</div>
+					<div class="modal-body">
+						<label class="form-label" for="novo-status-pedido">Novo status</label>
+						<select class="form-select" id="novo-status-pedido"></select>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" id="botao-cancelar-modal-status">Cancelar</button>
+						<button type="submit" class="btn btn-primary">Salvar</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</section>
