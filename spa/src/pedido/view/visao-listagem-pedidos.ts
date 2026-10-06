@@ -1,7 +1,8 @@
 import { ControladoraListagemPedidos } from '../controller/controladora-listagem-pedidos';
 import { PedidoListagem } from '../dominio/pedido-listagem';
+import { VisaoPedidos } from './visao-pedidos';
 
-export class VisaoListagemPedidos {
+export class VisaoListagemPedidos implements VisaoPedidos {
 	private readonly pagina = document.querySelector<HTMLElement>('#pagina-listagem-pedidos')!;
 	private readonly formularioFiltroPedidos = this.pagina.querySelector<HTMLFormElement>('#formulario-filtro-pedidos')!;
 	private readonly inputFiltroPedidos = this.pagina.querySelector<HTMLInputElement>('#filtro-pedidos')!;

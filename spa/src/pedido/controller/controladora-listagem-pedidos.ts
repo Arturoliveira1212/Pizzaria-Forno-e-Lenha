@@ -1,11 +1,12 @@
 import { RepositorioPedidoNoServidor } from '../repositorio/repositorio-pedido-no-servidor';
 import { VisaoListagemPedidos } from '../view/visao-listagem-pedidos';
 import { ServicoHttpComFetch } from '../../infra/http/servico-http-com-fetch';
+import { VisaoPedidos } from '../view/visao-pedidos';
 
 export class ControladoraListagemPedidos {
 	private readonly repositorioPedido: RepositorioPedidoNoServidor;
 
-	constructor(private readonly visaoListagemPedidos: VisaoListagemPedidos) {
+	constructor(private readonly visaoListagemPedidos: VisaoPedidos) {
 		this.repositorioPedido = new RepositorioPedidoNoServidor(new ServicoHttpComFetch());
 	}
 

@@ -27,7 +27,11 @@ async function carregarConteudo(arquivo: string, script?: () => void): Promise<v
 }
 
 page('/', async () => {
-	await carregarConteudo('/app/pages/home.html');
+	await carregarConteudo('/app/pages/monitor-pedidos.html', (await import('../app/js/monitor-pedidos.js')).default);
+});
+
+page.exit('/', async () => {
+	(await import('../app/js/monitor-pedidos.js')).pararMonitorPedidos();
 });
 
 page.redirect('/home', '/');
