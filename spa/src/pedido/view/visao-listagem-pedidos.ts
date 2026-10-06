@@ -60,7 +60,7 @@ export class VisaoListagemPedidos implements VisaoPedidos {
 		const linha = template.querySelector('tr')!;
 
 		linha.querySelector<HTMLElement>('.pedido-id')!.textContent = String(pedido.id);
-		linha.querySelector<HTMLElement>('.pedido-data')!.textContent = pedido.data;
+		linha.querySelector<HTMLElement>('.pedido-data')!.textContent = this.formatarData(pedido.data);
 		linha.querySelector<HTMLElement>('.pedido-cliente')!.textContent = pedido.nomeCliente ?? 'Consumidor final';
 		linha.querySelector<HTMLElement>('.pedido-atendimento')!.textContent = pedido.tipoAtendimento;
 		linha.querySelector<HTMLElement>('.pedido-status')!.textContent = pedido.status;
@@ -73,6 +73,13 @@ export class VisaoListagemPedidos implements VisaoPedidos {
 		}
 
 		return template;
+	}
+
+	private formatarData(data: string): string {
+		return new Date(data.replace(' ', 'T')).toLocaleString('pt-BR', {
+			dateStyle: 'short',
+			timeStyle: 'short',
+		});
 	}
 
 	private abrirModalStatus(pedido: PedidoListagem): void {
