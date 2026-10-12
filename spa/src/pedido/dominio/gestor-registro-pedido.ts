@@ -14,6 +14,11 @@ import { RepositorioProdutoSimples } from '../../produto-simples/repositorio/rep
 import { TipoProdutoSimples } from '../../produto-simples/dominio/tipo-produto-simples';
 import { ProdutoSimples } from '../../produto-simples/dominio/produto-simples';
 import { RepositorioCliente } from '../../cliente/repositorio/repositorio-cliente';
+import { PizzaParaCardapio } from '../../pizza/dominio/pizza-para-cardapio';
+import { DadosItemPizza } from '../dados-item-pizza';
+import { IngredienteEscolhido } from './ingrediente-escolhido';
+import { Ingrediente } from '../../ingrediente/dominio/ingrediente';
+import { DadosItemSimples } from '../dados-item-simples';
 
 export class GestorRegistroPedido {
 	private pedidoAtual: Pedido = new Pedido();
@@ -25,7 +30,7 @@ export class GestorRegistroPedido {
 		private readonly repositorioCliente: RepositorioCliente,
 	) {}
 
-	async obterPizzasParaCardapio(busca: string): Promise<Pizza[]> {
+	async obterPizzasParaCardapio(busca: string): Promise<PizzaParaCardapio[]> {
 		return this.repositorioPizza.obterPizzasParaCardapio(busca);
 	}
 
@@ -37,25 +42,29 @@ export class GestorRegistroPedido {
 		return this.repositorioCliente.obterClientes(identificador);
 	}
 
-	async adicionarItemPizza(item: { quantidade: number; tamanho: string; preco: number; saboresEscolhidos: { idPizza: number; nome: string }[] }): Promise<Pedido> {
-		const itemPizza = this.criarItemPizza(item);
+	async adicionarItemPizza(dados: DadosItemPizza): Promise<Pedido> {
+		const itemPizza = this.criarItemPizza(dados);
 		this.pedidoAtual.adicionarItemPizza(itemPizza);
 		await this.atualizarPedido();
 
 		return this.pedidoAtual;
 	}
 
-	private criarItemPizza(item: { quantidade: number; tamanho: string; preco: number; saboresEscolhidos: { idPizza: number; nome: string }[] }) {
+	private criarItemPizza(dados: DadosItemPizza) {
 		const sabores = [];
-		for (const sabor of item.saboresEscolhidos) {
-			sabores.push(new SaborEscolhido(new Pizza(sabor.idPizza, sabor.nome)));
+
+		for (const sabor of dados.saboresEscolhidos) {
+			const ingredientesEscolhidos = sabor.ingredientesEscolhidos.map((ingrediente) => {
+				return new IngredienteEscolhido(new Ingrediente(ingrediente.idIngrediente), ingrediente.papel);
+			});
+			sabores.push(new SaborEscolhido(new Pizza(sabor.idPizza, sabor.nome), ingredientesEscolhidos));
 		}
 
-		return new ItemPizza(item.quantidade, sabores, item.tamanho as TamanhoPizza, item.preco);
+		return new ItemPizza(dados.quantidade, sabores, dados.tamanho as TamanhoPizza, dados.preco);
 	}
 
-	async adicionarItemSimples(item: { quantidade: number; idProduto: number; nome: string; preco: number }): Promise<Pedido> {
-		this.pedidoAtual.adicionarItemSimples(new ItemSimples(item.quantidade, item.idProduto, item.nome, item.preco));
+	async adicionarItemSimples(dados: DadosItemSimples): Promise<Pedido> {
+		this.pedidoAtual.adicionarItemSimples(new ItemSimples(dados.quantidade, dados.idProduto, dados.nome, dados.preco));
 		await this.atualizarPedido();
 
 		return this.pedidoAtual;

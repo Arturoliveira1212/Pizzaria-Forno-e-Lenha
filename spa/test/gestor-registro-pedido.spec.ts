@@ -17,6 +17,10 @@ import { RepositorioProdutoSimples } from '../src/produto-simples/repositorio/re
 import { RepositorioCliente } from '../src/cliente/repositorio/repositorio-cliente';
 import { TamanhoPizza } from '../src/pizza/dominio/tamanho-pizza';
 import { SaborEscolhido } from '../src/pedido/dominio/sabor-escolhido';
+import { PizzaParaCardapio } from '../src/pizza/dominio/pizza-para-cardapio';
+import { PapelIngrediente } from '../src/pedido/dominio/papel-ingrediente';
+import { IngredienteEscolhido } from '../src/pedido/dominio/ingrediente-escolhido';
+import { Ingrediente } from '../src/ingrediente/dominio/ingrediente';
 
 export class RepositorioPedidoEmMemoria implements RepositorioPedido {
 	async obterPedidos(identificador?: string): Promise<PedidoListagem[]> {
@@ -33,8 +37,8 @@ export class RepositorioPedidoEmMemoria implements RepositorioPedido {
 }
 
 export class RepositorioPizzaEmMemoria implements RepositorioPizza {
-	async obterPizzasParaCardapio(identificador: string): Promise<Pizza[]> {
-		return [new Pizza(1, 'Margherita'), new Pizza(2, 'Calabresa')];
+	async obterPizzasParaCardapio(identificador: string): Promise<PizzaParaCardapio[]> {
+		return [new PizzaParaCardapio(1, 'Margherita', 'de Mussarela', [], []), new PizzaParaCardapio(2, 'Calabresa', 'de Calabresa', [], [])];
 	}
 }
 
@@ -111,77 +115,188 @@ describe('GestorRegistroPedido', () => {
 		it('adiciona uma pizza corretamente ao pedido', async () => {
 			const pedido = await gestor.adicionarItemPizza({
 				quantidade: 1,
-				tamanho: 'MEDIA',
+				tamanho: TamanhoPizza.MEDIA,
 				preco: 40,
-				saboresEscolhidos: [{ idPizza: 1, nome: 'Margherita' }],
+				saboresEscolhidos: [
+					{
+						idPizza: 1,
+						nome: 'Margherita',
+						ingredientesEscolhidos: [
+							{
+								idIngrediente: 1,
+								papel: PapelIngrediente.PADRAO,
+							},
+						],
+					},
+				],
 			});
 
+			const ingredientesEscolhidosEsperados = [new IngredienteEscolhido(new Ingrediente(1), PapelIngrediente.PADRAO)];
+			const itemPizzaEsperado = new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'), ingredientesEscolhidosEsperados)], TamanhoPizza.MEDIA, 40);
+
 			expect(pedido.itensPedido).toHaveLength(1);
-			expect(pedido.itensPedido[0]).toEqual(new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'))], TamanhoPizza.MEDIA, 40));
+			expect(pedido.itensPedido[0]).toEqual(itemPizzaEsperado);
 		});
 
 		it('junta pizzas iguais somando as quantidades', async () => {
 			await gestor.adicionarItemPizza({
 				quantidade: 1,
-				tamanho: 'MEDIA',
+				tamanho: TamanhoPizza.MEDIA,
 				preco: 40,
-				saboresEscolhidos: [{ idPizza: 1, nome: 'Margherita' }],
+				saboresEscolhidos: [
+					{
+						idPizza: 1,
+						nome: 'Margherita',
+						ingredientesEscolhidos: [
+							{
+								idIngrediente: 1,
+								papel: PapelIngrediente.PADRAO,
+							},
+							{
+								idIngrediente: 2,
+								papel: PapelIngrediente.SUBSTITUTO,
+							},
+						],
+					},
+				],
 			});
 			const pedido = await gestor.adicionarItemPizza({
 				quantidade: 2,
-				tamanho: 'MEDIA',
+				tamanho: TamanhoPizza.MEDIA,
 				preco: 40,
-				saboresEscolhidos: [{ idPizza: 1, nome: 'Margherita' }],
+				saboresEscolhidos: [
+					{
+						idPizza: 1,
+						nome: 'Margherita',
+						ingredientesEscolhidos: [
+							{
+								idIngrediente: 1,
+								papel: PapelIngrediente.PADRAO,
+							},
+							{
+								idIngrediente: 2,
+								papel: PapelIngrediente.SUBSTITUTO,
+							},
+						],
+					},
+				],
 			});
 
+			const ingredientesEscolhidosEsperados = [new IngredienteEscolhido(new Ingrediente(1), PapelIngrediente.PADRAO), new IngredienteEscolhido(new Ingrediente(2), PapelIngrediente.SUBSTITUTO)];
+			const itemPizzaEsperado = new ItemPizza(3, [new SaborEscolhido(new Pizza(1, 'Margherita'), ingredientesEscolhidosEsperados)], TamanhoPizza.MEDIA, 40);
+
 			expect(pedido.itensPedido).toHaveLength(1);
-			expect(pedido.itensPedido[0]).toEqual(new ItemPizza(3, [new SaborEscolhido(new Pizza(1, 'Margherita'))], TamanhoPizza.MEDIA, 40));
+			expect(pedido.itensPedido[0]).toEqual(itemPizzaEsperado);
 		});
 
 		it('mantém separadas pizzas de tamanhos diferentes', async () => {
 			await gestor.adicionarItemPizza({
 				quantidade: 1,
-				tamanho: 'MEDIA',
+				tamanho: TamanhoPizza.MEDIA,
 				preco: 40,
-				saboresEscolhidos: [{ idPizza: 1, nome: 'Margherita' }],
+				saboresEscolhidos: [
+					{
+						idPizza: 1,
+						nome: 'Margherita',
+						ingredientesEscolhidos: [
+							{
+								idIngrediente: 1,
+								papel: PapelIngrediente.PADRAO,
+							},
+						],
+					},
+				],
 			});
 			const pedido = await gestor.adicionarItemPizza({
 				quantidade: 1,
-				tamanho: 'GRANDE',
+				tamanho: TamanhoPizza.GRANDE,
 				preco: 55,
-				saboresEscolhidos: [{ idPizza: 1, nome: 'Margherita' }],
+				saboresEscolhidos: [
+					{
+						idPizza: 1,
+						nome: 'Margherita',
+						ingredientesEscolhidos: [
+							{
+								idIngrediente: 1,
+								papel: PapelIngrediente.PADRAO,
+							},
+						],
+					},
+				],
 			});
 
+			const ingredientesEscolhidosEsperados = [new IngredienteEscolhido(new Ingrediente(1), PapelIngrediente.PADRAO)];
+			const itemPizzaEsperado1 = new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'), ingredientesEscolhidosEsperados)], TamanhoPizza.MEDIA, 40);
+			const itemPizzaEsperado2 = new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'), ingredientesEscolhidosEsperados)], TamanhoPizza.GRANDE, 55);
+
 			expect(pedido.itensPedido).toHaveLength(2);
-			expect(pedido.itensPedido[0]).toEqual(new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'))], TamanhoPizza.MEDIA, 40));
-			expect(pedido.itensPedido[1]).toEqual(new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'))], TamanhoPizza.GRANDE, 55));
+			expect(pedido.itensPedido[0]).toEqual(itemPizzaEsperado1);
+			expect(pedido.itensPedido[1]).toEqual(itemPizzaEsperado2);
 		});
 
 		it('mantém separadas pizzas de sabores diferentes', async () => {
 			await gestor.adicionarItemPizza({
 				quantidade: 1,
-				tamanho: 'MEDIA',
+				tamanho: TamanhoPizza.MEDIA,
 				preco: 40,
-				saboresEscolhidos: [{ idPizza: 1, nome: 'Margherita' }],
+				saboresEscolhidos: [
+					{
+						idPizza: 1,
+						nome: 'Margherita',
+						ingredientesEscolhidos: [
+							{
+								idIngrediente: 1,
+								papel: PapelIngrediente.PADRAO,
+							},
+						],
+					},
+				],
 			});
 			const pedido = await gestor.adicionarItemPizza({
 				quantidade: 1,
-				tamanho: 'MEDIA',
+				tamanho: TamanhoPizza.MEDIA,
 				preco: 40,
-				saboresEscolhidos: [{ idPizza: 2, nome: 'Calabresa' }],
+				saboresEscolhidos: [
+					{
+						idPizza: 2,
+						nome: 'Calabresa',
+						ingredientesEscolhidos: [
+							{
+								idIngrediente: 3,
+								papel: PapelIngrediente.PADRAO,
+							},
+						],
+					},
+				],
 			});
 
+			const ingredientesEscolhidosEsperados1 = [new IngredienteEscolhido(new Ingrediente(1), PapelIngrediente.PADRAO)];
+			const itemPizzaEsperado1 = new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'), ingredientesEscolhidosEsperados1)], TamanhoPizza.MEDIA, 40);
+			const ingredientesEscolhidosEsperados2 = [new IngredienteEscolhido(new Ingrediente(3), PapelIngrediente.PADRAO)];
+			const itemPizzaEsperado2 = new ItemPizza(1, [new SaborEscolhido(new Pizza(2, 'Calabresa'), ingredientesEscolhidosEsperados2)], TamanhoPizza.MEDIA, 40);
+
 			expect(pedido.itensPedido).toHaveLength(2);
-			expect(pedido.itensPedido[0]).toEqual(new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'))], TamanhoPizza.MEDIA, 40));
-			expect(pedido.itensPedido[1]).toEqual(new ItemPizza(1, [new SaborEscolhido(new Pizza(2, 'Calabresa'))], TamanhoPizza.MEDIA, 40));
+			expect(pedido.itensPedido[0]).toEqual(itemPizzaEsperado1);
+			expect(pedido.itensPedido[1]).toEqual(itemPizzaEsperado2);
 		});
 
 		it('mantém separados uma pizza e um item simples', async () => {
 			await gestor.adicionarItemPizza({
 				quantidade: 1,
-				tamanho: 'MEDIA',
+				tamanho: TamanhoPizza.MEDIA,
 				preco: 40,
-				saboresEscolhidos: [{ idPizza: 1, nome: 'Margherita' }],
+				saboresEscolhidos: [
+					{
+						idPizza: 1,
+						nome: 'Margherita',
+						ingredientesEscolhidos: [
+							{
+								idIngrediente: 1,
+								papel: PapelIngrediente.PADRAO,
+							},
+						],
+					},
+				],
 			});
 			const pedido = await gestor.adicionarItemSimples({
 				quantidade: 1,
@@ -190,8 +305,11 @@ describe('GestorRegistroPedido', () => {
 				preco: 6,
 			});
 
+			const ingredientesEscolhidosEsperados = [new IngredienteEscolhido(new Ingrediente(1), PapelIngrediente.PADRAO)];
+			const itemPizzaEsperado = new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'), ingredientesEscolhidosEsperados)], TamanhoPizza.MEDIA, 40);
+
 			expect(pedido.itensPedido).toHaveLength(2);
-			expect(pedido.itensPedido[0]).toEqual(new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'))], TamanhoPizza.MEDIA, 40));
+			expect(pedido.itensPedido[0]).toEqual(itemPizzaEsperado);
 			expect(pedido.itensPedido[1]).toEqual(new ItemSimples(1, 10, 'Refrigerante', 6));
 		});
 	});

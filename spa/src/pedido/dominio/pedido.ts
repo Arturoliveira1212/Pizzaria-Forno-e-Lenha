@@ -5,6 +5,7 @@ import { ItemSimples } from './item-simples';
 import { ResumoValoresPedido } from './resumo-valores-pedido';
 import { TipoAtendimento } from './tipo-atendimento';
 import { DominioError } from '../../infra/exceptions/dominio-error';
+import { SaborEscolhido } from './sabor-escolhido';
 
 export class Pedido {
 	public readonly tipoAtendimento: TipoAtendimento = TipoAtendimento.BALCAO;
@@ -36,41 +37,44 @@ export class Pedido {
 	adicionarItemPizza(itemPizza: ItemPizza): void {
 		for (const i in this.itensPedido) {
 			const item = this.itensPedido[i];
-			if (item instanceof ItemPizza && item.tamanhoPizza === itemPizza.tamanhoPizza) {
-				const saboresExistentes = item.saboresEscolhidos.map((sabor) => sabor.pizza.id);
-				const novosSabores = itemPizza.saboresEscolhidos.map((sabor) => sabor.pizza.id);
 
-				if (this.saboresIguais(saboresExistentes, novosSabores)) {
-					this.itensPedido[i] = item.criarItemPizzaComNovaQuantidade(item.quantidade + itemPizza.quantidade);
-					return;
-				}
+			if (item instanceof ItemPizza && this.itensPizzaSaoIguais(item, itemPizza)) {
+				this.itensPedido[i] = item.criarItemPizzaComNovaQuantidade(item.quantidade + itemPizza.quantidade);
+				return;
 			}
 		}
 
 		this.itensPedido.push(itemPizza);
 	}
 
-	private saboresIguais(a: number[], b: number[]): boolean {
-		if (a.length !== b.length) {
-			return false;
-		}
+	private itensPizzaSaoIguais(itemA: ItemPizza, itemB: ItemPizza): boolean {
+		return itemA.tamanhoPizza === itemB.tamanhoPizza && this.saboresIguais(itemA.saboresEscolhidos, itemB.saboresEscolhidos);
+	}
 
-		const ordenadoA = [...a].sort();
-		const ordenadoB = [...b].sort();
+	private saboresIguais(a: SaborEscolhido[], b: SaborEscolhido[]): boolean {
+		if (a.length !== b.length) return false;
 
-		return ordenadoA.every((id, indice) => id === ordenadoB[indice]);
+		const chavesA = a.map((s) => s.chave()).sort();
+		const chavesB = b.map((s) => s.chave()).sort();
+
+		return chavesA.every((chave, indice) => chave === chavesB[indice]);
 	}
 
 	adicionarItemSimples(itemSimples: ItemSimples): void {
 		for (const i in this.itensPedido) {
 			const item = this.itensPedido[i];
-			if (item instanceof ItemSimples && item.idProduto === itemSimples.idProduto) {
+
+			if (item instanceof ItemSimples && this.itensSimplesSaoIguais(item, itemSimples)) {
 				this.itensPedido[i] = item.criarItemSimplesComNovaQuantidade(item.quantidade + itemSimples.quantidade);
 				return;
 			}
 		}
 
 		this.itensPedido.push(itemSimples);
+	}
+
+	private itensSimplesSaoIguais(itemA: ItemSimples, itemB: ItemSimples): boolean {
+		return itemA.idProduto === itemB.idProduto;
 	}
 
 	alterarQuantidade(indice: number, delta: number): void {

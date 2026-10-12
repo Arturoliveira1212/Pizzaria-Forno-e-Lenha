@@ -1,16 +1,17 @@
 import { RepositorioPizza } from './repositorio-pizza';
-import { Pizza } from '../dominio/pizza';
 import { ServicoHttp } from '../../infra/http/servico-http';
 import { RepositorioError } from '../../infra/exceptions/repositorio-error';
 import { API } from '../../infra/constantes';
 import { PrecoPorTamanho } from '../dominio/preco-por-tamanho';
 import { HttpError } from '../../infra/exceptions/http-error';
+import { PizzaParaCardapio } from '../dominio/pizza-para-cardapio';
+import { Ingrediente } from '../../ingrediente/dominio/ingrediente';
 
 export class RepositorioPizzaNoServidor implements RepositorioPizza {
 	constructor(private readonly servicoHttp: ServicoHttp) {}
 
-	async obterPizzasParaCardapio(identificador: string = ''): Promise<Pizza[]> {
-		const pizzasParaCardapio: Pizza[] = [];
+	async obterPizzasParaCardapio(identificador: string = ''): Promise<PizzaParaCardapio[]> {
+		const pizzasParaCardapio: PizzaParaCardapio[] = [];
 
 		try {
 			const parametros = new URLSearchParams();
@@ -21,11 +22,12 @@ export class RepositorioPizzaNoServidor implements RepositorioPizza {
 
 			resultado.data.pizzas.forEach((pizza: any) => {
 				pizzasParaCardapio.push(
-					new Pizza(
+					new PizzaParaCardapio(
 						pizza.id,
 						pizza.nome,
 						pizza.descricao,
 						pizza.precosPorTamanho.map((preco: any) => new PrecoPorTamanho(preco.id, preco.tamanhoPizza, preco.preco)),
+						pizza.ingredientes.map((ingrediente: any) => new Ingrediente(ingrediente.id, ingrediente.nome)),
 					),
 				);
 			});

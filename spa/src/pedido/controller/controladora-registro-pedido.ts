@@ -11,6 +11,8 @@ import { TipoAtendimento } from '../dominio/tipo-atendimento';
 import { VisaoResumoPedido } from '../view/visao-resumo-pedido';
 import { VisaoEtapaProdutos } from '../view/visao-etapa-produtos';
 import { VisaoEtapaAtendimento } from '../view/visao-etapa-atendimento';
+import { DadosItemPizza } from '../dados-item-pizza';
+import { DadosItemSimples } from '../dados-item-simples';
 
 type VisoesRegistroPedido = {
 	principal: VisaoRegistroPedido;
@@ -82,9 +84,9 @@ export class ControladoraRegistroPedido {
 		}
 	}
 
-	async adicionarItemPizza(item: { quantidade: number; tamanho: string; preco: number; saboresEscolhidos: { idPizza: number; nome: string }[] }): Promise<void> {
+	async adicionarItemPizza(dados: DadosItemPizza): Promise<void> {
 		try {
-			const pedido = await this.gestor.adicionarItemPizza(item);
+			const pedido = await this.gestor.adicionarItemPizza(dados);
 			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar o produto ao pedido.';
@@ -92,9 +94,9 @@ export class ControladoraRegistroPedido {
 		}
 	}
 
-	async adicionarItemSimples(item: { quantidade: number; idProduto: number; nome: string; preco: number }): Promise<void> {
+	async adicionarItemSimples(dados: DadosItemSimples): Promise<void> {
 		try {
-			const pedido = await this.gestor.adicionarItemSimples(item);
+			const pedido = await this.gestor.adicionarItemSimples(dados);
 			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar o produto ao pedido.';

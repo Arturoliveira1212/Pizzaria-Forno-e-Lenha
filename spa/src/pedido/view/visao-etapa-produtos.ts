@@ -1,11 +1,14 @@
-import { Pizza } from '../../pizza/dominio/pizza';
+import { PizzaParaCardapio } from '../../pizza/dominio/pizza-para-cardapio';
 import { PrecoPorTamanho } from '../../pizza/dominio/preco-por-tamanho';
-import { rotuloTamanho } from '../../pizza/dominio/tamanho-pizza';
+import { rotuloTamanho, TamanhoPizza } from '../../pizza/dominio/tamanho-pizza';
 import { ProdutoSimples } from '../../produto-simples/dominio/produto-simples';
 import { TipoProdutoSimples } from '../../produto-simples/dominio/tipo-produto-simples';
 import { formatarDinheiro } from '../../util/dinheiro';
 import { CategoriaCardapio } from '../categoria-cardapio';
 import { ControladoraRegistroPedido } from '../controller/controladora-registro-pedido';
+import { DadosItemPizza } from '../dados-item-pizza';
+import { DadosItemSimples } from '../dados-item-simples';
+import { PapelIngrediente } from '../dominio/papel-ingrediente';
 import { FiltroCardapio } from '../filtro-cardapio';
 
 export class VisaoEtapaProdutos {
@@ -51,7 +54,7 @@ export class VisaoEtapaProdutos {
 			}
 
 			const card = botao.closest<HTMLElement>('.card-item')!;
-			const itemPizza = this.obterDadosDoItemPizza(card);
+			const itemPizza = this.obterDadosItemPizza(card);
 			if (!itemPizza) {
 				return;
 			}
@@ -68,7 +71,7 @@ export class VisaoEtapaProdutos {
 				}
 
 				const card = botao.closest<HTMLElement>('.card-item')!;
-				const itemSimples = this.obterDadosDoItemSimples(card);
+				const itemSimples = this.obterDadosItemSimples(card);
 				if (!itemSimples) {
 					return;
 				}
@@ -130,7 +133,7 @@ export class VisaoEtapaProdutos {
 		div.appendChild(this.criarAvisoCardapioErro(mensagem));
 	}
 
-	exibirPizzasNoCardapio(pizzas: Pizza[]) {
+	exibirPizzasNoCardapio(pizzas: PizzaParaCardapio[]) {
 		this.exibirCardsNoCardapio(
 			'#secao-pizza > .row',
 			pizzas.map((pizza) => this.criarCardPizza(pizza)),
@@ -142,12 +145,13 @@ export class VisaoEtapaProdutos {
 		this.exibirErroNoCardapio('#secao-pizza > .row', mensagem);
 	}
 
-	private criarCardPizza(pizza: Pizza): DocumentFragment {
+	private criarCardPizza(pizza: PizzaParaCardapio): DocumentFragment {
 		const template = document.querySelector<HTMLTemplateElement>('#template-card-pizza')!.content.cloneNode(true) as DocumentFragment;
 
 		const card = template.querySelector<HTMLElement>('.card-item')!;
 		card.dataset.idPizza = String(pizza.id);
 		card.dataset.nome = pizza.nome;
+		card.dataset.idsIngredientes = pizza.ingredientes.map((ingrediente) => ingrediente.id).join(',');
 
 		const img = card.querySelector<HTMLImageElement>('.card-img-top')!;
 		img.src = pizza.imagem;
@@ -221,26 +225,37 @@ export class VisaoEtapaProdutos {
 		return template;
 	}
 
-	private obterDadosDoItemPizza(card: HTMLElement) {
+	private obterDadosItemPizza(card: HTMLElement): DadosItemPizza | undefined {
 		const tamanhoSelecionado = card.querySelector<HTMLInputElement>('input[name^="tamanho-pizza-"]:checked');
 		if (!tamanhoSelecionado) {
 			return;
 		}
 
+		const ingredientesEscolhidos = card.dataset.idsIngredientes?.split(',').map((id) => {
+			return {
+				idIngrediente: Number(id),
+				papel: PapelIngrediente.PADRAO,
+			};
+		});
+		if (!ingredientesEscolhidos) {
+			return;
+		}
+
 		return {
 			quantidade: 1,
-			tamanho: tamanhoSelecionado.value,
+			tamanho: tamanhoSelecionado.value as TamanhoPizza,
 			preco: Number(tamanhoSelecionado.dataset.preco),
 			saboresEscolhidos: [
 				{
 					idPizza: Number(card.dataset.idPizza),
 					nome: card.dataset.nome ?? '',
+					ingredientesEscolhidos: ingredientesEscolhidos,
 				},
 			],
 		};
 	}
 
-	private obterDadosDoItemSimples(card: HTMLElement) {
+	private obterDadosItemSimples(card: HTMLElement): DadosItemSimples {
 		return {
 			quantidade: 1,
 			idProduto: Number(card.dataset.idProduto),

@@ -72,7 +72,10 @@ export class RepositorioPedidoNoServidor implements RepositorioPedido {
 					tamanhoPizza: item.tamanhoPizza,
 					saboresEscolhidos: item.saboresEscolhidos.map((sabor) => ({
 						idPizza: sabor.pizza.id,
-						ingredientesEscolhidos: [],
+						ingredientesEscolhidos: sabor.ingredientesEscolhidos.map((ingredienteEscolhido) => ({
+							idIngrediente: ingredienteEscolhido.ingrediente.id,
+							papel: ingredienteEscolhido.papel,
+						})),
 					})),
 				};
 			} else if (item instanceof ItemSimples) {
