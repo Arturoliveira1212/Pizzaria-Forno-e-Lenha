@@ -7,12 +7,12 @@ final class CriaTabelaCancelamento extends AbstractMigration {
         $sql = <<<'SQL'
             CREATE TABLE cancelamento (
                 id INT PRIMARY KEY AUTO_INCREMENT,
-                pedidoId INT NOT NULL,
+                idPedido INT NOT NULL,
                 motivo TEXT NOT NULL,
                 data DATETIME NOT NULL,
-                UNIQUE KEY uq_cancelamento_pedido (pedidoId),
+                UNIQUE KEY uq_cancelamento_pedido (idPedido),
                 CONSTRAINT fk_cancelamento_pedido
-                    FOREIGN KEY (pedidoId) REFERENCES pedido(id)
+                    FOREIGN KEY (idPedido) REFERENCES pedido(id)
                     ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=INNODB;
         SQL;

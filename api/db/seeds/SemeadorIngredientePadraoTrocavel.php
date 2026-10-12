@@ -11,7 +11,7 @@ class SemeadorIngredientePadraoTrocavel extends AbstractSeed {
 
     public function run(): void {
         $sql = <<<SQL
-            INSERT INTO ingrediente_padrao_trocavel (ingredientePadraoId, ingredienteId) VALUES
+            INSERT INTO ingrediente_padrao_trocavel (idIngredientePadrao, idIngrediente) VALUES
                 (2, 12), (2, 13),
                 (5, 12), (5, 13),
                 (6, 18), (6, 15),

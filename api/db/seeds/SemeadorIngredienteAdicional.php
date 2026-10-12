@@ -12,7 +12,7 @@ class SemeadorIngredienteAdicional extends AbstractSeed {
 
     public function run(): void {
         $sql = <<<SQL
-            INSERT INTO ingrediente_adicional (pizzaId, ingredienteId, preco) VALUES
+            INSERT INTO ingrediente_adicional (idPizza, idIngrediente, preco) VALUES
                 (1, 18, 500), (1, 7, 400), (1, 11, 450),
                 (2, 18, 500), (2, 7, 400), (2, 11, 450),
                 (3, 18, 500), (3, 7, 400), (3, 11, 450),

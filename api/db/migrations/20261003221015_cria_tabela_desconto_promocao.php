@@ -7,14 +7,14 @@ final class CriaTabelaDescontoPromocao extends AbstractMigration {
         $sql = <<<'SQL'
             CREATE TABLE desconto_promocao (
                 id INT PRIMARY KEY AUTO_INCREMENT,
-                pedidoId INT NOT NULL,
+                idPedido INT NOT NULL,
                 valorDesconto INT NOT NULL,
-                promocaoId INT NOT NULL,
+                idPromocao INT NOT NULL,
                 CONSTRAINT fk_desconto_promocao_pedido
-                    FOREIGN KEY (pedidoId) REFERENCES pedido(id)
+                    FOREIGN KEY (idPedido) REFERENCES pedido(id)
                     ON DELETE CASCADE ON UPDATE CASCADE,
                 CONSTRAINT fk_desconto_promocao_promocao
-                    FOREIGN KEY (promocaoId) REFERENCES promocao(id)
+                    FOREIGN KEY (idPromocao) REFERENCES promocao(id)
                     ON DELETE RESTRICT ON UPDATE CASCADE
             ) ENGINE=INNODB;
         SQL;

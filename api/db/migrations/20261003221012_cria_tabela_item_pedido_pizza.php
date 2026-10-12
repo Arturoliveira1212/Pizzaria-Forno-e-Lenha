@@ -7,12 +7,12 @@ final class CriaTabelaItemPedidoPizza extends AbstractMigration {
         $sql = <<<'SQL'
             CREATE TABLE item_pedido_pizza (
                 id INT PRIMARY KEY AUTO_INCREMENT,
-                pedidoId INT NOT NULL,
+                idPedido INT NOT NULL,
                 quantidade INT NOT NULL,
                 precoPraticado INT NOT NULL DEFAULT 0,
                 tamanho ENUM('PEQUENA', 'MEDIA', 'GRANDE') NOT NULL,
                 CONSTRAINT fk_item_pedido_pizza_pedido
-                    FOREIGN KEY (pedidoId) REFERENCES pedido(id)
+                    FOREIGN KEY (idPedido) REFERENCES pedido(id)
                     ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=INNODB;
         SQL;

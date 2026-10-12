@@ -126,9 +126,9 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
     private function salvarDescontos(int $idPedido, Pedido $pedido): void {
         foreach ($pedido->descontosPromocao as $desconto) {
             $sql = 'INSERT INTO desconto_promocao (
-                    pedidoId,
+                    idPedido,
                     valorDesconto,
-                    promocaoId
+                    idPromocao
                 ) VALUES (
                     :pedidoId,
                     :valorDesconto,
@@ -144,9 +144,9 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
 
         if ($pedido->descontoFidelidade instanceof DescontoFidelidade) {
             $sql = 'INSERT INTO desconto_fidelidade (
-                    pedidoId,
+                    idPedido,
                     valorDesconto,
-                    beneficioFidelidadeId
+                    idBeneficioFidelidade
                 ) VALUES (
                     :pedidoId,
                     :valorDesconto,
@@ -176,10 +176,10 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
 
     private function salvarItemSimples(int $idPedido, ItemSimples $itemSimples): void {
         $sql = 'INSERT INTO item_pedido_simples (
-                pedidoId,
+                idPedido,
                 quantidade,
                 precoPraticado,
-                produtoSimplesId
+                idProdutoSimples
             ) VALUES (
                 :pedidoId,
                 :quantidade,
@@ -197,7 +197,7 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
 
     private function salvarItemPizza(int $idPedido, ItemPizza $itemPizza): void {
         $sql = 'INSERT INTO item_pedido_pizza (
-                pedidoId,
+                idPedido,
                 quantidade,
                 precoPraticado,
                 tamanho
@@ -223,8 +223,8 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
 
     private function salvarSaborEscolhido(int $idItemPizza, SaborEscolhido $saborEscolhido): void {
         $sql = 'INSERT INTO sabor_escolhido (
-                itemPedidoPizzaId,
-                pizzaId
+                idItemPedidoPizza,
+                idPizza
             ) VALUES (
                 :itemPedidoPizzaId,
                 :pizzaId
@@ -243,8 +243,8 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
 
     private function salvarIngredienteEscolhido(int $idSaborEscolhido, IngredienteEscolhido $ingredienteEscolhido): void {
         $sql = 'INSERT INTO ingrediente_escolhido (
-                saborEscolhidoId,
-                ingredienteId,
+                idSaborEscolhido,
+                idIngrediente,
                 custo,
                 papel
             ) VALUES (

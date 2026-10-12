@@ -134,11 +134,11 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
         $idsPizzasString = implode(',', $idsPizzas);
         $sql = "SELECT
             preco_por_tamanho.id,
-            preco_por_tamanho.pizzaId,
+            preco_por_tamanho.idPizza,
             preco_por_tamanho.tamanho,
             preco_por_tamanho.preco
                 FROM preco_por_tamanho
-                    WHERE preco_por_tamanho.pizzaId IN ({$idsPizzasString})";
+                    WHERE preco_por_tamanho.idPizza IN ({$idsPizzasString})";
 
         $resultado = $this->bancoDados->consultar($sql);
 
@@ -159,14 +159,14 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
         $idsPizzasString = implode(',', $idsPizzas);
         $sql = "SELECT
             ingrediente_padrao.id AS idIngredientePadrao,
-            ingrediente_padrao.pizzaId,
+            ingrediente_padrao.idPizza,
             ingrediente_padrao.removivel,
             ingrediente_padrao.substituivel,
             ingrediente.id AS idIngrediente,
             ingrediente.nome AS nomeIngrediente
                 FROM ingrediente_padrao
-                    INNER JOIN ingrediente ON ingrediente.id = ingrediente_padrao.ingredienteId
-                    WHERE ingrediente_padrao.pizzaId IN ({$idsPizzasString})";
+                    INNER JOIN ingrediente ON ingrediente.id = ingrediente_padrao.idIngrediente
+                    WHERE ingrediente_padrao.idPizza IN ({$idsPizzasString})";
 
         $resultado = $this->bancoDados->consultar($sql);
 
@@ -190,15 +190,15 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
     private function buscarIngredientesSubstitutos(array $idsPizzas): array {
         $idsPizzasString = implode(',', $idsPizzas);
         $sql = "SELECT DISTINCT
-            ingrediente_padrao.pizzaId,
+            ingrediente_padrao.idPizza,
             ingrediente.id AS idIngrediente,
             ingrediente.nome AS nomeIngrediente
                 FROM ingrediente_padrao_trocavel
                     INNER JOIN ingrediente_padrao
-                        ON ingrediente_padrao.id = ingrediente_padrao_trocavel.ingredientePadraoId
+                        ON ingrediente_padrao.id = ingrediente_padrao_trocavel.idIngredientePadrao
                     INNER JOIN ingrediente
-                        ON ingrediente.id = ingrediente_padrao_trocavel.ingredienteId
-                    WHERE ingrediente_padrao.pizzaId IN ({$idsPizzasString})";
+                        ON ingrediente.id = ingrediente_padrao_trocavel.idIngrediente
+                    WHERE ingrediente_padrao.idPizza IN ({$idsPizzasString})";
 
         $resultado = $this->bancoDados->consultar($sql);
 
@@ -218,13 +218,13 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
         $idsPizzasString = implode(',', $idsPizzas);
         $sql = "SELECT
             ingrediente_adicional.id AS idIngredienteAdicional,
-            ingrediente_adicional.pizzaId,
+            ingrediente_adicional.idPizza,
             ingrediente_adicional.preco,
             ingrediente.id AS idIngrediente,
             ingrediente.nome AS nomeIngrediente
                 FROM ingrediente_adicional
-                    INNER JOIN ingrediente ON ingrediente.id = ingrediente_adicional.ingredienteId
-                    WHERE ingrediente_adicional.pizzaId IN ({$idsPizzasString})";
+                    INNER JOIN ingrediente ON ingrediente.id = ingrediente_adicional.idIngrediente
+                    WHERE ingrediente_adicional.idPizza IN ({$idsPizzasString})";
 
         $resultado = $this->bancoDados->consultar($sql);
 
@@ -248,7 +248,7 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
         $agrupado = [];
 
         foreach ($linhas as $linha) {
-            $idPizza = (int) $linha['pizzaId'];
+            $idPizza = (int) $linha['idPizza'];
             $agrupado[$idPizza][] = $criarObjeto($linha);
         }
 

@@ -7,21 +7,21 @@ final class CriaTabelaEntrega extends AbstractMigration {
         $sql = <<<'SQL'
             CREATE TABLE entrega (
                 id INT PRIMARY KEY AUTO_INCREMENT,
-                pedidoId INT NOT NULL,
+                idPedido INT NOT NULL,
                 dataSaida DATETIME NULL,
                 dataChegada DATETIME NULL,
                 taxa INT NOT NULL,
-                enderecoId INT NOT NULL,
-                entregadorId INT NOT NULL,
-                UNIQUE KEY uq_entrega_pedido (pedidoId),
+                idEndereco INT NOT NULL,
+                idEntregador INT NOT NULL,
+                UNIQUE KEY uq_entrega_pedido (idPedido),
                 CONSTRAINT fk_entrega_pedido
-                    FOREIGN KEY (pedidoId) REFERENCES pedido(id)
+                    FOREIGN KEY (idPedido) REFERENCES pedido(id)
                     ON DELETE CASCADE ON UPDATE CASCADE,
                 CONSTRAINT fk_entrega_endereco
-                    FOREIGN KEY (enderecoId) REFERENCES endereco(id)
+                    FOREIGN KEY (idEndereco) REFERENCES endereco(id)
                     ON DELETE RESTRICT ON UPDATE CASCADE,
                 CONSTRAINT fk_entrega_entregador
-                    FOREIGN KEY (entregadorId) REFERENCES entregador(id)
+                    FOREIGN KEY (idEntregador) REFERENCES entregador(id)
                     ON DELETE RESTRICT ON UPDATE CASCADE
             ) ENGINE=INNODB;
         SQL;

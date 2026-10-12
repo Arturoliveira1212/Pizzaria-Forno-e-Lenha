@@ -11,7 +11,7 @@ class SemeadorPrecoPorTamanho extends AbstractSeed {
 
     public function run(): void {
         $sql = <<<SQL
-            INSERT INTO preco_por_tamanho (pizzaId, tamanho, preco) VALUES
+            INSERT INTO preco_por_tamanho (idPizza, tamanho, preco) VALUES
                 (1, 'PEQUENA', 3200), (1, 'MEDIA', 4200), (1, 'GRANDE', 5200),
                 (2, 'PEQUENA', 3300), (2, 'MEDIA', 4300), (2, 'GRANDE', 5300),
                 (3, 'PEQUENA', 3000), (3, 'MEDIA', 4000), (3, 'GRANDE', 5000),

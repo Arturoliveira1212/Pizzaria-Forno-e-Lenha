@@ -138,15 +138,15 @@ describe('RepositorioPedidoEmBDR', function () {
             expect($pedidoPersistido['idCliente'])->toBe(11);
 
             $dadosItemSimples = $this->bancoDados->consultar(
-                'SELECT quantidade, precoPraticado, produtoSimplesId FROM item_pedido_simples WHERE pedidoId = :pedidoId',
+                'SELECT quantidade, precoPraticado, idProdutoSimples FROM item_pedido_simples WHERE idPedido = :pedidoId',
                 ['pedidoId' => $idPedido],
             );
             expect($dadosItemSimples)->toBe([
-                ['quantidade' => 1, 'precoPraticado' => 1200, 'produtoSimplesId' => 1],
+                ['quantidade' => 1, 'precoPraticado' => 1200, 'idProdutoSimples' => 1],
             ]);
 
             $dadosItemPizza = $this->bancoDados->consultar(
-                'SELECT quantidade, precoPraticado, tamanho FROM item_pedido_pizza WHERE pedidoId = :pedidoId',
+                'SELECT quantidade, precoPraticado, tamanho FROM item_pedido_pizza WHERE idPedido = :pedidoId',
                 ['pedidoId' => $idPedido],
             );
 
@@ -155,44 +155,44 @@ describe('RepositorioPedidoEmBDR', function () {
             ]);
 
             $dadosSaboresEscolhidos = $this->bancoDados->consultar(
-                'SELECT sabor_escolhido.pizzaId
+                'SELECT sabor_escolhido.idPizza
                     FROM sabor_escolhido
-                    INNER JOIN item_pedido_pizza ON item_pedido_pizza.id = sabor_escolhido.itemPedidoPizzaId
-                        WHERE item_pedido_pizza.pedidoId = :pedidoId',
+                    INNER JOIN item_pedido_pizza ON item_pedido_pizza.id = sabor_escolhido.idItemPedidoPizza
+                        WHERE item_pedido_pizza.idPedido = :pedidoId',
                 ['pedidoId' => $idPedido],
             );
             expect($dadosSaboresEscolhidos)->toBe([
-                ['pizzaId' => 1],
+                ['idPizza' => 1],
             ]);
 
             $dadosIngredientesEscolhidos = $this->bancoDados->consultar(
-                'SELECT ingrediente_escolhido.ingredienteId, ingrediente_escolhido.custo, ingrediente_escolhido.papel
+                'SELECT ingrediente_escolhido.idIngrediente, ingrediente_escolhido.custo, ingrediente_escolhido.papel
                     FROM ingrediente_escolhido
-                    INNER JOIN sabor_escolhido ON sabor_escolhido.id = ingrediente_escolhido.saborEscolhidoId
-                    INNER JOIN item_pedido_pizza ON item_pedido_pizza.id = sabor_escolhido.itemPedidoPizzaId
-                        WHERE item_pedido_pizza.pedidoId = :pedidoId
-                            ORDER BY ingrediente_escolhido.ingredienteId',
+                    INNER JOIN sabor_escolhido ON sabor_escolhido.id = ingrediente_escolhido.idSaborEscolhido
+                    INNER JOIN item_pedido_pizza ON item_pedido_pizza.id = sabor_escolhido.idItemPedidoPizza
+                        WHERE item_pedido_pizza.idPedido = :pedidoId
+                            ORDER BY ingrediente_escolhido.idIngrediente',
                 ['pedidoId' => $idPedido],
             );
             expect($dadosIngredientesEscolhidos)->toBe([
-                ['ingredienteId' => 1, 'custo' => 0, 'papel' => 'PADRAO'],
-                ['ingredienteId' => 2, 'custo' => 0, 'papel' => 'PADRAO'],
+                ['idIngrediente' => 1, 'custo' => 0, 'papel' => 'PADRAO'],
+                ['idIngrediente' => 2, 'custo' => 0, 'papel' => 'PADRAO'],
             ]);
 
             $dadosDescontosPromocao = $this->bancoDados->consultar(
-                'SELECT valorDesconto, promocaoId FROM desconto_promocao WHERE pedidoId = :pedidoId',
+                'SELECT valorDesconto, idPromocao FROM desconto_promocao WHERE idPedido = :pedidoId',
                 ['pedidoId' => $idPedido],
             );
             expect($dadosDescontosPromocao)->toBe([
-                ['valorDesconto' => 500, 'promocaoId' => 1],
+                ['valorDesconto' => 500, 'idPromocao' => 1],
             ]);
 
             $dadosDescontoFidelidade = $this->bancoDados->consultar(
-                'SELECT valorDesconto, beneficioFidelidadeId FROM desconto_fidelidade WHERE pedidoId = :pedidoId',
+                'SELECT valorDesconto, idBeneficioFidelidade FROM desconto_fidelidade WHERE idPedido = :pedidoId',
                 ['pedidoId' => $idPedido],
             );
             expect($dadosDescontoFidelidade)->toBe([
-                ['valorDesconto' => 490, 'beneficioFidelidadeId' => 1],
+                ['valorDesconto' => 490, 'idBeneficioFidelidade' => 1],
             ]);
         });
 

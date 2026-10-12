@@ -7,12 +7,12 @@ final class CriaTabelaPrecoPorTamanho extends AbstractMigration {
         $sql = <<<'SQL'
             CREATE TABLE preco_por_tamanho (
                 id INT PRIMARY KEY AUTO_INCREMENT,
-                pizzaId INT NOT NULL,
+                idPizza INT NOT NULL,
                 tamanho ENUM('PEQUENA', 'MEDIA', 'GRANDE') NOT NULL,
                 preco INT NOT NULL,
-                UNIQUE KEY uq_preco_pizza_tamanho (pizzaId, tamanho),
+                UNIQUE KEY uq_preco_pizza_tamanho (idPizza, tamanho),
                 CONSTRAINT fk_preco_por_tamanho_pizza
-                    FOREIGN KEY (pizzaId) REFERENCES pizza(id)
+                    FOREIGN KEY (idPizza) REFERENCES pizza(id)
                     ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=INNODB;
         SQL;

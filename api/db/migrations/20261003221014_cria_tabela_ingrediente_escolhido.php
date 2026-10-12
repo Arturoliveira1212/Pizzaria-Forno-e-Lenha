@@ -7,15 +7,15 @@ final class CriaTabelaIngredienteEscolhido extends AbstractMigration {
         $sql = <<<'SQL'
             CREATE TABLE ingrediente_escolhido (
                 id INT PRIMARY KEY AUTO_INCREMENT,
-                saborEscolhidoId INT NOT NULL,
-                ingredienteId INT NOT NULL,
+                idSaborEscolhido INT NOT NULL,
+                idIngrediente INT NOT NULL,
                 custo INT NOT NULL,
                 papel ENUM('PADRAO', 'SUBSTITUTO', 'ADICIONAL') NOT NULL,
                 CONSTRAINT fk_ingrediente_escolhido_sabor
-                    FOREIGN KEY (saborEscolhidoId) REFERENCES sabor_escolhido(id)
+                    FOREIGN KEY (idSaborEscolhido) REFERENCES sabor_escolhido(id)
                     ON DELETE CASCADE ON UPDATE CASCADE,
                 CONSTRAINT fk_ingrediente_escolhido_ingrediente
-                    FOREIGN KEY (ingredienteId) REFERENCES ingrediente(id)
+                    FOREIGN KEY (idIngrediente) REFERENCES ingrediente(id)
                     ON DELETE RESTRICT ON UPDATE CASCADE
             ) ENGINE=INNODB;
         SQL;
