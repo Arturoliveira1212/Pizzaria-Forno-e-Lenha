@@ -7,6 +7,7 @@ class GestorPedido {
         private readonly RepositorioCliente $repositorioCliente,
         private readonly RepositorioPizza $repositorioPizza,
         private readonly RepositorioProdutoSimples $repositorioProdutoSimples,
+        private readonly RepositorioIngrediente $repositorioIngrediente,
         private readonly RepositorioPromocao $repositorioPromocao,
         private readonly RepositorioConfiguracaoFidelidade $repositorioConfiguracaoFidelidade,
     ) {}
@@ -135,16 +136,10 @@ class GestorPedido {
                 continue;
             }
 
-            $ingredientesEscolhidos = [];
-
-            foreach ($pizza->ingredientesPadrao as $ingredientePadrao) {
-                $ingredientesEscolhidos[] = new IngredienteEscolhido(
-                    id: 0,
-                    ingrediente: $ingredientePadrao->ingrediente,
-                    papel: PapelIngrediente::PADRAO,
-                    custoAdicional: Dinheiro::zero(),
-                );
-            }
+            $ingredientesEscolhidos = $this->criarIngredientesEscolhidos(
+                pizza: $pizza,
+                ingredientesEscolhidosParaCadastro: $saborEscolhidoParaCadastro->ingredientesEscolhidos,
+            );
 
             try {
                 $saborEscolhido = new SaborEscolhido(
@@ -165,6 +160,57 @@ class GestorPedido {
         }
 
         return $saboresEscolhidos;
+    }
+
+    /**
+     * @param IngredienteEscolhidoParaCadastro[] $ingredientesEscolhidosParaCadastro
+     * @return IngredienteEscolhido[]
+     */
+    private function criarIngredientesEscolhidos(Pizza $pizza, array $ingredientesEscolhidosParaCadastro): array {
+        $erros = [];
+        $ingredientesEscolhidos = [];
+
+        foreach ($ingredientesEscolhidosParaCadastro as $ingredienteEscolhidoParaCadastro) {
+            $ingrediente = $this->repositorioIngrediente->obterIngredientePorId($ingredienteEscolhidoParaCadastro->idIngrediente);
+            if (!$ingrediente instanceof Ingrediente) {
+                $erros[] = "Ingrediente (ID {$ingredienteEscolhidoParaCadastro->idIngrediente}) não encontrado.";
+                continue;
+            }
+
+            $papel = PapelIngrediente::tryFrom(value: $ingredienteEscolhidoParaCadastro->papel);
+            if ($papel === null) {
+                $erros[] = "Papel do ingrediente inválido: {$ingredienteEscolhidoParaCadastro->papel}.";
+                continue;
+            }
+
+            $custo = Dinheiro::zero();
+            if ($papel === PapelIngrediente::ADICIONAL) {
+                $adicional = $pizza->obterAdicional($ingrediente);
+                if ($adicional instanceof IngredienteAdicional) {
+                    $custo = $adicional->preco;
+                }
+            }
+
+            try {
+                $ingredienteEscolhido = new IngredienteEscolhido(
+                    id: 0,
+                    ingrediente: $ingrediente,
+                    papel: $papel,
+                    custoAdicional: $custo,
+                );
+            } catch (DominioException $e) {
+                $erros = [...$erros, ...$e->erros()];
+                continue;
+            }
+
+            $ingredientesEscolhidos[] = $ingredienteEscolhido;
+        }
+
+        if (!empty($erros)) {
+            throw DominioException::criarException(...$erros);
+        }
+
+        return $ingredientesEscolhidos;
     }
 
     /**

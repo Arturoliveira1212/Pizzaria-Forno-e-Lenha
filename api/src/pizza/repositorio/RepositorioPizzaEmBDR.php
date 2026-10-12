@@ -15,15 +15,23 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
 
             $idsPizzas = array_map('intval', array_column($resultado, 'id'));
             $precos = $this->buscarPrecosPorTamanho($idsPizzas);
+            $ingredientesPadrao = $this->buscarIngredientesPadrao($idsPizzas);
 
             $pizzas = [];
             foreach ($resultado as $linha) {
                 $idPizza = (int) $linha['id'];
+                $ingredientes = $ingredientesPadrao[$idPizza]
+                    ? array_map(function (IngredientePadrao $ingredientePadrao) {
+                        return $ingredientePadrao->ingrediente;
+                    }, $ingredientesPadrao[$idPizza])
+                    : [];
+
                 $pizzas[] = new PizzaParaCardapio(
                     id: $idPizza,
                     nome: $linha['nome'],
                     descricao: $linha['descricao'],
                     precosPorTamanho: $precos[$idPizza] ?? [],
+                    ingredientes: $ingredientes,
                 );
             }
 

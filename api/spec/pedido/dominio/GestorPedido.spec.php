@@ -10,6 +10,7 @@ describe('GestorPedido', function () {
         $this->repositorioCliente = Double::instance(['implements' => RepositorioCliente::class]);
         $this->repositorioPizza = Double::instance(['implements' => RepositorioPizza::class]);
         $this->repositorioProdutoSimples = Double::instance(['implements' => RepositorioProdutoSimples::class]);
+        $this->repositorioIngrediente = Double::instance(['implements' => RepositorioIngrediente::class]);
         $this->repositorioPromocao = Double::instance(['implements' => RepositorioPromocao::class]);
         $this->repositorioConfiguracaoFidelidade = Double::instance(['implements' => RepositorioConfiguracaoFidelidade::class]);
 
@@ -19,6 +20,7 @@ describe('GestorPedido', function () {
             repositorioCliente: $this->repositorioCliente,
             repositorioPizza: $this->repositorioPizza,
             repositorioProdutoSimples: $this->repositorioProdutoSimples,
+            repositorioIngrediente: $this->repositorioIngrediente,
             repositorioPromocao: $this->repositorioPromocao,
             repositorioConfiguracaoFidelidade: $this->repositorioConfiguracaoFidelidade,
         );
@@ -149,71 +151,71 @@ describe('GestorPedido', function () {
 
         describe('IngredienteEscolhido', function () {
 
-            // it('lança exceção quando o ingrediente não existe', function () {
-            //     allow($this->repositorioPizza)->toReceive('obterPizzaPorId')->andReturn($this->pizza);
-            //     allow($this->repositorioIngrediente)->toReceive('obterIngredientePorId')->andReturn(null);
+            it('lança exceção quando o ingrediente não existe', function () {
+                allow($this->repositorioPizza)->toReceive('obterPizzaPorId')->andReturn($this->pizza);
+                allow($this->repositorioIngrediente)->toReceive('obterIngredientePorId')->andReturn(null);
 
-            //     $idInexistente = 999;
+                $idInexistente = 999;
 
-            //     expect(function () use ($idInexistente) {
-            //         $this->gestorPedido->registrarPedido(
-            //             new PedidoParaCadastro(
-            //                 tipoAtendimento: TipoAtendimento::BALCAO->value,
-            //                 idCliente: 'dasdsadasdsadas',
-            //                 itensPedido: [
-            //                     new ItemPizzaParaCadastro(
-            //                         tamanho: TamanhoPizza::MEDIA->value,
-            //                         quantidade: 1,
-            //                         saboresEscolhidos: [
-            //                             new SaborEscolhidoParaCadastro(
-            //                                 idPizza: 1,
-            //                                 ingredientesEscolhidos: [
-            //                                     new IngredienteEscolhidoParaCadastro(
-            //                                         idIngrediente: $idInexistente,
-            //                                         papel: PapelIngrediente::PADRAO->value,
-            //                                     ),
-            //                                 ],
-            //                             ),
-            //                         ],
-            //                     ),
-            //                 ],
-            //             ),
-            //         );
-            //     })->toThrow(new DominioException("Ingrediente (ID {$idInexistente}) não encontrado."));
-            // });
+                expect(function () use ($idInexistente) {
+                    $this->gestorPedido->registrarPedido(
+                        new PedidoParaCadastro(
+                            tipoAtendimento: TipoAtendimento::BALCAO->value,
+                            idCliente: 'dasdsadasdsadas',
+                            itensPedido: [
+                                new ItemPizzaParaCadastro(
+                                    tamanho: TamanhoPizza::MEDIA->value,
+                                    quantidade: 1,
+                                    saboresEscolhidos: [
+                                        new SaborEscolhidoParaCadastro(
+                                            idPizza: 1,
+                                            ingredientesEscolhidos: [
+                                                new IngredienteEscolhidoParaCadastro(
+                                                    idIngrediente: $idInexistente,
+                                                    papel: PapelIngrediente::PADRAO->value,
+                                                ),
+                                            ],
+                                        ),
+                                    ],
+                                ),
+                            ],
+                        ),
+                    );
+                })->toThrow(new DominioException("Ingrediente (ID {$idInexistente}) não encontrado."));
+            });
 
-            // it('lança exceção quando o papel do ingrediente é inválido', function () {
-            //     allow($this->repositorioPizza)->toReceive('obterPizzaPorId')->andReturn($this->pizza);
-            //     allow($this->repositorioIngrediente)->toReceive('obterIngredientePorId')->andReturn($this->queijo);
+            it('lança exceção quando o papel do ingrediente é inválido', function () {
+                allow($this->repositorioPizza)->toReceive('obterPizzaPorId')->andReturn($this->pizza);
+                allow($this->repositorioIngrediente)->toReceive('obterIngredientePorId')->andReturn($this->queijo);
 
-            //     $papelQueNaoExiste = 'papel_que_nao_existe';
+                $papelQueNaoExiste = 'papel_que_nao_existe';
 
-            //     expect(function () use ($papelQueNaoExiste) {
-            //         $this->gestorPedido->registrarPedido(
-            //             new PedidoParaCadastro(
-            //                 tipoAtendimento: TipoAtendimento::BALCAO->value,
-            //                 idCliente: 'dasdsadasdsadas',
-            //                 itensPedido: [
-            //                     new ItemPizzaParaCadastro(
-            //                         tamanho: TamanhoPizza::MEDIA->value,
-            //                         quantidade: 1,
-            //                         saboresEscolhidos: [
-            //                             new SaborEscolhidoParaCadastro(
-            //                                 idPizza: 1,
-            //                                 ingredientesEscolhidos: [
-            //                                     new IngredienteEscolhidoParaCadastro(
-            //                                         idIngrediente: 1,
-            //                                         papel: $papelQueNaoExiste,
-            //                                     ),
-            //                                 ],
-            //                             ),
-            //                         ],
-            //                     ),
-            //                 ],
-            //             ),
-            //         );
-            //     })->toThrow(new DominioException("Papel do ingrediente inválido: {$papelQueNaoExiste}."));
-            // });
+                expect(function () use ($papelQueNaoExiste) {
+                    $this->gestorPedido->registrarPedido(
+                        new PedidoParaCadastro(
+                            tipoAtendimento: TipoAtendimento::BALCAO->value,
+                            idCliente: 'dasdsadasdsadas',
+                            itensPedido: [
+                                new ItemPizzaParaCadastro(
+                                    tamanho: TamanhoPizza::MEDIA->value,
+                                    quantidade: 1,
+                                    saboresEscolhidos: [
+                                        new SaborEscolhidoParaCadastro(
+                                            idPizza: 1,
+                                            ingredientesEscolhidos: [
+                                                new IngredienteEscolhidoParaCadastro(
+                                                    idIngrediente: 1,
+                                                    papel: $papelQueNaoExiste,
+                                                ),
+                                            ],
+                                        ),
+                                    ],
+                                ),
+                            ],
+                        ),
+                    );
+                })->toThrow(new DominioException("Papel do ingrediente inválido: {$papelQueNaoExiste}."));
+            });
 
         });
 
@@ -572,6 +574,7 @@ describe('GestorPedido - integração com banco de dados', function () {
             repositorioCliente: new RepositorioClienteEmBDR($this->bancoDados),
             repositorioPizza: new RepositorioPizzaEmBDR($this->bancoDados),
             repositorioProdutoSimples: new RepositorioProdutoSimplesEmBDR($this->bancoDados),
+            repositorioIngrediente: new RepositorioIngredienteEmBDR($this->bancoDados),
             repositorioPromocao: new RepositorioPromocaoEmBDR($this->bancoDados),
             repositorioConfiguracaoFidelidade: new RepositorioConfiguracaoFidelidadeEmBDR($this->bancoDados),
         );
@@ -629,7 +632,12 @@ describe('GestorPedido - integração com banco de dados', function () {
                         saboresEscolhidos: [
                             new SaborEscolhidoParaCadastro(
                                 idPizza: 1,
-                                ingredientesEscolhidos: [],
+                                ingredientesEscolhidos: [
+                                    new IngredienteEscolhidoParaCadastro(
+                                        idIngrediente: 1,
+                                        papel: PapelIngrediente::PADRAO->value,
+                                    ),
+                                ],
                             ),
                         ],
                     ),

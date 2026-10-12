@@ -3,11 +3,13 @@
 class PizzaParaCardapio {
     /**
      * @param PrecoPorTamanho[] $precosPorTamanho
+     * @param Ingrediente[] $ingredientes
      */
     public function __construct(
         public readonly int $id,
         public readonly string $nome,
         public readonly string $descricao,
         public readonly array $precosPorTamanho,
+        public readonly array $ingredientes,
     ) {}
 }
