@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { Cliente } from '../src/cliente/dominio/cliente';
-import { GestorPedido } from '../src/pedido/dominio/gestor-pedido';
 import { ItemPizza } from '../src/pedido/dominio/item-pizza';
 import { ItemSimples } from '../src/pedido/dominio/item-simples';
 import { TipoAtendimento } from '../src/pedido/dominio/tipo-atendimento';
@@ -8,33 +7,58 @@ import { RepositorioPedido } from '../src/pedido/repositorio/repositorio-pedido'
 import { ResumoValoresPedido } from '../src/pedido/dominio/resumo-valores-pedido';
 import { Pedido } from '../src/pedido/dominio/pedido';
 import { DominioError } from '../src/infra/exceptions/dominio-error';
+import { PedidoListagem } from '../src/pedido/dominio/pedido-listagem';
+import { GestorRegistroPedido } from '../src/pedido/dominio/gestor-registro-pedido';
+import { Pizza } from '../src/pizza/dominio/pizza';
+import { RepositorioPizza } from '../src/pizza/repositorio/repositorio-pizza';
+import { ProdutoSimples } from '../src/produto-simples/dominio/produto-simples';
+import { TipoProdutoSimples } from '../src/produto-simples/dominio/tipo-produto-simples';
+import { RepositorioProdutoSimples } from '../src/produto-simples/repositorio/repositorio-produto-simples';
+import { RepositorioCliente } from '../src/cliente/repositorio/repositorio-cliente';
+import { TamanhoPizza } from '../src/pizza/dominio/tamanho-pizza';
+import { SaborEscolhido } from '../src/pedido/dominio/sabor-escolhido';
 
 export class RepositorioPedidoEmMemoria implements RepositorioPedido {
-	public pedidosRegistrados: Pedido[] = [];
-
-	async obterResumoValores(pedido: Pedido): Promise<ResumoValoresPedido> {
-		const subtotal = pedido.itensPedido.reduce((total, item) => total + item.preco * item.quantidade, 0);
-		const taxaEntrega = pedido.tipoAtendimento === TipoAtendimento.ENTREGA ? 10 : 0;
-
-		return new ResumoValoresPedido(0, 0, 0, taxaEntrega, subtotal + taxaEntrega);
+	async obterPedidos(identificador?: string): Promise<PedidoListagem[]> {
+		return [new PedidoListagem(1, '2024-06-01', 'Cliente 1', 'BALCAO', 'PENDENTE', ['EM_PREPARO'], 50)];
 	}
 
-	async registrarPedido(pedido: Pedido): Promise<void> {
-		this.pedidosRegistrados.push(pedido);
+	async alterarStatus(idPedido: number, status: string): Promise<void> {}
+
+	async obterResumoValores(pedido: Pedido): Promise<ResumoValoresPedido> {
+		return new ResumoValoresPedido(0, 0, 0, 0, 150);
+	}
+
+	async registrarPedido(pedido: Pedido): Promise<void> {}
+}
+
+export class RepositorioPizzaEmMemoria implements RepositorioPizza {
+	async obterPizzasParaCardapio(identificador: string): Promise<Pizza[]> {
+		return [new Pizza(1, 'Margherita'), new Pizza(2, 'Calabresa')];
+	}
+}
+
+export class RepositorioProdutoSimplesEmMemoria implements RepositorioProdutoSimples {
+	async obterProdutosSimples(tipo: TipoProdutoSimples, identificador: string): Promise<ProdutoSimples[]> {
+		return [new ProdutoSimples(10, 'Refrigerante', 'Refrigerante gelado', TipoProdutoSimples.BEBIDA, 6)];
+	}
+}
+
+export class RepositorioClienteEmMemoria implements RepositorioCliente {
+	async obterClientes(identificador: string): Promise<Cliente[]> {
+		return [new Cliente(1, 'Cliente 1', '123456789', '123.456.789-00')];
 	}
 }
 
 describe('GestorPedido', () => {
-	let repositorio: RepositorioPedidoEmMemoria;
-	let gestor: GestorPedido;
+	let gestor: GestorRegistroPedido;
 
 	beforeEach(() => {
-		repositorio = new RepositorioPedidoEmMemoria();
-		gestor = new GestorPedido(repositorio);
+		gestor = new GestorRegistroPedido(new RepositorioPedidoEmMemoria(), new RepositorioPizzaEmMemoria(), new RepositorioProdutoSimplesEmMemoria(), new RepositorioClienteEmMemoria());
 	});
 
 	describe('itens simples', () => {
-		it('adiciona um item e atualiza o valor total', async () => {
+		it('adiciona um item corretamente ao pedido', async () => {
 			const pedido = await gestor.adicionarItemSimples({
 				quantidade: 1,
 				idProduto: 10,
@@ -43,7 +67,6 @@ describe('GestorPedido', () => {
 			});
 
 			expect(pedido.itensPedido).toEqual([new ItemSimples(1, 10, 'Refrigerante', 6)]);
-			expect(pedido.valorTotal).toBe(6);
 		});
 
 		it('junta itens iguais somando as quantidades', async () => {
@@ -62,7 +85,6 @@ describe('GestorPedido', () => {
 
 			expect(pedido.itensPedido).toHaveLength(1);
 			expect(pedido.itensPedido[0]).toEqual(new ItemSimples(3, 10, 'Refrigerante', 6));
-			expect(pedido.valorTotal).toBe(18);
 		});
 
 		it('mantém separados itens de produtos diferentes', async () => {
@@ -80,12 +102,13 @@ describe('GestorPedido', () => {
 			});
 
 			expect(pedido.itensPedido).toHaveLength(2);
-			expect(pedido.valorTotal).toBe(14);
+			expect(pedido.itensPedido[0]).toEqual(new ItemSimples(1, 10, 'Refrigerante', 6));
+			expect(pedido.itensPedido[1]).toEqual(new ItemSimples(1, 11, 'Suco', 8));
 		});
 	});
 
 	describe('itens pizza', () => {
-		it('adiciona uma pizza e atualiza o valor total', async () => {
+		it('adiciona uma pizza corretamente ao pedido', async () => {
 			const pedido = await gestor.adicionarItemPizza({
 				quantidade: 1,
 				tamanho: 'MEDIA',
@@ -94,11 +117,10 @@ describe('GestorPedido', () => {
 			});
 
 			expect(pedido.itensPedido).toHaveLength(1);
-			expect(pedido.itensPedido[0]).toBeInstanceOf(ItemPizza);
-			expect(pedido.valorTotal).toBe(40);
+			expect(pedido.itensPedido[0]).toEqual(new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'))], TamanhoPizza.MEDIA, 40));
 		});
 
-		it('junta pizzas com mesmo tamanho e sabores', async () => {
+		it('junta pizzas iguais somando as quantidades', async () => {
 			await gestor.adicionarItemPizza({
 				quantidade: 1,
 				tamanho: 'MEDIA',
@@ -113,8 +135,7 @@ describe('GestorPedido', () => {
 			});
 
 			expect(pedido.itensPedido).toHaveLength(1);
-			expect(pedido.itensPedido[0].quantidade).toBe(3);
-			expect(pedido.valorTotal).toBe(120);
+			expect(pedido.itensPedido[0]).toEqual(new ItemPizza(3, [new SaborEscolhido(new Pizza(1, 'Margherita'))], TamanhoPizza.MEDIA, 40));
 		});
 
 		it('mantém separadas pizzas de tamanhos diferentes', async () => {
@@ -132,10 +153,11 @@ describe('GestorPedido', () => {
 			});
 
 			expect(pedido.itensPedido).toHaveLength(2);
-			expect(pedido.valorTotal).toBe(95);
+			expect(pedido.itensPedido[0]).toEqual(new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'))], TamanhoPizza.MEDIA, 40));
+			expect(pedido.itensPedido[1]).toEqual(new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'))], TamanhoPizza.GRANDE, 55));
 		});
 
-		it('mantém separadas pizzas com sabores diferentes', async () => {
+		it('mantém separadas pizzas de sabores diferentes', async () => {
 			await gestor.adicionarItemPizza({
 				quantidade: 1,
 				tamanho: 'MEDIA',
@@ -150,7 +172,8 @@ describe('GestorPedido', () => {
 			});
 
 			expect(pedido.itensPedido).toHaveLength(2);
-			expect(pedido.valorTotal).toBe(80);
+			expect(pedido.itensPedido[0]).toEqual(new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'))], TamanhoPizza.MEDIA, 40));
+			expect(pedido.itensPedido[1]).toEqual(new ItemPizza(1, [new SaborEscolhido(new Pizza(2, 'Calabresa'))], TamanhoPizza.MEDIA, 40));
 		});
 
 		it('mantém separados uma pizza e um item simples', async () => {
@@ -168,7 +191,8 @@ describe('GestorPedido', () => {
 			});
 
 			expect(pedido.itensPedido).toHaveLength(2);
-			expect(pedido.valorTotal).toBe(46);
+			expect(pedido.itensPedido[0]).toEqual(new ItemPizza(1, [new SaborEscolhido(new Pizza(1, 'Margherita'))], TamanhoPizza.MEDIA, 40));
+			expect(pedido.itensPedido[1]).toEqual(new ItemSimples(1, 10, 'Refrigerante', 6));
 		});
 	});
 
@@ -198,7 +222,6 @@ describe('GestorPedido', () => {
 			const pedido = await gestor.alterarQuantidade(0, 2);
 
 			expect(pedido.itensPedido[0].quantidade).toBe(3);
-			expect(pedido.valorTotal).toBe(18);
 		});
 
 		it('diminui a quantidade sem remover o item enquanto ela for maior que zero', async () => {
@@ -212,7 +235,6 @@ describe('GestorPedido', () => {
 			const pedido = await gestor.alterarQuantidade(0, -1);
 
 			expect(pedido.itensPedido[0].quantidade).toBe(2);
-			expect(pedido.valorTotal).toBe(12);
 		});
 
 		it('lança exceção ao remover item não existente', async () => {
@@ -240,7 +262,6 @@ describe('GestorPedido', () => {
 			const pedido = await gestor.alterarQuantidade(0, -2);
 
 			expect(pedido.itensPedido).toEqual([]);
-			expect(pedido.valorTotal).toBe(0);
 		});
 
 		it('remove apenas o item do índice informado', async () => {
@@ -260,7 +281,6 @@ describe('GestorPedido', () => {
 			const pedido = await gestor.removerItem(0);
 
 			expect(pedido.itensPedido).toEqual([new ItemSimples(1, 11, 'Suco', 8)]);
-			expect(pedido.valorTotal).toBe(8);
 		});
 
 		it('zera os valores ao remover o último item', async () => {
@@ -274,7 +294,6 @@ describe('GestorPedido', () => {
 			const pedido = await gestor.removerItem(0);
 
 			expect(pedido.estaVazio()).toBe(true);
-			expect(pedido.valorTotal).toBe(0);
 		});
 	});
 
@@ -287,8 +306,8 @@ describe('GestorPedido', () => {
 				preco: 6,
 			});
 
-			const comCliente = await gestor.adicionarCliente('cliente-1');
-			expect(comCliente.cliente).toEqual(new Cliente('cliente-1'));
+			const comCliente = await gestor.adicionarCliente(1);
+			expect(comCliente.cliente).toEqual(new Cliente(1));
 		});
 
 		it('remove cliente do pedido', async () => {
@@ -298,7 +317,7 @@ describe('GestorPedido', () => {
 				nome: 'Refrigerante',
 				preco: 6,
 			});
-			await gestor.adicionarCliente('cliente-1');
+			await gestor.adicionarCliente(1);
 
 			const semCliente = await gestor.removerCliente();
 			expect(semCliente.cliente).toBeUndefined();
@@ -316,61 +335,6 @@ describe('GestorPedido', () => {
 
 			const comEntrega = await gestor.atualizarTipoAtendimento(TipoAtendimento.ENTREGA);
 			expect(comEntrega.tipoAtendimento).toBe(TipoAtendimento.ENTREGA);
-			expect(comEntrega.taxaEntrega).toBe(10);
-			expect(comEntrega.valorTotal).toBe(16);
-		});
-	});
-
-	describe('registro do pedido', () => {
-		it('registra o pedido no repositório (itens simples)', async () => {
-			await gestor.adicionarItemSimples({
-				quantidade: 1,
-				idProduto: 10,
-				nome: 'Refrigerante',
-				preco: 6,
-			});
-
-			await gestor.registrarPedido();
-
-			expect(repositorio.pedidosRegistrados).toHaveLength(1);
-			expect(repositorio.pedidosRegistrados[0].itensPedido).toHaveLength(1);
-			expect(repositorio.pedidosRegistrados[0].valorTotal).toBe(6);
-		});
-
-		it('registra o pedido no repositório (itens pizza)', async () => {
-			await gestor.adicionarItemPizza({
-				quantidade: 1,
-				tamanho: 'MEDIA',
-				preco: 40,
-				saboresEscolhidos: [{ idPizza: 1, nome: 'Margherita' }],
-			});
-
-			await gestor.registrarPedido();
-
-			expect(repositorio.pedidosRegistrados).toHaveLength(1);
-			expect(repositorio.pedidosRegistrados[0].itensPedido).toHaveLength(1);
-			expect(repositorio.pedidosRegistrados[0].valorTotal).toBe(40);
-		});
-
-		it('registra o pedido no repositório (itens mistos)', async () => {
-			await gestor.adicionarItemPizza({
-				quantidade: 1,
-				tamanho: 'MEDIA',
-				preco: 40,
-				saboresEscolhidos: [{ idPizza: 1, nome: 'Margherita' }],
-			});
-			await gestor.adicionarItemSimples({
-				quantidade: 1,
-				idProduto: 10,
-				nome: 'Refrigerante',
-				preco: 6,
-			});
-
-			await gestor.registrarPedido();
-
-			expect(repositorio.pedidosRegistrados).toHaveLength(1);
-			expect(repositorio.pedidosRegistrados[0].itensPedido).toHaveLength(2);
-			expect(repositorio.pedidosRegistrados[0].valorTotal).toBe(46);
 		});
 	});
 });

@@ -9,11 +9,33 @@ import { Pizza } from '../../pizza/dominio/pizza';
 import { Cliente } from '../../cliente/dominio/cliente';
 import { TipoAtendimento } from './tipo-atendimento';
 import { DominioError } from '../../infra/exceptions/dominio-error';
+import { RepositorioPizza } from '../../pizza/repositorio/repositorio-pizza';
+import { RepositorioProdutoSimples } from '../../produto-simples/repositorio/repositorio-produto-simples';
+import { TipoProdutoSimples } from '../../produto-simples/dominio/tipo-produto-simples';
+import { ProdutoSimples } from '../../produto-simples/dominio/produto-simples';
+import { RepositorioCliente } from '../../cliente/repositorio/repositorio-cliente';
 
-export class GestorPedido {
+export class GestorRegistroPedido {
 	private pedidoAtual: Pedido = new Pedido();
 
-	constructor(private readonly repositorioPedido: RepositorioPedido) {}
+	constructor(
+		private readonly repositorioPedido: RepositorioPedido,
+		private readonly repositorioPizza: RepositorioPizza,
+		private readonly repositorioProdutoSimples: RepositorioProdutoSimples,
+		private readonly repositorioCliente: RepositorioCliente,
+	) {}
+
+	async obterPizzasParaCardapio(busca: string): Promise<Pizza[]> {
+		return this.repositorioPizza.obterPizzasParaCardapio(busca);
+	}
+
+	async obterProdutosSimples(tipo: TipoProdutoSimples, busca: string): Promise<ProdutoSimples[]> {
+		return this.repositorioProdutoSimples.obterProdutosSimples(tipo, busca);
+	}
+
+	async obterClientes(identificador: string = ''): Promise<Cliente[]> {
+		return this.repositorioCliente.obterClientes(identificador);
+	}
 
 	async adicionarItemPizza(item: { quantidade: number; tamanho: string; preco: number; saboresEscolhidos: { idPizza: number; nome: string }[] }): Promise<Pedido> {
 		const itemPizza = this.criarItemPizza(item);

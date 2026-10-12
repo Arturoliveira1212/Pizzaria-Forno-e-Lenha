@@ -1,36 +1,42 @@
 import { RepositorioPizzaNoServidor } from '../../pizza/repositorio/repositorio-pizza-no-servidor';
-import { GestorPedido } from '../dominio/gestor-pedido';
+import { GestorRegistroPedido } from '../dominio/gestor-registro-pedido';
 import { RepositorioPedidoNoServidor } from '../repositorio/repositorio-pedido-no-servidor';
 import { VisaoRegistroPedido } from '../view/visao-registro-pedido';
 import { ServicoHttpComFetch } from '../../infra/http/servico-http-com-fetch';
 import { CategoriaCardapio } from '../categoria-cardapio';
 import { TipoProdutoSimples } from '../../produto-simples/dominio/tipo-produto-simples';
-import { GestorPizza } from '../../pizza/dominio/gestor-pizza';
-import { GestorProdutoSimples } from '../../produto-simples/dominio/gestor-produto-simples';
 import { RepositorioProdutoSimplesNoServidor } from '../../produto-simples/repositorio/repositorio-produto-simples-no-servidor';
-import { GestorCliente } from '../../cliente/dominio/gestor-cliente';
 import { RepositorioClienteNoServidor } from '../../cliente/repositorio/repositorio-cliente-no-servidor';
 import { TipoAtendimento } from '../dominio/tipo-atendimento';
+import { VisaoResumoPedido } from '../view/visao-resumo-pedido';
+import { VisaoEtapaProdutos } from '../view/visao-etapa-produtos';
+import { VisaoEtapaAtendimento } from '../view/visao-etapa-atendimento';
+
+type VisoesRegistroPedido = {
+	principal: VisaoRegistroPedido;
+	produtos: VisaoEtapaProdutos;
+	atendimento: VisaoEtapaAtendimento;
+	resumo: VisaoResumoPedido;
+};
 
 export class ControladoraRegistroPedido {
-	private readonly visaoRegistroPedido: VisaoRegistroPedido;
-	private readonly gestorPedido: GestorPedido;
-	private readonly gestorPizza: GestorPizza;
-	private readonly gestorProdutoSimples: GestorProdutoSimples;
-	private readonly gestorCliente: GestorCliente;
+	private readonly visoes: VisoesRegistroPedido;
+	private readonly gestor: GestorRegistroPedido;
 
-	constructor(visaoRegistroPedido: VisaoRegistroPedido) {
-		this.visaoRegistroPedido = visaoRegistroPedido;
+	constructor(visoes: VisoesRegistroPedido) {
+		this.visoes = visoes;
 
 		const servicoHttp = new ServicoHttpComFetch();
-		this.gestorPedido = new GestorPedido(new RepositorioPedidoNoServidor(servicoHttp));
-		this.gestorPizza = new GestorPizza(new RepositorioPizzaNoServidor(servicoHttp));
-		this.gestorProdutoSimples = new GestorProdutoSimples(new RepositorioProdutoSimplesNoServidor(servicoHttp));
-		this.gestorCliente = new GestorCliente(new RepositorioClienteNoServidor(servicoHttp));
+		this.gestor = new GestorRegistroPedido(
+			new RepositorioPedidoNoServidor(servicoHttp),
+			new RepositorioPizzaNoServidor(servicoHttp),
+			new RepositorioProdutoSimplesNoServidor(servicoHttp),
+			new RepositorioClienteNoServidor(servicoHttp),
+		);
 	}
 
 	obterCardapio() {
-		const filtro = this.visaoRegistroPedido.obterFiltroCardapio();
+		const filtro = this.visoes.produtos.obterFiltroCardapio();
 
 		switch (filtro.categoria) {
 			case CategoriaCardapio.PIZZA:
@@ -47,113 +53,114 @@ export class ControladoraRegistroPedido {
 
 	private async obterPizzasParaCardapio(busca: string = '') {
 		try {
-			const pizzas = await this.gestorPizza.obterPizzasParaCardapio(busca);
-			this.visaoRegistroPedido.exibirPizzasNoCardapio(pizzas);
+			const pizzas = await this.gestor.obterPizzasParaCardapio(busca);
+			this.visoes.produtos.exibirPizzasNoCardapio(pizzas);
 		} catch (erro) {
 			const mensagemErro = erro instanceof Error ? erro.message : 'Ocorreu um erro ao obter as pizzas para o cardápio.';
-			this.visaoRegistroPedido.exibirErroAoObterPizzasParaCardapio(mensagemErro);
+			this.visoes.produtos.exibirErroAoObterPizzasParaCardapio(mensagemErro);
 		}
 	}
 
 	private async obterProdutosSimplesParaCardapio(tipo: TipoProdutoSimples, busca: string = '') {
 		try {
-			const produtos = await this.gestorProdutoSimples.obterProdutosSimples(tipo, busca);
-			this.visaoRegistroPedido.exibirProdutosSimplesNoCardapio(produtos, tipo);
+			const produtos = await this.gestor.obterProdutosSimples(tipo, busca);
+			this.visoes.produtos.exibirProdutosSimplesNoCardapio(produtos, tipo);
 		} catch (erro) {
 			const mensagemErro = erro instanceof Error ? erro.message : 'Ocorreu um erro ao obter os produtos simples para o cardápio.';
-			this.visaoRegistroPedido.exibirErroAoObterProdutosSimplesParaCardapio(mensagemErro, tipo);
+			this.visoes.produtos.exibirErroAoObterProdutosSimplesParaCardapio(mensagemErro, tipo);
 		}
 	}
 
 	async obterClientes() {
 		try {
-			const busca = this.visaoRegistroPedido.obterFiltroCliente();
-			const clientes = await this.gestorCliente.obterClientes(busca);
-			this.visaoRegistroPedido.exibirClientes(clientes);
+			const busca = this.visoes.atendimento.obterFiltroCliente();
+			const clientes = await this.gestor.obterClientes(busca);
+			this.visoes.atendimento.exibirClientes(clientes);
 		} catch (erro) {
 			const mensagemErro = erro instanceof Error ? erro.message : 'Ocorreu um erro ao obter as pizzas para o cardápio.';
-			this.visaoRegistroPedido.exibirErroAoObterClientes(mensagemErro);
+			this.visoes.atendimento.exibirErroAoObterClientes(mensagemErro);
 		}
 	}
 
 	async adicionarItemPizza(item: { quantidade: number; tamanho: string; preco: number; saboresEscolhidos: { idPizza: number; nome: string }[] }): Promise<void> {
 		try {
-			const pedido = await this.gestorPedido.adicionarItemPizza(item);
-			this.visaoRegistroPedido.exibirResumoPedido(pedido);
+			const pedido = await this.gestor.adicionarItemPizza(item);
+			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar o produto ao pedido.';
-			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
 	}
 
 	async adicionarItemSimples(item: { quantidade: number; idProduto: number; nome: string; preco: number }): Promise<void> {
 		try {
-			const pedido = await this.gestorPedido.adicionarItemSimples(item);
-			this.visaoRegistroPedido.exibirResumoPedido(pedido);
+			const pedido = await this.gestor.adicionarItemSimples(item);
+			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar o produto ao pedido.';
-			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
 	}
 
 	async adicionarCliente(idCliente: number): Promise<void> {
 		try {
-			const pedido = await this.gestorPedido.adicionarCliente(idCliente);
-			this.visaoRegistroPedido.exibirResumoPedido(pedido);
+			const pedido = await this.gestor.adicionarCliente(idCliente);
+			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar o cliente ao pedido.';
-			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
 	}
 
 	async removerCliente(): Promise<void> {
 		try {
-			const pedido = await this.gestorPedido.removerCliente();
-			this.visaoRegistroPedido.exibirResumoPedido(pedido);
+			const pedido = await this.gestor.removerCliente();
+			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível remover o cliente do pedido.';
-			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
 	}
 
 	async alterarQuantidade(indice: number, delta: number): Promise<void> {
 		try {
-			const pedido = await this.gestorPedido.alterarQuantidade(indice, delta);
-			this.visaoRegistroPedido.exibirResumoPedido(pedido);
+			const pedido = await this.gestor.alterarQuantidade(indice, delta);
+			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível alterar a quantidade do item.';
-			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
 	}
 
 	async removerItem(indice: number): Promise<void> {
 		try {
-			const pedido = await this.gestorPedido.removerItem(indice);
-			this.visaoRegistroPedido.exibirResumoPedido(pedido);
+			const pedido = await this.gestor.removerItem(indice);
+			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível remover o item.';
-			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
 	}
 
 	async atualizarTipoAtendimento(tipoAtendimento: TipoAtendimento): Promise<void> {
 		try {
-			const pedido = await this.gestorPedido.atualizarTipoAtendimento(tipoAtendimento);
-			this.visaoRegistroPedido.exibirResumoPedido(pedido);
+			const pedido = await this.gestor.atualizarTipoAtendimento(tipoAtendimento);
+			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível atualizar o tipo de atendimento.';
-			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
+			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
 	}
 
 	async registrarPedido(): Promise<void> {
 		try {
-			await this.gestorPedido.registrarPedido();
-			this.visaoRegistroPedido.exibirPedidoRegistrado();
+			await this.gestor.registrarPedido();
+			this.visoes.resumo.exibirMensagemPedidoRegistrado();
+			this.visoes.principal.redirecionarParaHome();
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível registrar o pedido.';
-			this.visaoRegistroPedido.exibirErroNoPedido(mensagem);
-			this.visaoRegistroPedido.habilitarRegistroPedido();
+			this.visoes.resumo.exibirErroNoPedido(mensagem);
+			this.visoes.resumo.habilitarRegistroPedido();
 		}
 	}
 }
