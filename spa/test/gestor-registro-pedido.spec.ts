@@ -50,7 +50,7 @@ export class RepositorioClienteEmMemoria implements RepositorioCliente {
 	}
 }
 
-describe('GestorPedido', () => {
+describe('GestorRegistroPedido', () => {
 	let gestor: GestorRegistroPedido;
 
 	beforeEach(() => {
