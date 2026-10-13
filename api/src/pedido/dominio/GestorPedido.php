@@ -186,9 +186,12 @@ class GestorPedido {
             $custo = Dinheiro::zero();
             if ($papel === PapelIngrediente::ADICIONAL) {
                 $adicional = $pizza->obterAdicional($ingrediente);
-                if ($adicional instanceof IngredienteAdicional) {
-                    $custo = $adicional->preco;
+                if (!$adicional instanceof IngredienteAdicional) {
+                    $erros[] = "Ingrediente adicional (ID {$ingrediente->id}) não encontrado para a pizza (ID {$pizza->id}).";
+                    continue;
                 }
+
+                $custo = $adicional->preco;
             }
 
             try {

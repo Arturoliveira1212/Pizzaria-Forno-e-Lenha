@@ -217,6 +217,41 @@ describe('GestorPedido', function () {
                 })->toThrow(new DominioException("Papel do ingrediente inválido: {$papelQueNaoExiste}."));
             });
 
+            it('lança exceção quando o adicional não é encontrado', function () {
+                allow($this->repositorioPizza)->toReceive('obterPizzaPorId')->andReturn($this->pizza);
+                allow($this->repositorioIngrediente)->toReceive('obterIngredientePorId')->andReturn($this->queijo);
+
+                expect(function () {
+                    $this->gestorPedido->registrarPedido(
+                        new PedidoParaCadastro(
+                            tipoAtendimento: TipoAtendimento::BALCAO->value,
+                            idCliente: 'dasdsadasdsadas',
+                            itensPedido: [
+                                new ItemPizzaParaCadastro(
+                                    tamanho: TamanhoPizza::MEDIA->value,
+                                    quantidade: 1,
+                                    saboresEscolhidos: [
+                                        new SaborEscolhidoParaCadastro(
+                                            idPizza: 1,
+                                            ingredientesEscolhidos: [
+                                                new IngredienteEscolhidoParaCadastro(
+                                                    idIngrediente: 2,
+                                                    papel: PapelIngrediente::PADRAO->value,
+                                                ),
+                                                new IngredienteEscolhidoParaCadastro(
+                                                    idIngrediente: 1,
+                                                    papel: PapelIngrediente::ADICIONAL->value,
+                                                ),
+                                            ],
+                                        ),
+                                    ],
+                                ),
+                            ],
+                        ),
+                    );
+                })->toThrow(new DominioException('Ingrediente adicional (ID 1) não encontrado para a pizza (ID 1).'));
+            });
+
         });
 
         describe('ItemSimples', function () {
