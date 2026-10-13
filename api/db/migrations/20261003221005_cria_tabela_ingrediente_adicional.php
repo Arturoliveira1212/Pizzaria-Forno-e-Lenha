@@ -7,12 +7,8 @@ final class CriaTabelaIngredienteAdicional extends AbstractMigration {
         $sql = <<<'SQL'
             CREATE TABLE ingrediente_adicional (
                 id INT PRIMARY KEY AUTO_INCREMENT,
-                idPizza INT NOT NULL,
                 idIngrediente INT NOT NULL,
                 preco INT NOT NULL,
-                CONSTRAINT fk_ingrediente_adicional_pizza
-                    FOREIGN KEY (idPizza) REFERENCES pizza(id)
-                    ON DELETE CASCADE ON UPDATE CASCADE,
                 CONSTRAINT fk_ingrediente_adicional_ingrediente
                     FOREIGN KEY (idIngrediente) REFERENCES ingrediente(id)
                     ON DELETE RESTRICT ON UPDATE CASCADE

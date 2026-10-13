@@ -198,15 +198,13 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
     private function buscarIngredientesSubstitutos(array $idsPizzas): array {
         $idsPizzasString = implode(',', $idsPizzas);
         $sql = "SELECT DISTINCT
-            ingrediente_padrao.idPizza,
+            ingrediente_substituto.idPizza,
             ingrediente.id AS idIngrediente,
             ingrediente.nome AS nomeIngrediente
-                FROM ingrediente_padrao_trocavel
-                    INNER JOIN ingrediente_padrao
-                        ON ingrediente_padrao.id = ingrediente_padrao_trocavel.idIngredientePadrao
+                FROM ingrediente_substituto
                     INNER JOIN ingrediente
-                        ON ingrediente.id = ingrediente_padrao_trocavel.idIngrediente
-                    WHERE ingrediente_padrao.idPizza IN ({$idsPizzasString})";
+                        ON ingrediente.id = ingrediente_substituto.idIngrediente
+                    WHERE ingrediente_substituto.idPizza IN ({$idsPizzasString})";
 
         $resultado = $this->bancoDados->consultar($sql);
 
@@ -226,13 +224,15 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
         $idsPizzasString = implode(',', $idsPizzas);
         $sql = "SELECT
             ingrediente_adicional.id AS idIngredienteAdicional,
-            ingrediente_adicional.idPizza,
+            adicional_pizza.idPizza,
             ingrediente_adicional.preco,
             ingrediente.id AS idIngrediente,
             ingrediente.nome AS nomeIngrediente
                 FROM ingrediente_adicional
+                    INNER JOIN adicional_pizza
+                        ON adicional_pizza.idIngredienteAdicional = ingrediente_adicional.id
                     INNER JOIN ingrediente ON ingrediente.id = ingrediente_adicional.idIngrediente
-                    WHERE ingrediente_adicional.idPizza IN ({$idsPizzasString})";
+                    WHERE adicional_pizza.idPizza IN ({$idsPizzasString})";
 
         $resultado = $this->bancoDados->consultar($sql);
 
