@@ -10,7 +10,7 @@ class SemeadorPromocao extends AbstractSeed {
     public function run(): void {
         $sql = <<<SQL
             INSERT INTO promocao (descricao, percentualDesconto, quantidadeMinima, dataInicio, validade, tamanho) VALUES
-                ('Promoção Dia das Crianças', 10, 2, '2026-10-01', '2026-10-12', 'GRANDE');
+                ('Promoção', 10, 2, '2026-01-01', NULL, 'GRANDE');
         SQL;
         $this->execute($sql);
     }

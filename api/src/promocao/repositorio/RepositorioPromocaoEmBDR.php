@@ -21,8 +21,8 @@ class RepositorioPromocaoEmBDR implements RepositorioPromocao {
                     quantidadeMinima: (int) $linha['quantidadeMinima'],
                     tamanhoPizza: TamanhoPizza::from($linha['tamanho']),
                     percentualDesconto: new Percentual((int) $linha['percentualDesconto']),
-                    dataInicio: new DateTime($linha['dataInicio']),
-                    dataFim: new DateTime($linha['validade']),
+                    dataInicio: $linha['dataInicio'] ? new DateTime($linha['dataInicio']) : null,
+                    dataFim: $linha['validade'] ? new DateTime($linha['validade']) : null,
                 );
             }
 
@@ -48,8 +48,8 @@ class RepositorioPromocaoEmBDR implements RepositorioPromocao {
                     WHERE 1=1';
 
         if ($filtro->apenasVigentes) {
-            $query .= ' AND promocao.dataInicio <= CURDATE()
-                AND promocao.validade >= CURDATE()';
+            $query .= ' AND (dataInicio IS NULL OR dataInicio <= CURDATE())
+                AND (validade IS NULL OR validade   >= CURDATE());';
         }
 
         if ($filtro->paginacao !== null) {

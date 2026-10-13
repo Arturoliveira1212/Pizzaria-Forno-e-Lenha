@@ -10,8 +10,8 @@ final class CriaTabelaPromocao extends AbstractMigration {
                 descricao TEXT NOT NULL,
                 percentualDesconto INT NOT NULL,
                 quantidadeMinima INT NOT NULL,
-                dataInicio DATE NOT NULL,
-                validade DATE NOT NULL,
+                dataInicio DATE DEFAULT NULL,
+                validade DATE DEFAULT NULL,
                 tamanho ENUM('PEQUENA', 'MEDIA', 'GRANDE') NOT NULL
             ) ENGINE=INNODB;
         SQL;
