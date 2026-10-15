@@ -32,4 +32,13 @@ class GestorPizza {
             ),
         );
     }
+
+    public function obterPizzaPorId(int $id): Pizza {
+        $pizza = $this->repositorio->obterPizzaPorId($id);
+        if (!$pizza instanceof Pizza) {
+            throw new NaoEncontradoException('Pizza não encontrada.');
+        }
+
+        return $pizza;
+    }
 }
