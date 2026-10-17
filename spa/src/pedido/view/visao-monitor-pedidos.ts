@@ -1,3 +1,4 @@
+import { clonarTemplate } from '../../util/dom';
 import { ControladoraListagemPedidos } from '../controller/controladora-listagem-pedidos';
 import { PedidoListagem } from '../dominio/pedido-listagem';
 import { VisaoPedidos } from './visao-pedidos';
@@ -24,7 +25,7 @@ export class VisaoMonitorPedidos implements VisaoPedidos {
 	}
 
 	exibirPedidos(pedidos: PedidoListagem[]): void {
-		this.listaPedidos.innerHTML = '';
+		this.listaPedidos.replaceChildren();
 
 		if (pedidos.length === 0) {
 			this.listaPedidos.innerHTML = '<tr><td colspan="3" class="text-center text-body-secondary">Nenhum pedido no momento.</td></tr>';
@@ -41,7 +42,7 @@ export class VisaoMonitorPedidos implements VisaoPedidos {
 	}
 
 	private criarLinhaPedido(pedido: PedidoListagem): DocumentFragment {
-		const template = document.querySelector<HTMLTemplateElement>('#template-pedido-monitor')!.content.cloneNode(true) as DocumentFragment;
+		const template = clonarTemplate('template-pedido-monitor');
 		const linha = template.querySelector('tr')!;
 
 		linha.querySelector<HTMLElement>('.pedido-id')!.textContent = `#${pedido.id}`;

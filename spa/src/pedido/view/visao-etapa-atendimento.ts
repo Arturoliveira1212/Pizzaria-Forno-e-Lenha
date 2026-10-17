@@ -1,4 +1,5 @@
 import { Cliente } from '../../cliente/dominio/cliente';
+import { clonarTemplate } from '../../util/dom';
 import { ControladoraRegistroPedido } from '../controller/controladora-registro-pedido';
 import { TipoAtendimento } from '../dominio/tipo-atendimento';
 import { TipoCliente } from '../tipo-cliente';
@@ -99,7 +100,7 @@ export class VisaoEtapaAtendimento {
 	}
 
 	exibirClientes(clientes: Cliente[]) {
-		this.listaClientes.innerHTML = '';
+		this.listaClientes.replaceChildren();
 
 		if (clientes.length === 0) {
 			this.listaClientes.appendChild(this.criarAvisoCliente('Nenhum cliente encontrado.'));
@@ -114,19 +115,19 @@ export class VisaoEtapaAtendimento {
 	}
 
 	exibirErroAoObterClientes(mensagem: string) {
-		this.listaClientes.innerHTML = '';
+		this.listaClientes.replaceChildren();
 		this.listaClientes.appendChild(this.criarAvisoCliente(mensagem));
 	}
 
 	private criarAvisoCliente(mensagem: string): DocumentFragment {
-		const template = document.querySelector<HTMLTemplateElement>('#template-cliente-erro')!.content.cloneNode(true) as DocumentFragment;
+		const template = clonarTemplate('template-cliente-erro');
 		template.querySelector<HTMLElement>('.mensagem')!.textContent = mensagem;
 
 		return template;
 	}
 
 	private criarInputCliente(cliente: Cliente): DocumentFragment {
-		const template = document.querySelector<HTMLTemplateElement>('#template-cliente')!.content.cloneNode(true) as DocumentFragment;
+		const template = clonarTemplate('template-cliente');
 
 		const input = template.querySelector<HTMLInputElement>('input[type="radio"]')!;
 		input.id = `cliente-${cliente.id}`;

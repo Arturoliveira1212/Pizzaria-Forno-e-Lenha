@@ -4,6 +4,7 @@ import { rotuloTamanho, TamanhoPizza } from '../../pizza/dominio/tamanho-pizza';
 import { ProdutoSimples } from '../../produto-simples/dominio/produto-simples';
 import { TipoProdutoSimples } from '../../produto-simples/dominio/tipo-produto-simples';
 import { formatarDinheiro } from '../../util/dinheiro';
+import { clonarTemplate } from '../../util/dom';
 import { CategoriaCardapio } from '../categoria-cardapio';
 import { ControladoraRegistroPedido } from '../controller/controladora-registro-pedido';
 import { DadosItemPizza } from '../dados-item-pizza';
@@ -107,7 +108,7 @@ export class VisaoEtapaProdutos {
 	}
 
 	private criarAvisoCardapioErro(mensagem: string): DocumentFragment {
-		const template = document.querySelector<HTMLTemplateElement>('#template-cardapio-erro')!.content.cloneNode(true) as DocumentFragment;
+		const template = clonarTemplate('template-cardapio-erro');
 		template.querySelector<HTMLElement>('.mensagem')!.textContent = mensagem;
 
 		return template;
@@ -115,7 +116,7 @@ export class VisaoEtapaProdutos {
 
 	private exibirCardsNoCardapio(seletorDiv: string, cards: DocumentFragment[], mensagemVazio: string) {
 		const div = document.querySelector<HTMLElement>(seletorDiv)!;
-		div.innerHTML = '';
+		div.replaceChildren();
 
 		if (cards.length === 0) {
 			div.appendChild(this.criarAvisoCardapioErro(mensagemVazio));
@@ -129,7 +130,7 @@ export class VisaoEtapaProdutos {
 
 	private exibirErroNoCardapio(seletorDiv: string, mensagem: string) {
 		const div = document.querySelector<HTMLElement>(seletorDiv)!;
-		div.innerHTML = '';
+		div.replaceChildren();
 		div.appendChild(this.criarAvisoCardapioErro(mensagem));
 	}
 
@@ -146,7 +147,7 @@ export class VisaoEtapaProdutos {
 	}
 
 	private criarCardPizza(pizza: PizzaParaCardapio): DocumentFragment {
-		const template = document.querySelector<HTMLTemplateElement>('#template-card-pizza')!.content.cloneNode(true) as DocumentFragment;
+		const template = clonarTemplate('template-card-pizza');
 
 		const card = template.querySelector<HTMLElement>('.card-item')!;
 		card.dataset.idPizza = String(pizza.id);
@@ -169,7 +170,7 @@ export class VisaoEtapaProdutos {
 	}
 
 	private criarOpcaoTamanho(idPizza: number, precoPorTamanho: PrecoPorTamanho, selecionado: boolean): DocumentFragment {
-		const template = document.querySelector<HTMLTemplateElement>('#template-tamanho-pizza')!.content.cloneNode(true) as DocumentFragment;
+		const template = clonarTemplate('template-tamanho-pizza');
 
 		const input = template.querySelector<HTMLInputElement>('input[type="radio"]')!;
 		input.id = `tamanho-${idPizza}-${precoPorTamanho.tamanhoPizza}`;
@@ -206,7 +207,7 @@ export class VisaoEtapaProdutos {
 	}
 
 	private criarCardProdutoSimples(produto: ProdutoSimples): DocumentFragment {
-		const template = document.querySelector<HTMLTemplateElement>('#template-card-produto-simples')!.content.cloneNode(true) as DocumentFragment;
+		const template = clonarTemplate('template-card-produto-simples');
 
 		const card = template.querySelector<HTMLElement>('.card-item')!;
 		card.dataset.idProduto = String(produto.id);

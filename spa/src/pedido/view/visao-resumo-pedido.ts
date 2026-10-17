@@ -1,5 +1,6 @@
 import { rotuloTamanho } from '../../pizza/dominio/tamanho-pizza';
 import { formatarDinheiro } from '../../util/dinheiro';
+import { clonarTemplate } from '../../util/dom';
 import { ControladoraRegistroPedido } from '../controller/controladora-registro-pedido';
 import { ItemPizza } from '../dominio/item-pizza';
 import { ItemSimples } from '../dominio/item-simples';
@@ -47,7 +48,7 @@ export class VisaoResumoPedido {
 	exibirResumoPedido(pedido: Pedido): void {
 		const itensPedido = pedido.itensPedido;
 
-		this.listaItensPedido.innerHTML = '';
+		this.listaItensPedido.replaceChildren();
 		this.avisoCarrinhoVazio.classList.toggle('d-none', itensPedido.length > 0);
 
 		const totalUnidades = itensPedido.reduce((soma, item) => soma + item.quantidade, 0);
@@ -67,7 +68,7 @@ export class VisaoResumoPedido {
 	}
 
 	private criarItemPizzaNoResumo(item: ItemPizza, indice: number): DocumentFragment {
-		const template = document.querySelector<HTMLTemplateElement>('#template-item-pedido')!.content.cloneNode(true) as DocumentFragment;
+		const template = clonarTemplate('template-item-pedido');
 		const elemento = template.querySelector<HTMLElement>('.item-pedido')!;
 		elemento.dataset.indice = String(indice);
 
@@ -89,7 +90,7 @@ export class VisaoResumoPedido {
 	}
 
 	private criarItemSimplesNoResumo(item: ItemSimples, indice: number): DocumentFragment {
-		const template = document.querySelector<HTMLTemplateElement>('#template-item-pedido')!.content.cloneNode(true) as DocumentFragment;
+		const template = clonarTemplate('template-item-pedido');
 		const elemento = template.querySelector<HTMLElement>('.item-pedido')!;
 		elemento.dataset.indice = String(indice);
 
@@ -141,7 +142,7 @@ export class VisaoResumoPedido {
 	exibirErroNoPedido(mensagem: string): void {
 		this.tituloCarrinho.querySelector('.alert')?.remove();
 
-		const template = document.querySelector<HTMLTemplateElement>('#template-pedido-erro')!.content.cloneNode(true) as DocumentFragment;
+		const template = clonarTemplate('template-pedido-erro');
 		const mensagemErro = template.querySelector<HTMLElement>('.mensagem')!;
 		mensagemErro.textContent = mensagem;
 
@@ -161,7 +162,7 @@ export class VisaoResumoPedido {
 	}
 
 	exibirMensagemPedidoRegistrado(): void {
-		const template = document.querySelector<HTMLTemplateElement>('#template-pedido-sucesso')!.content.cloneNode(true) as DocumentFragment;
+		const template = clonarTemplate('template-pedido-sucesso');
 		const aviso = template.querySelector<HTMLElement>('.mensagem')!;
 		aviso.textContent = 'Pedido registrado com sucesso.';
 		this.tituloCarrinho.append(template);

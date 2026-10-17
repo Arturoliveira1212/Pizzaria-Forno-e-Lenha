@@ -1,3 +1,4 @@
+import { clonarTemplate } from '../../util/dom';
 import { ControladoraListagemPedidos } from '../controller/controladora-listagem-pedidos';
 import { PedidoListagem } from '../dominio/pedido-listagem';
 import { VisaoPedidos } from './visao-pedidos';
@@ -39,7 +40,7 @@ export class VisaoListagemPedidos implements VisaoPedidos {
 	}
 
 	exibirPedidos(pedidos: PedidoListagem[]): void {
-		this.listaPedidos.innerHTML = '';
+		this.listaPedidos.replaceChildren();
 
 		if (pedidos.length === 0) {
 			this.listaPedidos.innerHTML = '<tr><td colspan="7" class="text-center text-body-secondary">Nenhum pedido encontrado.</td></tr>';
@@ -56,7 +57,7 @@ export class VisaoListagemPedidos implements VisaoPedidos {
 	}
 
 	private criarLinhaPedido(pedido: PedidoListagem): DocumentFragment {
-		const template = document.querySelector<HTMLTemplateElement>('#template-pedido-listagem')!.content.cloneNode(true) as DocumentFragment;
+		const template = clonarTemplate('template-pedido-listagem');
 		const linha = template.querySelector('tr')!;
 
 		linha.querySelector<HTMLElement>('.pedido-id')!.textContent = String(pedido.id);
@@ -85,7 +86,7 @@ export class VisaoListagemPedidos implements VisaoPedidos {
 	private abrirModalStatus(pedido: PedidoListagem): void {
 		this.pedidoSelecionado = pedido;
 		this.tituloModalStatus.textContent = `Pedido #${pedido.id}`;
-		this.selectStatusPedido.innerHTML = '';
+		this.selectStatusPedido.replaceChildren();
 		pedido.proximosStatus.forEach((status) => {
 			const option = document.createElement('option');
 			option.value = status;
