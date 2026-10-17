@@ -131,7 +131,7 @@ export class TelaRegistroPedido {
 	}
 
 	async removerItemDoResumo(nome: string): Promise<void> {
-		await this.itemResumo(nome).locator('.remover').click();
+		await this.itemResumo(nome).locator('.remover-item').click();
 	}
 
 	async deveExibirCarrinhoVazio(): Promise<void> {

@@ -34,7 +34,7 @@ export class VisaoResumoPedido {
 				this.controladoraRegistroPedido.alterarQuantidade(indice, 1);
 			} else if (elementoClicado.closest('.diminuir-quantidade')) {
 				this.controladoraRegistroPedido.alterarQuantidade(indice, -1);
-			} else if (elementoClicado.closest('.remover')) {
+			} else if (elementoClicado.closest('.remover-item')) {
 				this.controladoraRegistroPedido.removerItem(indice);
 			}
 		});

@@ -31,7 +31,34 @@ export class VisaoPersonalizacaoPizza {
 		this.registrarEventos();
 	}
 
-	registrarEventos(): void {}
+	registrarEventos(): void {
+		this.listaIngredientes.addEventListener('click', (event: Event) => {
+			const elementoClicado = event.target as HTMLInputElement;
+			const ingredientePersonalizavel = elementoClicado.closest<HTMLElement>('.ingrediente-personalizavel');
+			if (!ingredientePersonalizavel) {
+				return;
+			}
+
+			if (elementoClicado.closest('.remover-ingrediente')) {
+				const marcado = elementoClicado.checked;
+				this.removerIngrediente(ingredientePersonalizavel, marcado);
+			}
+		});
+
+		this.listaAdicionais.addEventListener('click', (event: Event) => {
+			const elementoClicado = event.target as HTMLInputElement;
+			const ingredienteAdicional = elementoClicado.closest<HTMLElement>('.ingrediente-adicional');
+			if (!ingredienteAdicional) {
+				return;
+			}
+
+			if (elementoClicado.closest('.aumentar-quantidade-adicional')) {
+				this.atualizarQuantidadeAdicional(ingredienteAdicional, 1);
+			} else if (elementoClicado.closest('.diminuir-quantidade-adicional')) {
+				this.atualizarQuantidadeAdicional(ingredienteAdicional, -1);
+			}
+		});
+	}
 
 	exibirPizzaParaPersonalizacao(pizza: Pizza, tamanho: TamanhoPizza): void {
 		this.resetarModal();
@@ -84,6 +111,10 @@ export class VisaoPersonalizacaoPizza {
 
 	private criarItemListaIngredienteFixo(ingredientePadrao: IngredientePadrao): DocumentFragment {
 		const template = clonarTemplate('template-ingrediente-fixo');
+
+		const li = template.querySelector<HTMLLIElement>('.ingrediente-fixo')!;
+		li.dataset.idIngrediente = String(ingredientePadrao.ingrediente.id);
+
 		const spanNomeIngrediente = template.querySelector<HTMLSpanElement>('.nome-ingrediente')!;
 		spanNomeIngrediente.textContent = ingredientePadrao.ingrediente.nome;
 
@@ -93,13 +124,25 @@ export class VisaoPersonalizacaoPizza {
 	private criarItemListaIngredientePersonalizavel(ingredientePadrao: IngredientePadrao, ingredientesSubstitutos: Ingrediente[]): DocumentFragment {
 		const template = clonarTemplate('template-ingrediente-personalizavel');
 
+		const li = template.querySelector<HTMLLIElement>('.ingrediente-personalizavel')!;
+		li.dataset.idIngredienteOriginal = String(ingredientePadrao.ingrediente.id);
+
 		const nomeIngredienteOriginal = template.querySelector<HTMLSpanElement>('.nome-ingrediente-original')!;
 		nomeIngredienteOriginal.textContent = ingredientePadrao.ingrediente.nome;
 
 		const selectOpcoesTroca = template.querySelector<HTMLSelectElement>('.opcoes-troca')!;
+		selectOpcoesTroca.disabled = !ingredientePadrao.substituivel;
 		const optionPadrao = this.criarOptionIngrediente(ingredientePadrao.ingrediente);
-		const options = ingredientesSubstitutos.map((substituto) => this.criarOptionIngrediente(substituto));
+
+		let options = [] as HTMLOptionElement[];
+		if (ingredientePadrao.substituivel) {
+			options = ingredientesSubstitutos.map((substituto) => this.criarOptionIngrediente(substituto));
+		}
+
 		selectOpcoesTroca.append(optionPadrao, ...options);
+
+		const inputRemoverIngrediente = template.querySelector<HTMLInputElement>('.remover-ingrediente')!;
+		inputRemoverIngrediente.disabled = !ingredientePadrao.removivel;
 
 		return template;
 	}
@@ -129,5 +172,24 @@ export class VisaoPersonalizacaoPizza {
 		inputQuantidadeAdicional.value = '0';
 
 		return template;
+	}
+
+	private removerIngrediente(ingredientePersonalizavel: HTMLElement, marcado: boolean): void {
+		ingredientePersonalizavel.classList.toggle('list-group-item-danger', marcado);
+
+		const selectOpcoesTroca = ingredientePersonalizavel.querySelector<HTMLSelectElement>('.opcoes-troca')!;
+		selectOpcoesTroca.classList.toggle('text-decoration-line-through', marcado);
+		selectOpcoesTroca.classList.toggle('bg-transparent', marcado);
+
+		const nomeIngredienteOriginal = ingredientePersonalizavel.querySelector<HTMLSpanElement>('.nome-ingrediente-original')!;
+		nomeIngredienteOriginal.classList.toggle('text-decoration-line-through', marcado);
+	}
+
+	private atualizarQuantidadeAdicional(ingredienteAdicional: HTMLElement, delta: number): void {
+		const inputQuantidade = ingredienteAdicional.querySelector<HTMLInputElement>('.quantidade-adicional')!;
+		const quantidadeAtual = Number(inputQuantidade.value);
+		const novaQuantidade = Math.max(0, quantidadeAtual + delta);
+
+		inputQuantidade.value = String(novaQuantidade);
 	}
 }
