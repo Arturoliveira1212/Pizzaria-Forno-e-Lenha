@@ -34,12 +34,12 @@ export class GestorRegistroPedido {
 		return this.repositorioPizza.obterPizzasParaCardapio(busca);
 	}
 
-	async obterProdutosSimples(tipo: TipoProdutoSimples, busca: string): Promise<ProdutoSimples[]> {
-		return this.repositorioProdutoSimples.obterProdutosSimples(tipo, busca);
+	async obterPizzaParaPersonalizacao(idPizza: number): Promise<Pizza> {
+		return this.repositorioPizza.obterPizzaPorId(idPizza);
 	}
 
-	async obterClientes(identificador: string = ''): Promise<Cliente[]> {
-		return this.repositorioCliente.obterClientes(identificador);
+	async obterProdutosSimples(tipo: TipoProdutoSimples, busca: string): Promise<ProdutoSimples[]> {
+		return this.repositorioProdutoSimples.obterProdutosSimples(tipo, busca);
 	}
 
 	async adicionarItemPizza(dados: DadosItemPizza): Promise<Pedido> {
@@ -68,6 +68,10 @@ export class GestorRegistroPedido {
 		await this.atualizarPedido();
 
 		return this.pedidoAtual;
+	}
+
+	async obterClientes(identificador: string = ''): Promise<Cliente[]> {
+		return this.repositorioCliente.obterClientes(identificador);
 	}
 
 	async adicionarCliente(idCliente: number): Promise<Pedido> {

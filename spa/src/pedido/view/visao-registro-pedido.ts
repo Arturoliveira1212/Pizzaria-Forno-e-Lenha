@@ -3,10 +3,12 @@ import { EtapaPedido } from '../etapa-pedido';
 import { VisaoEtapaProdutos } from './visao-etapa-produtos';
 import { VisaoEtapaAtendimento } from './visao-etapa-atendimento';
 import { VisaoResumoPedido } from './visao-resumo-pedido';
+import { VisaoPersonalizacaoPizza } from './visao-personalizacao-pizza';
 import page from 'page';
 
 export class VisaoRegistroPedido {
 	private readonly visaoEtapaProdutos: VisaoEtapaProdutos;
+	private readonly visaoPersonalizacaoPizza: VisaoPersonalizacaoPizza;
 	private readonly visaoEtapaAtendimento: VisaoEtapaAtendimento;
 	private readonly visaoResumoPedido: VisaoResumoPedido;
 
@@ -15,12 +17,14 @@ export class VisaoRegistroPedido {
 
 	constructor() {
 		this.visaoEtapaProdutos = new VisaoEtapaProdutos();
+		this.visaoPersonalizacaoPizza = new VisaoPersonalizacaoPizza();
 		this.visaoEtapaAtendimento = new VisaoEtapaAtendimento();
 		this.visaoResumoPedido = new VisaoResumoPedido();
 
 		this.controladoraRegistroPedido = new ControladoraRegistroPedido({
 			principal: this,
 			produtos: this.visaoEtapaProdutos,
+			personalizacao: this.visaoPersonalizacaoPizza,
 			atendimento: this.visaoEtapaAtendimento,
 			resumo: this.visaoResumoPedido,
 		});
@@ -29,6 +33,7 @@ export class VisaoRegistroPedido {
 	iniciar() {
 		this.registrarEventos();
 		this.visaoEtapaProdutos.iniciar(this.controladoraRegistroPedido);
+		this.visaoPersonalizacaoPizza.iniciar(this.controladoraRegistroPedido);
 		this.visaoEtapaAtendimento.iniciar(this.controladoraRegistroPedido);
 		this.visaoResumoPedido.iniciar(this.controladoraRegistroPedido);
 	}

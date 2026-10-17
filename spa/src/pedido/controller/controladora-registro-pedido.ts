@@ -13,10 +13,13 @@ import { VisaoEtapaProdutos } from '../view/visao-etapa-produtos';
 import { VisaoEtapaAtendimento } from '../view/visao-etapa-atendimento';
 import { DadosItemPizza } from '../dados-item-pizza';
 import { DadosItemSimples } from '../dados-item-simples';
+import { VisaoPersonalizacaoPizza } from '../view/visao-personalizacao-pizza';
+import { TamanhoPizza } from '../../pizza/dominio/tamanho-pizza';
 
 type VisoesRegistroPedido = {
 	principal: VisaoRegistroPedido;
 	produtos: VisaoEtapaProdutos;
+	personalizacao: VisaoPersonalizacaoPizza;
 	atendimento: VisaoEtapaAtendimento;
 	resumo: VisaoResumoPedido;
 };
@@ -73,14 +76,13 @@ export class ControladoraRegistroPedido {
 		}
 	}
 
-	async obterClientes() {
+	async personalizarItemPizza(idPizza: number, tamanho: TamanhoPizza): Promise<void> {
 		try {
-			const busca = this.visoes.atendimento.obterFiltroCliente();
-			const clientes = await this.gestor.obterClientes(busca);
-			this.visoes.atendimento.exibirClientes(clientes);
+			const pizza = await this.gestor.obterPizzaParaPersonalizacao(idPizza);
+			this.visoes.personalizacao.exibirPizzaParaPersonalizacao(pizza, tamanho);
 		} catch (erro) {
-			const mensagemErro = erro instanceof Error ? erro.message : 'Ocorreu um erro ao obter as pizzas para o cardápio.';
-			this.visoes.atendimento.exibirErroAoObterClientes(mensagemErro);
+			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível personalizar o produto.';
+			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
 	}
 
@@ -101,6 +103,17 @@ export class ControladoraRegistroPedido {
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar o produto ao pedido.';
 			this.visoes.resumo.exibirErroNoPedido(mensagem);
+		}
+	}
+
+	async obterClientes() {
+		try {
+			const busca = this.visoes.atendimento.obterFiltroCliente();
+			const clientes = await this.gestor.obterClientes(busca);
+			this.visoes.atendimento.exibirClientes(clientes);
+		} catch (erro) {
+			const mensagemErro = erro instanceof Error ? erro.message : 'Ocorreu um erro ao obter as pizzas para o cardápio.';
+			this.visoes.atendimento.exibirErroAoObterClientes(mensagemErro);
 		}
 	}
 

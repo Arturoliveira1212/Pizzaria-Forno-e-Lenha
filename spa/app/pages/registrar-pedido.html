@@ -14,14 +14,14 @@
 				<p class="fw-medium small text-body-secondary mb-2">Cardápio</p>
 				<div class="d-flex align-items-center gap-4 mb-3" id="categorias-cardapio">
 					<div class="btn-group flex-shrink-0">
-						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-pizza-radio" value="pizza" data-categoria="pizza" autocomplete="off" checked />
-						<label class="btn btn-outline-secondary" for="categoria-pizza-radio" data-categoria="pizza">Pizzas</label>
+						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-pizza-radio" value="pizza" autocomplete="off" checked />
+						<label class="btn btn-outline-secondary" for="categoria-pizza-radio">Pizzas</label>
 
-						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-bebida-radio" value="bebida" data-categoria="bebida" autocomplete="off" />
-						<label class="btn btn-outline-secondary" for="categoria-bebida-radio" data-categoria="bebida">Bebidas</label>
+						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-bebida-radio" value="bebida" autocomplete="off" />
+						<label class="btn btn-outline-secondary" for="categoria-bebida-radio">Bebidas</label>
 
-						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-sobremesa-radio" value="sobremesa" data-categoria="sobremesa" autocomplete="off" />
-						<label class="btn btn-outline-secondary" for="categoria-sobremesa-radio" data-categoria="sobremesa">Sobremesas</label>
+						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-sobremesa-radio" value="sobremesa" autocomplete="off" />
+						<label class="btn btn-outline-secondary" for="categoria-sobremesa-radio">Sobremesas</label>
 					</div>
 
 					<form id="formulario-filtro-cardapio">
@@ -124,6 +124,74 @@
 	</div>
 </div>
 
+<div class="modal fade" id="modal-personalizacao-pizza" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-scrollable modal-fullscreen-sm-down">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="nome-pizza"></h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+
+			<div class="modal-body">
+				<div class="row g-3 mb-3">
+					<div class="col-sm-4">
+						<div class="btn-group w-100" role="group" id="informacao-tamanho">
+							<input type="radio" class="btn-check" id="tamanho" checked />
+							<label class="btn btn-outline-secondary" for="tamanho"></label>
+						</div>
+					</div>
+
+					<div class="col-sm-8">
+						<div class="btn-group w-100" role="group">
+							<input type="radio" class="btn-check" name="tipo-inteira" id="tipo-inteira" value="inteira" checked />
+							<label class="btn btn-outline-secondary" for="tipo-inteira">Inteira</label>
+
+							<input type="radio" class="btn-check" name="tipo-meia" id="tipo-meia" value="meia" />
+							<label class="btn btn-outline-secondary" for="tipo-meia">Meia Pizza</label>
+						</div>
+					</div>
+				</div>
+
+				<ul class="nav nav-tabs mb-3 d-none" id="abas-metade">
+					<li class="nav-item">
+						<button class="nav-link active" type="button">1ª metade</button>
+					</li>
+					<li class="nav-item">
+						<button class="nav-link" type="button">2ª metade</button>
+					</li>
+				</ul>
+
+				<div id="secao-pizza1">
+					<div class="fw-semibold small mb-1">Ingredientes</div>
+					<ul class="list-group mb-3" id="lista-ingredientes"></ul>
+
+					<div class="fw-semibold small mb-1" id="titulo-adicionais">Adicionais</div>
+					<ul class="list-group" id="lista-adicionais"></ul>
+				</div>
+
+				<div class="d-none" id="secao-pizza2">
+					<div class="fw-semibold small mb-1">Segunda Metade</div>
+					<form id="formulario-filtro-segunda-metade" class="mb-3">
+						<div class="flex-grow-1">
+							<div class="input-group">
+								<input autofocus type="search" class="form-control" placeholder="Buscar por Id ou nome" id="filtro-segunda-metade" autocomplete="off" />
+								<button type="submit" class="btn btn-primary" id="botao-filtrar-segunda-metade">Buscar</button>
+							</div>
+						</div>
+					</form>
+
+					<div class="list-group" id="lista-segunda-metade"></div>
+				</div>
+			</div>
+
+			<div class="modal-footer justify-content-between">
+				<small class="text-muted" id="observacao-preco"></small>
+				<button type="button" class="btn btn-primary btn-lg" id="botao-adicionar-personalizacao-pizza">Adicionar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <template id="template-card-pizza">
 	<div class="col-6">
 		<div class="card card-item h-100">
@@ -134,8 +202,8 @@
 
 				<div class="btn-group w-100 mb-3 tamanhos-pizza" role="group"></div>
 
-				<div class="d-flex justify-content-between align-items-center mt-auto">
-					<span class="fw-semibold"></span>
+				<div class="d-flex justify-content-end align-items-center gap-2 mt-auto">
+					<button type="button" class="btn btn-outline-primary btn-sm personalizar-item-pizza">+ Personalizar</button>
 					<button type="button" class="btn btn-primary btn-sm adicionar-item">+ Adicionar</button>
 				</div>
 			</div>
@@ -229,4 +297,36 @@
 	<div class="alert alert-success text-center mb-2">
 		<span class="mensagem"></span>
 	</div>
+</template>
+
+<template id="template-ingrediente-fixo">
+	<li class="list-group-item d-flex justify-content-between align-items-center">
+		<span class="nome-ingrediente"></span>
+		<span class="badge text-bg-light border fw-normal">fixo</span>
+	</li>
+</template>
+
+<template id="template-ingrediente-personalizavel">
+	<li class="list-group-item p-2 d-flex align-items-center gap-3">
+		<input class="form-check-input m-0 ms-2 flex-shrink-0 removivel" type="checkbox" />
+
+		<div class="form-floating flex-grow-1">
+			<select class="form-select opcoes-troca"></select>
+			<label class="nome-ingrediente-original"></label>
+		</div>
+	</li>
+</template>
+
+<template id="template-adicional">
+	<li class="list-group-item d-flex justify-content-between align-items-center">
+		<div>
+			<span class="nome-adicional"></span>
+			<small class="preco-adicional"></small>
+		</div>
+		<div class="input-group input-group-sm w-auto">
+			<button type="button" class="btn btn-outline-secondary diminuir-quantidade-adicional">&minus;</button>
+			<input type="text" class="form-control text-center px-0 quantidade-adicional" readonly />
+			<button type="button" class="btn btn-outline-secondary aumentar-quantidade-adicional">+</button>
+		</div>
+	</li>
 </template>

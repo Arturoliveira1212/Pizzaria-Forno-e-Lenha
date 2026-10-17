@@ -49,18 +49,36 @@ export class VisaoEtapaProdutos {
 
 		this.secaoPizza.addEventListener('click', (event: Event) => {
 			const elementoClicado = event.target as HTMLElement;
-			const botao = elementoClicado.closest<HTMLButtonElement>('.adicionar-item');
-			if (!botao) {
+
+			const botaoAdicionarItem = elementoClicado.closest<HTMLButtonElement>('.adicionar-item');
+			const botaoPersonalizarItem = elementoClicado.closest<HTMLButtonElement>('.personalizar-item-pizza');
+			if (!botaoAdicionarItem && !botaoPersonalizarItem) {
 				return;
 			}
 
+			const botao = botaoAdicionarItem ?? botaoPersonalizarItem!;
 			const card = botao.closest<HTMLElement>('.card-item')!;
-			const itemPizza = this.obterDadosItemPizza(card);
-			if (!itemPizza) {
-				return;
-			}
 
-			this.controladoraRegistroPedido.adicionarItemPizza(itemPizza);
+			if (botaoPersonalizarItem) {
+				const idPizza = Number(card.dataset.idPizza);
+				if (isNaN(idPizza)) {
+					return;
+				}
+
+				const tamanhoSelecionado = this.obterDadosTamanhoSelecionado(card);
+				if (!tamanhoSelecionado) {
+					return;
+				}
+
+				this.controladoraRegistroPedido.personalizarItemPizza(idPizza, tamanhoSelecionado.tamanho);
+			} else if (botaoAdicionarItem) {
+				const itemPizza = this.obterDadosItemPizza(card);
+				if (!itemPizza) {
+					return;
+				}
+
+				this.controladoraRegistroPedido.adicionarItemPizza(itemPizza);
+			}
 		});
 
 		this.secoesProdutosSimples.forEach((seletorSecao) => {
@@ -226,7 +244,7 @@ export class VisaoEtapaProdutos {
 	}
 
 	private obterDadosItemPizza(card: HTMLElement): DadosItemPizza | undefined {
-		const tamanhoSelecionado = card.querySelector<HTMLInputElement>('input[name^="tamanho-pizza-"]:checked');
+		const tamanhoSelecionado = this.obterDadosTamanhoSelecionado(card);
 		if (!tamanhoSelecionado) {
 			return;
 		}
@@ -243,8 +261,8 @@ export class VisaoEtapaProdutos {
 
 		return {
 			quantidade: 1,
-			tamanho: tamanhoSelecionado.value as TamanhoPizza,
-			preco: Number(tamanhoSelecionado.dataset.preco),
+			tamanho: tamanhoSelecionado.tamanho as TamanhoPizza,
+			preco: tamanhoSelecionado.preco,
 			saboresEscolhidos: [
 				{
 					idPizza: Number(card.dataset.idPizza),
@@ -252,6 +270,18 @@ export class VisaoEtapaProdutos {
 					ingredientesEscolhidos: ingredientesEscolhidos,
 				},
 			],
+		};
+	}
+
+	private obterDadosTamanhoSelecionado(card: HTMLElement): { tamanho: TamanhoPizza; preco: number } | undefined {
+		const tamanhoSelecionado = card.querySelector<HTMLInputElement>('input[name^="tamanho-pizza-"]:checked');
+		if (!tamanhoSelecionado) {
+			return;
+		}
+
+		return {
+			tamanho: tamanhoSelecionado.value as TamanhoPizza,
+			preco: Number(tamanhoSelecionado.dataset.preco),
 		};
 	}
 

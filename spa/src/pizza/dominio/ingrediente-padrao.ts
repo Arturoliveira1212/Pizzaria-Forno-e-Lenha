@@ -7,4 +7,8 @@ export class IngredientePadrao {
 		public readonly removivel: boolean,
 		public readonly substituivel: boolean,
 	) {}
+
+	ehFixo(): boolean {
+		return !this.removivel && !this.substituivel;
+	}
 }

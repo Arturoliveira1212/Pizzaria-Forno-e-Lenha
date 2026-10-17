@@ -53,6 +53,7 @@ Templates Bootstrap usados:
 - https://getbootstrap.com/docs/5.3/components/card/
 - https://getbootstrap.com/docs/5.3/components/buttons/
 - https://getbootstrap.com/docs/5.3/components/list-group/
+- https://getbootstrap.com/docs/5.3/components/modal/
 
 Imagens dos produtos obtidas em:
 - https://www.pngkey.com/
