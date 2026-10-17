@@ -108,15 +108,11 @@ export class VisaoEtapaAtendimento {
 		}
 
 		const inputsClientes = clientes.map((cliente) => this.criarInputCliente(cliente));
-		const fragmento = document.createDocumentFragment();
-		inputsClientes.forEach((input) => fragmento.appendChild(input));
-
-		this.listaClientes.appendChild(fragmento);
+		this.listaClientes.append(...inputsClientes);
 	}
 
 	exibirErroAoObterClientes(mensagem: string) {
-		this.listaClientes.replaceChildren();
-		this.listaClientes.appendChild(this.criarAvisoCliente(mensagem));
+		this.listaClientes.replaceChildren(this.criarAvisoCliente(mensagem));
 	}
 
 	private criarAvisoCliente(mensagem: string): DocumentFragment {

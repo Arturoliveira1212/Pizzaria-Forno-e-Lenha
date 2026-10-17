@@ -123,15 +123,12 @@ export class VisaoEtapaProdutos {
 			return;
 		}
 
-		const fragmento = document.createDocumentFragment();
-		cards.forEach((card) => fragmento.appendChild(card));
-		div.appendChild(fragmento);
+		div.append(...cards);
 	}
 
 	private exibirErroNoCardapio(seletorDiv: string, mensagem: string) {
 		const div = document.querySelector<HTMLElement>(seletorDiv)!;
-		div.replaceChildren();
-		div.appendChild(this.criarAvisoCardapioErro(mensagem));
+		div.replaceChildren(this.criarAvisoCardapioErro(mensagem));
 	}
 
 	exibirPizzasNoCardapio(pizzas: PizzaParaCardapio[]) {
@@ -161,10 +158,12 @@ export class VisaoEtapaProdutos {
 		card.querySelector('.card-title')!.textContent = pizza.nome;
 		card.querySelector('.card-text')!.textContent = pizza.descricao;
 
-		const grupoTamanhos = card.querySelector('.tamanhos-pizza')!;
-		pizza.precosPorTamanho.forEach((precoPorTamanho: PrecoPorTamanho, indice: number) => {
-			grupoTamanhos.appendChild(this.criarOpcaoTamanho(pizza.id, precoPorTamanho, indice === 0));
+		const opcoes = pizza.precosPorTamanho.map((precoPorTamanho: PrecoPorTamanho, indice: number) => {
+			return this.criarOpcaoTamanho(pizza.id, precoPorTamanho, indice === 0);
 		});
+
+		const grupoTamanhos = card.querySelector('.tamanhos-pizza')!;
+		grupoTamanhos.append(...opcoes);
 
 		return template;
 	}
