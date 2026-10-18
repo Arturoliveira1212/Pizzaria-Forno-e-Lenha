@@ -22,6 +22,7 @@ export class VisaoPersonalizacaoPizza {
 	private readonly listaAdicionais = document.querySelector<HTMLElement>('#lista-adicionais')!;
 	private readonly secaoPizza1 = document.querySelector<HTMLElement>('#secao-pizza1')!;
 	private readonly secaoPizza2 = document.querySelector<HTMLElement>('#secao-pizza2')!;
+	private readonly valorTotalPersonalizacao = document.querySelector<HTMLElement>('#valor-total-personalizacao')!;
 	private readonly formularioFiltroSegundaMetade = this.secaoPizza2.querySelector<HTMLElement>('#formulario-filtro-segunda-metade')!;
 	private readonly inputFiltroCliente = this.secaoPizza2.querySelector<HTMLInputElement>('#filtro-segunda-metade')!;
 
@@ -79,8 +80,13 @@ export class VisaoPersonalizacaoPizza {
 	}
 
 	private povoarModal(pizza: Pizza, tamanho: TamanhoPizza): void {
+		const preco = pizza.obterPrecoPorTamanho(tamanho);
+		const precoFormatado = formatarDinheiro(preco);
+
 		this.nomePizza.textContent = pizza.nome;
-		this.labelTamanho.textContent = `${rotuloTamanho(tamanho)} - ${formatarDinheiro(pizza.obterPrecoPorTamanho(tamanho))}`;
+		this.informacaoTamanho.dataset.preco = String(preco);
+		this.labelTamanho.textContent = `${rotuloTamanho(tamanho)} - ${precoFormatado}`;
+		this.valorTotalPersonalizacao.textContent = precoFormatado;
 
 		const ingredientesPadrao = pizza.ingredientesPadrao;
 		if (ingredientesPadrao.length === 0) {
@@ -162,6 +168,9 @@ export class VisaoPersonalizacaoPizza {
 	private criarItemListaAdicional(adicional: IngredienteAdicional): DocumentFragment {
 		const template = clonarTemplate('template-adicional');
 
+		const li = template.querySelector<HTMLLIElement>('.ingrediente-adicional')!;
+		li.dataset.preco = String(adicional.preco);
+
 		const spanNomeAdicional = template.querySelector<HTMLSpanElement>('.nome-adicional')!;
 		spanNomeAdicional.textContent = adicional.ingrediente.nome;
 
@@ -191,5 +200,23 @@ export class VisaoPersonalizacaoPizza {
 		const novaQuantidade = Math.max(0, quantidadeAtual + delta);
 
 		inputQuantidade.value = String(novaQuantidade);
+
+		if (novaQuantidade !== quantidadeAtual) {
+			this.atualizarValorTotalPersonalizacao();
+		}
+	}
+
+	private atualizarValorTotalPersonalizacao(): void {
+		let valorTotal = Number(this.informacaoTamanho.dataset.preco);
+
+		const ingredientesAdicionais = this.listaAdicionais.querySelectorAll<HTMLElement>('.ingrediente-adicional');
+		ingredientesAdicionais.forEach((ingredienteAdicional) => {
+			const precoAdicional = Number(ingredienteAdicional.dataset.preco) || 0;
+			const quantidade = Number(ingredienteAdicional.querySelector<HTMLInputElement>('.quantidade-adicional')?.value || 0);
+
+			valorTotal += precoAdicional * quantidade;
+		});
+
+		this.valorTotalPersonalizacao.textContent = formatarDinheiro(valorTotal);
 	}
 }
