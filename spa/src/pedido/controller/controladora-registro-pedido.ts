@@ -86,6 +86,19 @@ export class ControladoraRegistroPedido {
 		}
 	}
 
+	async adicionarPersonalizacaoItemPizza(): Promise<void> {
+		try {
+			const dados = this.visoes.personalizacao.obterDadosPersonalizacaoItemPizza();
+			const pedido = await this.gestor.adicionarItemPizza(dados);
+			this.visoes.resumo.exibirResumoPedido(pedido);
+			this.visoes.personalizacao.fecharModal();
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar a personalização ao pedido.';
+			this.visoes.resumo.exibirErroNoPedido(mensagem);
+			this.visoes.personalizacao.fecharModal();
+		}
+	}
+
 	async adicionarItemPizza(dados: DadosItemPizza): Promise<void> {
 		try {
 			const pedido = await this.gestor.adicionarItemPizza(dados);

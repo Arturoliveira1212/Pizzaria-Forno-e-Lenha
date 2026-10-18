@@ -8,6 +8,9 @@ import { Ingrediente } from '../../ingrediente/dominio/ingrediente';
 import { formatarDinheiro } from '../../util/dinheiro';
 import { rotuloTamanho, TamanhoPizza } from '../../pizza/dominio/tamanho-pizza';
 import { DadosItemPizza } from '../dados-item-pizza';
+import { PapelIngrediente } from '../dominio/papel-ingrediente';
+import { DadosSaborEscolhido } from '../dados-sabor-escolhido';
+import { DadosIngredienteEscolhido } from '../dados-ingrediente-escolhido';
 
 export class VisaoPersonalizacaoPizza {
 	private controladoraRegistroPedido!: ControladoraRegistroPedido;
@@ -100,6 +103,8 @@ export class VisaoPersonalizacaoPizza {
 		const preco = pizza.obterPrecoPorTamanho(tamanho);
 		const precoFormatado = formatarDinheiro(preco);
 
+		this.secaoPizzaPrimeiroSabor.dataset.idPizza = String(pizza.id);
+		this.secaoPizzaPrimeiroSabor.dataset.nomePizza = pizza.nome;
 		this.nomePizza.textContent = pizza.nome;
 		this.informacaoTamanho.dataset.preco = String(preco);
 		this.inputTamanho.value = tamanho;
@@ -188,6 +193,7 @@ export class VisaoPersonalizacaoPizza {
 		const template = clonarTemplate('template-adicional');
 
 		const li = template.querySelector<HTMLLIElement>('.ingrediente-adicional')!;
+		li.dataset.idIngrediente = String(adicional.ingrediente.id);
 		li.dataset.preco = String(adicional.preco);
 
 		const spanNomeAdicional = template.querySelector<HTMLSpanElement>('.nome-adicional')!;
@@ -238,5 +244,72 @@ export class VisaoPersonalizacaoPizza {
 
 		this.valorTotalPersonalizacao.dataset.preco = String(valorTotal);
 		this.valorTotalPersonalizacao.textContent = formatarDinheiro(valorTotal);
+	}
+
+	obterDadosPersonalizacaoItemPizza(): DadosItemPizza {
+		return {
+			quantidade: 1,
+			tamanho: this.inputTamanho.value as TamanhoPizza,
+			preco: Number(this.valorTotalPersonalizacao.dataset.preco),
+			saboresEscolhidos: [this.obterDadosPrimeiroSabor()],
+		};
+	}
+
+	private obterDadosPrimeiroSabor(): DadosSaborEscolhido {
+		const ingredientesEscolhidos = this.obterIngredientesEscolhidos(this.listaIngredientesPrimeiroSabor, this.listaIngredientesPrimeiroSabor, this.listaAdicionaisPrimeiroSabor);
+
+		return {
+			idPizza: Number(this.secaoPizzaPrimeiroSabor.dataset.idPizza),
+			nome: this.secaoPizzaPrimeiroSabor.dataset.nomePizza ?? '',
+			ingredientesEscolhidos: ingredientesEscolhidos,
+		};
+	}
+
+	private obterIngredientesEscolhidos(listaIngredientesFixos: HTMLElement, listaIngredientesPersonalizaveis: HTMLElement, listaIngredientesAdicionais: HTMLElement): DadosIngredienteEscolhido[] {
+		const ingredientesEscolhidos: DadosIngredienteEscolhido[] = [];
+
+		listaIngredientesFixos.querySelectorAll<HTMLElement>('.ingrediente-fixo').forEach((itemListaIngrediente) => {
+			const idIngrediente = Number(itemListaIngrediente.dataset.idIngrediente);
+
+			ingredientesEscolhidos.push({
+				idIngrediente,
+				papel: PapelIngrediente.PADRAO,
+			});
+		});
+
+		listaIngredientesPersonalizaveis.querySelectorAll<HTMLElement>('.ingrediente-personalizavel').forEach((itemListaIngrediente) => {
+			const inputRemoverIngrediente = itemListaIngrediente.querySelector<HTMLInputElement>('.remover-ingrediente')!;
+			if (inputRemoverIngrediente.checked) {
+				return;
+			}
+
+			const idIngredienteOriginal = Number(itemListaIngrediente.dataset.idIngredienteOriginal);
+			const selectOpcoesTroca = itemListaIngrediente.querySelector<HTMLSelectElement>('.opcoes-troca')!;
+			const idIngredienteSelecionado = Number(selectOpcoesTroca.value);
+			const papel = idIngredienteSelecionado === idIngredienteOriginal ? PapelIngrediente.PADRAO : PapelIngrediente.SUBSTITUTO;
+
+			ingredientesEscolhidos.push({
+				idIngrediente: idIngredienteSelecionado,
+				papel,
+			});
+		});
+
+		listaIngredientesAdicionais.querySelectorAll<HTMLElement>('.ingrediente-adicional').forEach((itemListaIngrediente) => {
+			const idIngrediente = Number(itemListaIngrediente.dataset.idIngrediente);
+			const inputQuantidade = itemListaIngrediente.querySelector<HTMLInputElement>('.quantidade-adicional')!;
+			const quantidade = Number(inputQuantidade.value);
+			if (quantidade <= 0) {
+				return;
+			}
+
+			for (let i = 0; i < quantidade; i++) {
+				ingredientesEscolhidos.push({
+					idIngrediente,
+					papel: PapelIngrediente.ADICIONAL,
+				});
+			}
+		});
+
+		return ingredientesEscolhidos;
 	}
 }
