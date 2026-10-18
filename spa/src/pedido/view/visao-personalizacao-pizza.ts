@@ -68,7 +68,7 @@ export class VisaoPersonalizacaoPizza {
 			}
 		});
 
-		this.botaoAdicionarPersonalizacaoPizza.addEventListener('click', async () => {
+		this.botaoAdicionarPersonalizacaoPizza.addEventListener('click', () => {
 			this.controladoraRegistroPedido.adicionarPersonalizacaoItemPizza();
 		});
 	}

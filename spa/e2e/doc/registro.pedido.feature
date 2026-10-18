@@ -1,125 +1,180 @@
-Funcionalidade: Registrar Novo Pedido para Pizzaria.
-    A fim de atender os clientes da pizzaria com rapidez e sem erros
+Funcionalidade: Buscar pizzas no cardápio
+    A fim de encontrar rapidamente a pizza desejada pelo cliente
     Como um atendente
-    Eu quero registrar pedidos com pizzas, sobremesas e bebidas
-    De modo a enviar o pedido corretamente para a cozinha
+    Eu quero filtrar e pesquisar pizzas no cardápio
+    De modo a adicioná-las ao pedido
 
-    Cenário: Busca de todas as pizzas no cardápio
+    Contexto:
         Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Produtos" e filtro pela categoria "Pizzas"
-        Então deve aparecer todas as 10 pizzas do cardápio
+        E acesso a etapa "Produtos"
 
-    Cenário: Busca de pizza existente no cardápio
+        Cenário: Busca de todas as pizzas no cardápio
+            Quando filtro pela categoria "Pizzas"
+            Então deve aparecer todas as 10 pizzas do cardápio
+
+        Cenário: Busca de pizza existente no cardápio
+            Quando filtro pela categoria "Pizzas" e pesquiso por "Quatro Queijos"
+            Então deve aparecer o card da pizza "Quatro Queijos" com nome, descrição, preços e tamanho
+
+        Cenário: Busca de pizza inexistente no cardápio
+            Quando filtro pela categoria "Pizzas" e pesquiso por "Pizza inexistente"
+            Então deve aparecer a mensagem de aviso "Nenhuma pizza encontrada"
+
+Funcionalidade: Buscar bebidas no cardápio
+    A fim de encontrar rapidamente a bebida desejada pelo cliente
+    Como um atendente
+    Eu quero filtrar e pesquisar bebidas no cardápio
+    De modo a adicioná-las ao pedido
+
+    Contexto:
         Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Produtos", filtro pela categoria "Pizzas" e por "Margherita"
-        Então deve aparecer o card da pizza com nome, descrição, precos e tamanho
+        E acesso a etapa "Produtos"
 
-    Cenário: Busca de pizza inexistente no cardápio
+        Cenário: Busca de todas as bebidas no cardápio
+            Quando filtro pela categoria "Bebidas"
+            Então deve aparecer todas as 3 bebidas do cardápio
+
+        Cenário: Busca de bebida existente no cardápio
+            Quando filtro pela categoria "Bebidas" e pesquiso por "Coca"
+            Então deve aparecer o card da bebida "Coca-Cola 2L" com nome, descrição e preço
+
+        Cenário: Busca de bebida inexistente no cardápio
+            Quando filtro pela categoria "Bebidas" e pesquiso por "Bebida inexistente"
+            Então deve aparecer a mensagem de aviso "Nenhuma bebida encontrada"
+
+Funcionalidade: Gerenciar itens do pedido
+    A fim de montar o pedido do cliente sem erros
+    Como um atendente
+    Eu quero adicionar, alterar e remover pizzas e sobremesas no pedido
+    De modo a enviar o pedido correto para a cozinha
+
+    Contexto:
         Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Produtos", filtro pela categoria "Pizzas" e por "Pizza inexistente"
-        Então deve aparecer a mensagem de aviso "Nenhuma pizza encontrada"
+        E acesso a etapa "Produtos"
 
-    Cenário: Busca de todas as bebidas no cardápio
+        Cenário: Adição de pizza no pedido
+            Quando filtro pela categoria "Pizzas" e pesquiso por ID "2"
+            E clico em adicionar a pizza "Calabresa"
+            Então deve aparecer no resumo lateral a pizza "Calabresa"
+
+        Cenário: Adição de pizza com tamanho diferente do padrão
+            Quando filtro pela categoria "Pizzas" e pesquiso por "Catupiry"
+            E seleciono o tamanho "Grande" para a pizza "Frango com Catupiry"
+            E clico em adicionar a pizza "Frango com Catupiry"
+            Então deve aparecer no resumo lateral a pizza "Frango com Catupiry" no tamanho "Grande"
+
+        Cenário: Adição da mesma pizza duas vezes
+            Quando filtro pela categoria "Pizzas" e pesquiso por ID "8"
+            E clico em adicionar a pizza "Napolitana" 2 vezes
+            Então deve aparecer no resumo lateral a pizza "Napolitana" com quantidade "2"
+
+        Cenário: Adição de sobremesa no pedido
+            Quando filtro pela categoria "Sobremesas" e pesquiso por "Pudim"
+            E clico em adicionar a sobremesa "Pudim de Leite"
+            Então deve aparecer no resumo lateral a sobremesa "Pudim de Leite"
+
+        Cenário: Adição da mesma sobremesa duas vezes
+            Quando filtro pela categoria "Sobremesas" e pesquiso por ID "5"
+            E clico em adicionar a sobremesa "Pudim de Leite" 2 vezes
+            Então deve aparecer no resumo lateral a sobremesa "Pudim de Leite" com quantidade "2"
+
+        Cenário: Aumento da quantidade de um item
+            Dado que a pizza "Calabresa" foi adicionada ao pedido 1 vez
+            Quando aumento a quantidade de "Calabresa" para "2"
+            Então o resumo deve ficar com "Calabresa" e quantidade "2"
+
+        Cenário: Diminuição da quantidade de um item
+            Dado que a pizza "Portuguesa" foi adicionada ao pedido 3 vezes
+            Quando diminuo a quantidade de "Portuguesa" para "2"
+            Então o resumo deve ficar com "Portuguesa" e quantidade "2"
+
+        Cenário: Remoção de item no resumo
+            Dado que a pizza "Calabresa" foi adicionada ao pedido
+            Quando clico em remover o item "Calabresa"
+            Então o resumo deve ficar vazio
+
+Funcionalidade: Definir atendimento e cliente
+    A fim de registrar corretamente como o pedido será atendido e para quem
+    Como um atendente
+    Eu quero escolher o tipo de atendimento e o tipo de cliente
+    De modo a vincular o pedido às informações corretas
+
+    Contexto:
         Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Produtos" e filtro pela categoria "Bebidas"
-        Então deve aparecer todas as 3 bebidas do cardápio
+        E acesso a etapa "Atendimento"
 
-    Cenário: Busca de bebida existente no cardápio
+        Cenário: Seleção de tipo de atendimento Entrega
+            Quando seleciono o tipo de atendimento "Entrega"
+            Então a opção de tipo de cliente "Consumidor Final" deve ficar desabilitada
+
+        Cenário: Seleção de tipo de cliente Consumidor Final
+            Quando seleciono o tipo de cliente "Consumidor Final"
+            Então a seção de clientes deve desaparecer
+            E deve aparecer a frase "Pedido sem cliente vinculado."
+
+        Cenário: Seleção de tipo de cliente Cliente Identificado
+            Dado que selecionei o tipo de cliente "Consumidor Final"
+            Quando seleciono o tipo de cliente "Cliente"
+            Então a seção de clientes deve aparecer
+
+Funcionalidade: Aplicar taxas e descontos no pedido
+    A fim de cobrar o valor correto do cliente
+    Como um atendente
+    Eu quero que taxas e descontos sejam aplicados automaticamente ao pedido
+    De modo a evitar erros de cálculo no resumo
+
+    Contexto:
         Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Produtos", filtro pela categoria "Bebidas" e por "Coca"
-        Então deve aparecer o card do produto com nome, descrição e preço
 
-    Cenário: Busca de pizza inexistente no cardápio
+        Cenário: Aplicação da taxa de entrega com produtos no pedido
+            Dado que a pizza "Calabresa" foi adicionada ao pedido
+            E acesso a etapa "Atendimento"
+            E vinculo o cliente "Ana Beatriz Souza"
+            Quando seleciono o tipo de atendimento "Entrega"
+            Então o resumo deve exibir a taxa de entrega de "R$ 10,00"
+
+        Cenário: Aplicação do desconto de fidelidade para cliente elegível
+            Dado que o cliente "Artur Alves" possui um benefício de fidelidade
+            E a pizza "Frango com Catupiry" foi adicionada ao pedido
+            Quando acesso a etapa "Atendimento"
+            E vinculo o cliente "Artur Alves"
+            Então o resumo deve exibir o desconto de fidelidade
+
+        Cenário: Não aplicação do desconto de fidelidade para cliente não elegível
+            Dado que o cliente "Gabriel Santos Rocha" não possui um benefício de fidelidade
+            E a pizza "Pepperoni" foi adicionada ao pedido
+            Quando acesso a etapa "Atendimento"
+            E vinculo o cliente "Gabriel Santos Rocha"
+            Então o resumo não deve exibir o desconto de fidelidade
+
+        Cenário: Aplicação do desconto de promoção para pizzas elegíveis
+            Dado que existe uma promoção vigente para pizzas "Grandes" a partir de 2 unidades
+            Quando adiciono 2 pizzas "Frango com Catupiry" no tamanho "Grande"
+            Então o resumo deve exibir o desconto de promoção
+
+        Cenário: Não aplicação do desconto de promoção para pizzas não elegíveis
+            Dado que existe uma promoção vigente para pizzas "Grandes" a partir de 2 unidades
+            Quando adiciono 1 pizza "Vegetariana" no tamanho "Grande"
+            Então o resumo não deve exibir o desconto de promoção
+
+Funcionalidade: Finalizar pedido
+    A fim de enviar o pedido para a cozinha
+    Como um atendente
+    Eu quero registrar o pedido apenas quando ele estiver válido
+    De modo a evitar pedidos vazios ou incorretos
+
+    Contexto:
         Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Produtos", filtro pela categoria "Bebidas" e por "Bebida inexistente"
-        Então deve aparecer a mensagem de aviso "Nenhuma bebida encontrada"
 
-    Cenário: Adição de pizza no pedido
-        Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Produtos", filtro pela categoria "Pizzas" e por "2" e clico em adicionar
-        Então deve aparecer no resumo lateral a pizza "Calabresa"
+        Cenário: Tentativa de finalizar pedido sem itens
+            Dado que acesso a etapa "Atendimento"
+            Quando clico em "Registrar pedido"
+            Então deve aparecer a mensagem de erro "Não é possível registrar um pedido sem itens."
 
-    Cenário: Adição de pizza com tamanho diferente do padrão
-        Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Produtos", filtro pela categoria "Pizzas" e por "Catupiry" e seleciono o tamanho "Grande" e clico em adicionar
-        Então deve aparecer no resumo lateral a pizza "Frango com Catupiry" no tamanho "Grande"
-
-    Cenário: Adição da mesma pizza duas vezes
-        Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Produtos", filtro pela categoria "Pizzas" e por "8" e clico em adicionar 2 vezes
-        Então deve aparecer no resumo lateral a pizza "Napolitana" com quantidade "2"
-
-    Cenário: Adição de sobremesa no pedido
-        Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Produtos", filtro pela categoria "Sobremesas" e por "Pudim" e clico em adicionar
-        Então deve aparecer no resumo lateral a sobremesa "Pudim de Leite"
-
-    Cenário: Adição da mesma sobremesa duas vezes
-        Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Produtos", filtro pela categoria "Sobremesas" e por "5" e clico em adicionar 2 vezes
-        Então deve aparecer no resumo lateral a sobremesa "Pudim de Leite" com quantidade "2"
-
-    Cenário: Seleção de tipo atendimento do tipo entrega:
-        Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Atendimento" e seleciono o tipo atendimento "Entrega"
-        Então a opção de tipo cliente "Consumidor Final" deve ficar desabilitada.
-
-    Cenário: Seleção de tipo cliente Consumidor Final:
-        Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Atendimento" e seleciono o tipo cliente "Consumidor Final"
-        A seção de clientes desaparece e aparece a frase: Pedido sem cliente vinculado.
-
-    Cenário: Seleção do tipo cliente Cliente Identificado:
-        Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Atendimento" e seleciono o tipo cliente "Cliente"
-        A seção de clientes aparece.
-
-    Cenário: Alteração de quantidade (aumentar)
-        Dado que estou na tela de registro de pedido com a pizza "Calabresa" adicionada
-        Quando aumento a quantidade para "2"
-        Então o resumo deve ficar com "Calabresa" e quantidade "2"
-
-    Cenário: Alteração de quantidade (diminuir)
-        Dado que estou na tela de registro de pedido com a pizza "Portuguesa" adicionada 3 vezes
-        Quando diminuo a quantidade para "2"
-        Então o resumo deve ficar com "Portuguesa" e quantidade "2"
-
-    Cenário: Remoção de item no resumo
-        Dado que estou na tela de registro de pedido com a pizza "Calabresa" adicionada
-        Quando cliclo em remover o item
-        Então o resumo deve ficar vazio
-
-    Cenário: Tentativa de finalizar pedido sem itens
-        Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Atendimento" e clico em "Registrar pedido"
-        Então deve aparecer a mensagem de erro "Não é possível registrar um pedido sem itens."
-
-    Cenário: Finalização de pedido com sucesso
-        Dado que estou na tela de registro de pedido
-        Quando acesso a etapa "Produtos", seleciona uma pizza de "Bacon", acesso a etapa "Atendimento", seleciono o cliente "Artur Alves" e clico em registrar pedido
-        Então deve aparecer a mensagem de pedido realizado e redirecionar para home
-
-    Cenário: Aplicação da taxa de entrega com produtos no pedido
-        Dado que estou na tela de registro de pedido com a pizza "Calabresa" adicionada
-        Quando acesso a etapa "Atendimento" e seleciono o tipo atendimento "Entrega"
-        Então o resumo deve exibir a taxa de entrega de "R$ 10,00"
-
-    Cenário: Aplicação do desconto de fidelidade para cliente elegível
-        Dado que estou na tela de registro de pedido e que o cliente "Artur Alves" possui um benefício de fidelidade
-        Quando adiciono uma pizza de "Frango com Catupiry" no pedido e vinculo o cliente "Artur Alves"
-        Então deve aparecer no resumo lateral o desconto fidelidade
-
-    Cenário: Aplicação do desconto de filidade para cliente não elegível
-        Dado que estou na tela de registro de pedido e que o cliente "Gabriel Santos Rocha" não possui um benefício de fidelidade
-        Quando adiciono uma pizza de "Pepperoni" no pedido e vinculo o cliente "Gabriel Santos Rocha"
-        Então não deve aparecer no resumo lateral o desconto fidelidade
-
-    Cenário: Aplicação do desconto de promoção para pizzas elegíveis
-        Dado que estou na tela de registro de pedido e que existe uma promoção vigente para pizzas
-        Quando adiciono a quantidade mínima de pizzas do tamanho promovido
-        Então o resumo deve exibir um desconto de promoção
-
-    Cenário: Aplicação do desconto de promoção para pizzas não elegíveis
-        Dado que estou na tela de registro de pedido e que existe uma promoção vigente para pizzas
-        Quando não adiciono a quantidade mínima de pizzas do tamanho promovido
-        Então o resumo não deve exibir um desconto de promoção
+        Cenário: Finalização de pedido com sucesso
+            Dado que a pizza "Bacon" foi adicionada ao pedido
+            E acesso a etapa "Atendimento"
+            E vinculo o cliente "Artur Alves"
+            Quando clico em "Registrar pedido"
+            Então deve aparecer a mensagem de pedido realizado
+            E devo ser redirecionado para a home
