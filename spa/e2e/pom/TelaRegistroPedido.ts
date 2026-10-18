@@ -4,6 +4,7 @@ type Categoria = 'pizza' | 'bebida' | 'sobremesa';
 type Tamanho = 'P' | 'M' | 'G';
 type TipoAtendimento = 'Entrega' | 'Retirada' | 'Balcão';
 type TipoCliente = 'Consumidor Final' | 'Cliente';
+type Sabor = 1 | 2;
 
 export class TelaRegistroPedido {
 	private readonly page: Page;
@@ -34,6 +35,13 @@ export class TelaRegistroPedido {
 	private readonly secaoPromocoes: Locator;
 	private readonly valorDescontoFidelidade: Locator;
 	private readonly valorDescontoPromocao: Locator;
+	private readonly modalPersonalizacaoPizza: Locator;
+	private readonly botaoFecharModalPersonalizacaoPizza: Locator;
+	private readonly listaIngredientesPrimeiroSabor: Locator;
+	private readonly listaAdicionaisPrimeiroSabor: Locator;
+	private readonly listaIngredientesSegundoSabor: Locator;
+	private readonly listaAdicionaisSegundoSabor: Locator;
+	private readonly valorTotalPersonalizacaoPizza: Locator;
 
 	constructor(page: Page) {
 		this.page = page;
@@ -64,6 +72,13 @@ export class TelaRegistroPedido {
 		this.secaoPromocoes = this.page.locator('#secao-promocoes');
 		this.valorDescontoFidelidade = this.page.locator('#valor-desconto-fidelidade');
 		this.valorDescontoPromocao = this.page.locator('#valor-desconto-promocao');
+		this.modalPersonalizacaoPizza = this.page.locator('#modal-personalizacao-pizza');
+		this.botaoFecharModalPersonalizacaoPizza = this.page.getByTestId('botao-fechar-modal-personalizacao');
+		this.listaIngredientesPrimeiroSabor = this.page.locator('#lista-ingredientes-primeiro-sabor');
+		this.listaAdicionaisPrimeiroSabor = this.page.locator('#lista-adicionais-primeiro-sabor');
+		this.listaIngredientesSegundoSabor = this.page.locator('#lista-ingredientes-segundo-sabor');
+		this.listaAdicionaisSegundoSabor = this.page.locator('#lista-adicionais-segundo-sabor');
+		this.valorTotalPersonalizacaoPizza = this.page.locator('#valor-total-personalizacao');
 	}
 
 	async abrir(): Promise<void> {
@@ -116,6 +131,18 @@ export class TelaRegistroPedido {
 
 	async removerItemDoResumo(nome: string): Promise<void> {
 		await this.itemResumo(nome).locator('.remover-item').click();
+	}
+
+	async abrirModalPersonalizacaoPizza(nome: string): Promise<void> {
+		await this.card('pizza', nome).locator('.personalizar-item').click();
+	}
+
+	async fecharModalPersonalizacaoPizza(): Promise<void> {
+		await this.botaoFecharModalPersonalizacaoPizza.click();
+	}
+
+	async removerIngredientePersonalizavel(nomeIngrediente: string, sabor: Sabor): Promise<void> {
+		await this.ingredientePersonalizavel(nomeIngrediente, sabor).locator('.remover-ingrediente').click();
 	}
 
 	async selecionarTipoAtendimento(tipoAtendimento: TipoAtendimento): Promise<void> {
@@ -217,6 +244,38 @@ export class TelaRegistroPedido {
 		await expect(this.tituloCarrinho).toHaveText('Carrinho (0 itens)');
 	}
 
+	async deveExibirModalPersonalizacaoPizza(): Promise<void> {
+		await expect(this.modalPersonalizacaoPizza).toBeVisible();
+	}
+
+	async deveNaoExibirModalPersonalizacaoPizza(): Promise<void> {
+		await expect(this.modalPersonalizacaoPizza).not.toBeVisible();
+	}
+
+	async deveTerQuantidadeDeIngredientes(quantidade: number, sabor: Sabor = 1): Promise<void> {
+		await expect(this.obterListaIngredientes(sabor).locator('li')).toHaveCount(quantidade);
+	}
+
+	async deveTerQuantidadeDeAdicionais(quantidade: number, sabor: Sabor = 1): Promise<void> {
+		await expect(this.obterListaAdicionais(sabor).locator('li')).toHaveCount(quantidade);
+	}
+
+	async deveAparecerValorTotalDaPersonalizacaoPizza(valor: string): Promise<void> {
+		await expect(this.valorTotalPersonalizacaoPizza).toHaveText(valor);
+	}
+
+	async deveEstarMarcadoParaRemocaoOIngredientePersonalizavel(nome: string, sabor: Sabor = 1): Promise<void> {
+		await expect(this.checkboxRemoverIngredientePersonalizavel(nome, sabor)).toBeChecked();
+	}
+
+	async deveTerFundoVermelhoOIngredientePersonalizavel(nome: string, sabor: Sabor = 1): Promise<void> {
+		await expect(this.ingredientePersonalizavel(nome, sabor)).toContainClass('list-group-item-danger');
+	}
+
+	async deveEstarDesmarcadoParaRemocaoOIngredientePersonalizavel(nome: string, sabor: Sabor = 1): Promise<void> {
+		await expect(this.checkboxRemoverIngredientePersonalizavel(nome, sabor)).not.toBeChecked();
+	}
+
 	async deveEstarDesabilitadoTipoClienteConsumidorFinal(): Promise<void> {
 		await expect(this.labelTipoClienteConsumidorFinal).toBeDisabled();
 	}
@@ -293,5 +352,29 @@ export class TelaRegistroPedido {
 
 	private cliente(identificador: string) {
 		return this.listaClientes.filter({ hasText: identificador });
+	}
+
+	private obterListaIngredientes(sabor: Sabor): Locator {
+		if (sabor === 1) {
+			return this.listaIngredientesPrimeiroSabor;
+		}
+
+		return this.listaIngredientesSegundoSabor;
+	}
+
+	private obterListaAdicionais(sabor: Sabor): Locator {
+		if (sabor === 1) {
+			return this.listaAdicionaisPrimeiroSabor;
+		}
+
+		return this.listaAdicionaisSegundoSabor;
+	}
+
+	private ingredientePersonalizavel(nomeIngrediente: string, sabor: Sabor): Locator {
+		return this.obterListaIngredientes(sabor).locator(`.ingrediente-personalizavel`).filter({ hasText: nomeIngrediente });
+	}
+
+	private checkboxRemoverIngredientePersonalizavel(nomeIngrediente: string, sabor: Sabor): Locator {
+		return this.ingredientePersonalizavel(nomeIngrediente, sabor).locator('input[type="checkbox"]');
 	}
 }

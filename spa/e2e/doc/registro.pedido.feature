@@ -93,6 +93,44 @@ Funcionalidade: Gerenciar itens do pedido
             Quando clico em remover o item "Calabresa"
             Então o resumo deve ficar vazio
 
+Funcionalidade: Personalizar ingredientes da pizza
+    A fim de atender às preferências do cliente
+    Como um atendente
+    Eu quero personalizar pizzas com adicionais, além da substituição e remoção de ingredientes
+    De modo a enviar o pedido correto para a cozinha
+
+    Contexto:
+        Dado que estou na tela de registro de pedido
+        E acesso a etapa "Produtos"
+
+        Cenário: Abertura do modal de personalização de pizza
+            Quando filtro pela categoria "Pizzas" e pesquiso por "Vegetariana"
+            E seleciono o tamanho "Média" para a pizza "Vegetariana"
+            E clico em personalizar a pizza "Vegetariana"
+            Então o modal de personalização da pizza "Vegetariana" deve ser exibido
+
+        Cenário: Fechmento do modal de personalização de pizza
+            Dado que o modal de personalização da pizza "Vegetariana" está aberto
+            Quando clico em fechar o modal
+            Então o modal de personalização da pizza "Vegetariana" deve ser fechado
+
+        Cenário: Carregamento dos ingredientes da pizza no modal
+            Dado que o modal de personalização da pizza "Napolitana" está aberto
+            Então devem ser exibidos os ingredientes padrão da pizza "Napolitana"
+            E devem ser exibidos os adicionais disponíveis para a pizza "Napolitana"
+            E deve ser exibido o valor total da personalização da pizza "Napolitana"
+
+        Cenário: Tentativa de remoção de ingrediente não permitido
+            Dado que o modal de personalização da pizza "Napolitana" está aberto
+            E a pizza "Napolitana" possui o ingrediente "Mussarela" como obrigatório
+            Então o checkbox para remoção correspondente a "Mussarela" deve estar desabilitado
+
+        Cenário: Remoção de ingrediente permitido
+            Dado que o modal de personalização da pizza "Napolitana" está aberto
+            E a pizza "Napolitana" possui o ingrediente "Tomate" como removível
+            Quando removo o ingrediente "Tomate"
+            Então o checkbox para remoção correspondente a "Tomate" deve estar marcado
+
 Funcionalidade: Definir atendimento e cliente
     A fim de registrar corretamente como o pedido será atendido e para quem
     Como um atendente

@@ -51,7 +51,7 @@ export class VisaoEtapaProdutos {
 			const elementoClicado = event.target as HTMLElement;
 
 			const botaoAdicionarItem = elementoClicado.closest<HTMLButtonElement>('.adicionar-item');
-			const botaoPersonalizarItem = elementoClicado.closest<HTMLButtonElement>('.personalizar-item-pizza');
+			const botaoPersonalizarItem = elementoClicado.closest<HTMLButtonElement>('.personalizar-item');
 			if (!botaoAdicionarItem && !botaoPersonalizarItem) {
 				return;
 			}
