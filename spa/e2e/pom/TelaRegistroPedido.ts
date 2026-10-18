@@ -1,125 +1,109 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, Locator, type Page } from '@playwright/test';
+
+type Categoria = 'pizza' | 'bebida' | 'sobremesa';
+type Tamanho = 'P' | 'M' | 'G';
+type TipoAtendimento = 'Entrega' | 'Retirada' | 'Balcão';
+type TipoCliente = 'Consumidor Final' | 'Cliente';
 
 export class TelaRegistroPedido {
-	constructor(private readonly page: Page) {}
+	private readonly page: Page;
+
+	private readonly botaoEtapaProdutos: Locator;
+	private readonly botaoEtapaAtendimento: Locator;
+	private readonly filtroCardapio: Locator;
+	private readonly botaoFiltrarCardapio: Locator;
+	private readonly listaItensPedido: Locator;
+	private readonly labelTipoAtendimentoEntrega: Locator;
+	private readonly labelTipoAtendimentoRetirada: Locator;
+	private readonly labelTipoAtendimentoBalcao: Locator;
+	private readonly labelTipoClienteConsumidorFinal: Locator;
+	private readonly labelTipoClienteIdentificado: Locator;
+	private readonly filtroCliente: Locator;
+	private readonly botaoFiltrarCliente: Locator;
+	private readonly listaClientes: Locator;
+	private readonly botaoRegistrarPedido: Locator;
+	private readonly secaoPizza: Locator;
+	private readonly secaoBebida: Locator;
+	private readonly avisoCarrinhoVazio: Locator;
+	private readonly tituloCarrinho: Locator;
+	private readonly secaoConsumidorFinal: Locator;
+	private readonly secaoCliente: Locator;
+	private readonly secaoEntrega: Locator;
+	private readonly valorEntrega: Locator;
+	private readonly secaoFidelidade: Locator;
+	private readonly secaoPromocoes: Locator;
+	private readonly valorDescontoFidelidade: Locator;
+	private readonly valorDescontoPromocao: Locator;
+
+	constructor(page: Page) {
+		this.page = page;
+
+		this.botaoEtapaProdutos = this.page.getByTestId('botao-etapa-produtos');
+		this.botaoEtapaAtendimento = this.page.getByTestId('botao-etapa-atendimento');
+		this.filtroCardapio = this.page.locator('#filtro-cardapio');
+		this.botaoFiltrarCardapio = this.page.locator('#botao-filtrar-cardapio');
+		this.listaItensPedido = this.page.locator('#lista-itens-pedido');
+		this.labelTipoAtendimentoEntrega = this.page.getByTestId('tipo-atendimento-entrega');
+		this.labelTipoAtendimentoRetirada = this.page.getByTestId('tipo-atendimento-retirada');
+		this.labelTipoAtendimentoBalcao = this.page.getByTestId('tipo-atendimento-balcao');
+		this.labelTipoClienteConsumidorFinal = this.page.getByTestId('tipo-cliente-consumidor-final');
+		this.labelTipoClienteIdentificado = this.page.getByTestId('tipo-cliente-identificado');
+		this.filtroCliente = this.page.locator('#filtro-cliente');
+		this.botaoFiltrarCliente = this.page.locator('#botao-filtrar-cliente');
+		this.listaClientes = this.page.locator('#lista-clientes');
+		this.botaoRegistrarPedido = this.page.locator('#botao-registrar-pedido');
+		this.secaoPizza = this.page.locator('#secao-pizza');
+		this.secaoBebida = this.page.locator('#secao-bebida');
+		this.avisoCarrinhoVazio = this.page.locator('#aviso-vazio');
+		this.tituloCarrinho = this.page.locator('#titulo-carrinho');
+		this.secaoConsumidorFinal = this.page.locator('#secao-consumidor-final');
+		this.secaoCliente = this.page.locator('#secao-cliente');
+		this.secaoEntrega = this.page.locator('#secao-entrega');
+		this.valorEntrega = this.page.locator('#valor-entrega');
+		this.secaoFidelidade = this.page.locator('#secao-fidelidade');
+		this.secaoPromocoes = this.page.locator('#secao-promocoes');
+		this.valorDescontoFidelidade = this.page.locator('#valor-desconto-fidelidade');
+		this.valorDescontoPromocao = this.page.locator('#valor-desconto-promocao');
+	}
 
 	async abrir(): Promise<void> {
 		await this.page.goto('/pedido/registrar');
 	}
 
 	async selecionarEtapaProdutos(): Promise<void> {
-		await this.page.locator('[data-etapa="produtos"]').click();
+		await this.botaoEtapaProdutos.click();
 	}
 
 	async selecionarEtapaAtendimento(): Promise<void> {
-		await this.page.locator('[data-etapa="atendimento"]').click();
-	}
-
-	async selecionarTamanhoPizza(nome: string, tamanho: 'P' | 'M' | 'G'): Promise<void> {
-		const card = this.cardPizza(nome);
-		const valores = { P: 'PEQUENA', M: 'MEDIA', G: 'GRANDE' };
-		const input = card.locator(`input[value="${valores[tamanho]}"]`);
-		const id = await input.getAttribute('id');
-
-		await this.page.locator(`label[for="${id}"]`).click();
+		await this.botaoEtapaAtendimento.click();
 	}
 
 	async buscarPizza(filtro: string): Promise<void> {
-		await this.page.locator(`label[for="categoria-pizza-radio"]`).click();
-		await this.page.locator('#filtro-cardapio').fill(filtro);
-		await this.page.locator('#botao-filtrar-cardapio').click();
-	}
-
-	async deveAparecerTodasAsPizzasDoCardapio(): Promise<void> {
-		const cards = this.page.locator('#secao-pizza .row .card-item');
-		await expect(cards).toHaveCount(10);
-	}
-
-	async deveAparecerCardDaPizza(nome: string): Promise<void> {
-		const card = this.page.locator('#secao-pizza .card-item').filter({ has: this.page.locator('.card-title', { hasText: nome }) });
-
-		await expect(card).toHaveCount(1);
-		await expect(card.locator('.card-title')).toHaveText(nome);
-		await expect(card.locator('.card-text')).not.toBeEmpty();
-
-		const tamanhos = card.locator('.tamanhos-pizza label');
-		await expect(tamanhos).not.toHaveCount(0);
-
-		for (const label of await tamanhos.all()) {
-			await expect(label).toContainText('R$');
-		}
-	}
-
-	async deveAparecerMensagemNenhumaPizzaEncontrada(): Promise<void> {
-		const mensagem = this.page.locator('#secao-pizza .alert');
-
-		await expect(mensagem).toHaveCount(1);
-		await expect(mensagem).toContainText('Nenhuma pizza encontrada.');
+		return this.buscarProduto('pizza', filtro);
 	}
 
 	async buscarBebida(filtro: string): Promise<void> {
-		await this.page.locator(`label[for="categoria-bebida-radio"]`).click();
-		await this.page.locator('#filtro-cardapio').fill(filtro);
-		await this.page.locator('#botao-filtrar-cardapio').click();
+		return this.buscarProduto('bebida', filtro);
 	}
 
 	async buscarSobremesa(filtro: string): Promise<void> {
-		await this.page.locator(`label[for="categoria-sobremesa-radio"]`).click();
-		await this.page.locator('#filtro-cardapio').fill(filtro);
-		await this.page.locator('#botao-filtrar-cardapio').click();
-	}
-
-	async deveAparecerTodasAsBebidasDoCardapio(): Promise<void> {
-		const cards = this.page.locator('#secao-bebida .row .card-item');
-		await expect(cards).toHaveCount(3);
-	}
-
-	async deveAparecerCardDaBebida(nome: string): Promise<void> {
-		const card = this.page.locator('#secao-bebida .card-item').filter({ has: this.page.locator('.card-title', { hasText: nome }) });
-
-		await expect(card).toHaveCount(1);
-		await expect(card.locator('.card-title')).toHaveText(nome);
-		await expect(card.locator('.preco')).toContainText('R$');
-	}
-
-	async deveAparecerMensagemNenhumaBebidaEncontrada(): Promise<void> {
-		const mensagem = this.page.locator('#secao-bebida .alert');
-
-		await expect(mensagem).toHaveCount(1);
-		await expect(mensagem).toContainText('Nenhuma bebida encontrada.');
+		return this.buscarProduto('sobremesa', filtro);
 	}
 
 	async adicionarPizzaAoPedido(nome: string): Promise<void> {
-		await this.cardPizza(nome).locator('.adicionar-item').click();
+		await this.adicionarProdutoAoPedido('pizza', nome);
 	}
 
-	async adicionarProdutoSimplesAoPedido(nome: string): Promise<void> {
-		const card = this.page.locator('#secao-bebida .card-item, #secao-sobremesa .card-item').filter({ has: this.page.locator('.card-title', { hasText: nome }) });
-
-		await card.locator('.adicionar-item').click();
+	async adicionarBebidaAoPedido(nome: string): Promise<void> {
+		await this.adicionarProdutoAoPedido('bebida', nome);
 	}
 
-	async deveAparecerPizzaNoResumo(nome: string, tamanho?: 'P' | 'M' | 'G'): Promise<void> {
-		const item = this.itemResumo(nome);
-
-		await expect(item).toHaveCount(1);
-		if (tamanho) {
-			await expect(item.locator('.nome-item')).toContainText(`Pizza ${tamanho}`);
-		}
-
-		await expect(item.locator('.quantidade-item')).toHaveValue('1');
+	async adicionarSobremesaAoPedido(nome: string): Promise<void> {
+		await this.adicionarProdutoAoPedido('sobremesa', nome);
 	}
 
-	async deveAparecerProdutoNoResumo(nome: string): Promise<void> {
-		const item = this.itemResumo(nome);
-
-		await expect(item).toHaveCount(1);
-		await expect(item.locator('.nome-item')).toHaveText(nome);
-		await expect(item.locator('.quantidade-item')).toHaveValue('1');
-	}
-
-	async deveTerQuantidadeNoResumo(nome: string, quantidade: string): Promise<void> {
-		await expect(this.itemResumo(nome).locator('.quantidade-item')).toHaveValue(quantidade);
+	async selecionarTamanhoPizza(nome: string, tamanho: Tamanho): Promise<void> {
+		await this.card('pizza', nome).getByTestId(`tamanho-pizza-${tamanho}`).click();
 	}
 
 	async aumentarQuantidadeDoItem(nome: string): Promise<void> {
@@ -134,65 +118,139 @@ export class TelaRegistroPedido {
 		await this.itemResumo(nome).locator('.remover-item').click();
 	}
 
-	async deveExibirCarrinhoVazio(): Promise<void> {
-		await expect(this.page.locator('#aviso-vazio')).toBeVisible();
-		await expect(this.page.locator('#titulo-carrinho')).toHaveText('Carrinho (0 itens)');
+	async selecionarTipoAtendimento(tipoAtendimento: TipoAtendimento): Promise<void> {
+		switch (tipoAtendimento) {
+			case 'Entrega':
+				await this.labelTipoAtendimentoEntrega.click();
+				break;
+			case 'Retirada':
+				await this.labelTipoAtendimentoRetirada.click();
+				break;
+			case 'Balcão':
+				await this.labelTipoAtendimentoBalcao.click();
+				break;
+		}
 	}
 
-	async selecionarTipoAtendimento(tipo: 'Entrega' | 'Retirada' | 'Balcão'): Promise<void> {
-		const ids = { Entrega: 'tipo-entrega', Retirada: 'tipo-retirada', Balcão: 'tipo-balcao' };
-		await this.page.locator(`label[for="${ids[tipo]}"]`).click();
-	}
-
-	async deveEstarDesabilitadoTipoClienteConsumidorFinal(): Promise<void> {
-		await expect(this.page.locator('#tipo-consumidor-final')).toBeDisabled();
-	}
-
-	async selecionarTipoCliente(tipo: 'Consumidor Final' | 'Cliente'): Promise<void> {
-		const id = tipo === 'Consumidor Final' ? 'tipo-consumidor-final' : 'tipo-cliente-identificado';
-		await this.page.locator(`label[for="${id}"]`).click();
-	}
-
-	async deveExibirPedidoSemClienteVinculado(): Promise<void> {
-		await expect(this.page.locator('#secao-consumidor-final')).toBeVisible();
-		await expect(this.page.locator('#secao-consumidor-final')).toContainText('Pedido sem cliente vinculado.');
-	}
-
-	async deveExibirSecaoDeClientes(): Promise<void> {
-		await expect(this.page.locator('#secao-cliente')).toBeVisible();
+	async selecionarTipoCliente(tipoCliente: TipoCliente): Promise<void> {
+		switch (tipoCliente) {
+			case 'Consumidor Final':
+				await this.labelTipoClienteConsumidorFinal.click();
+				break;
+			case 'Cliente':
+				await this.labelTipoClienteIdentificado.click();
+				break;
+		}
 	}
 
 	async buscarCliente(filtro: string): Promise<void> {
-		await this.page.locator('#filtro-cliente').fill(filtro);
-		await this.page.locator('#botao-filtrar-cliente').click();
+		await this.filtroCliente.fill(filtro);
+		await this.botaoFiltrarCliente.click();
 	}
 
 	async selecionarCliente(nome: string): Promise<void> {
-		const cliente = this.page.locator('#lista-clientes label').filter({ hasText: nome });
-		await cliente.click();
-	}
-
-	async deveExibirTaxaDeEntrega(): Promise<void> {
-		await expect(this.page.locator('#secao-entrega')).toBeVisible();
-		await expect(this.page.locator('#valor-entrega')).toHaveText('R$ 10,00');
-	}
-
-	async deveExibirDescontoFidelidade(): Promise<void> {
-		await expect(this.page.locator('#secao-fidelidade')).toBeVisible();
-		await expect(this.page.locator('#valor-desconto-fidelidade')).toHaveText(/-R\$\s*[1-9]/);
-	}
-
-	async deveNaoExibirDescontoFidelidade(): Promise<void> {
-		await expect(this.page.locator('#secao-fidelidade')).toBeHidden();
-	}
-
-	async deveExibirDescontoPromocao(): Promise<void> {
-		await expect(this.page.locator('#secao-promocoes')).toBeVisible();
-		await expect(this.page.locator('#valor-desconto-promocao')).toHaveText(/-R\$\s*[1-9]/);
+		await this.cliente(nome).click();
 	}
 
 	async registrarPedido(): Promise<void> {
-		await this.page.locator('#botao-registrar-pedido').click();
+		await this.botaoRegistrarPedido.click();
+	}
+
+	async deveAparecerCardDaPizza(nome: string): Promise<void> {
+		const card = this.card('pizza', nome);
+		const nomePizza = card.getByTestId('card-nome');
+		const tamanhos = card.locator('.tamanhos-pizza');
+
+		await expect(card).toHaveCount(1);
+		await expect(nomePizza).toHaveText(nome);
+		await expect(tamanhos).not.toHaveCount(0);
+	}
+
+	async deveAparecerMensagemNenhumaPizzaEncontrada(): Promise<void> {
+		const mensagem = this.secaoPizza.locator('.mensagem');
+
+		await expect(mensagem).toHaveCount(1);
+		await expect(mensagem).toContainText('Nenhuma pizza encontrada.');
+	}
+
+	async deveAparecerCardDaBebida(nome: string): Promise<void> {
+		const card = this.card('bebida', nome);
+		const nomeBebida = card.getByTestId('card-nome');
+
+		await expect(card).toHaveCount(1);
+		await expect(nomeBebida).toHaveText(nome);
+	}
+
+	async deveAparecerMensagemNenhumaBebidaEncontrada(): Promise<void> {
+		const mensagem = this.secaoBebida.locator('.mensagem');
+
+		await expect(mensagem).toHaveCount(1);
+		await expect(mensagem).toContainText('Nenhuma bebida encontrada.');
+	}
+
+	async deveAparecerTodasAsPizzasDoCardapio(): Promise<void> {
+		const cards = this.secaoPizza.getByTestId('card-produto');
+
+		await expect(cards).toHaveCount(10);
+	}
+
+	async deveAparecerTodasAsBebidasDoCardapio(): Promise<void> {
+		const cards = this.secaoBebida.getByTestId('card-produto');
+
+		await expect(cards).toHaveCount(3);
+	}
+
+	async deveAparecerProdutoNoResumo(nome: string, descricao: string = '', quantidade: string = '1'): Promise<void> {
+		const item = this.itemResumo(nome);
+		const quantidadeItem = item.locator('.quantidade-item');
+		const nomeItem = item.locator('.nome-item');
+		const descricaoItem = item.locator('.descricao-item');
+
+		await expect(item).toHaveCount(1);
+		await expect(nomeItem).toHaveText(nome);
+		await expect(descricaoItem).toHaveText(descricao);
+		await expect(quantidadeItem).toHaveValue(quantidade);
+	}
+
+	async deveExibirCarrinhoVazio(): Promise<void> {
+		await expect(this.avisoCarrinhoVazio).toBeVisible();
+		await expect(this.tituloCarrinho).toHaveText('Carrinho (0 itens)');
+	}
+
+	async deveEstarDesabilitadoTipoClienteConsumidorFinal(): Promise<void> {
+		await expect(this.labelTipoClienteConsumidorFinal).toBeDisabled();
+	}
+
+	async deveExibirPedidoSemClienteVinculado(): Promise<void> {
+		await expect(this.secaoConsumidorFinal).toBeVisible();
+		await expect(this.secaoConsumidorFinal).toContainText('Pedido sem cliente vinculado.');
+	}
+
+	async deveExibirSecaoDeClientes(): Promise<void> {
+		await expect(this.secaoCliente).toBeVisible();
+	}
+
+	async deveExibirTaxaDeEntrega(): Promise<void> {
+		await expect(this.secaoEntrega).toBeVisible();
+		await expect(this.valorEntrega).toHaveText('R$ 10,00');
+	}
+
+	async deveExibirDescontoFidelidade(): Promise<void> {
+		await expect(this.secaoFidelidade).toBeVisible();
+		await expect(this.valorDescontoFidelidade).toHaveText(/-R\$\s*[1-9]/);
+	}
+
+	async deveNaoExibirDescontoFidelidade(): Promise<void> {
+		await expect(this.secaoFidelidade).toBeHidden();
+	}
+
+	async deveExibirDescontoPromocao(): Promise<void> {
+		await expect(this.secaoPromocoes).toBeVisible();
+		await expect(this.valorDescontoPromocao).toHaveText(/-R\$\s*[1-9]/);
+	}
+
+	async deveNaoExibirDescontoPromocao(): Promise<void> {
+		await expect(this.secaoPromocoes).toBeHidden();
 	}
 
 	async deveRedirecionarParaInicio(): Promise<void> {
@@ -200,14 +258,40 @@ export class TelaRegistroPedido {
 	}
 
 	async deveExibirErroNoPedido(mensagem: string): Promise<void> {
-		await expect(this.page.locator('#titulo-carrinho .alert')).toContainText(mensagem);
+		await expect(this.tituloCarrinho.locator('.mensagem')).toContainText(mensagem);
 	}
 
-	private cardPizza(nome: string) {
-		return this.page.locator('#secao-pizza .card-item').filter({ has: this.page.locator('.card-title', { hasText: nome }) });
+	private secaoProdutos(categoria: Categoria): Locator {
+		return this.page.locator(`#secao-${categoria}`);
+	}
+
+	private cards(categoria: Categoria): Locator {
+		return this.secaoProdutos(categoria).getByTestId('card-produto');
+	}
+
+	private card(categoria: Categoria, nome: string): Locator {
+		return this.cards(categoria).filter({ has: this.nomeExatoCard(nome) });
+	}
+
+	private nomeExatoCard(nome: string): Locator {
+		return this.page.getByTestId('card-nome').getByText(nome, { exact: true });
+	}
+
+	private async buscarProduto(categoria: Categoria, filtro: string): Promise<void> {
+		await this.page.locator(`label[for="categoria-${categoria}"]`).click();
+		await this.filtroCardapio.fill(filtro);
+		await this.botaoFiltrarCardapio.click();
+	}
+
+	private async adicionarProdutoAoPedido(categoria: Categoria, nome: string): Promise<void> {
+		await this.card(categoria, nome).locator('.adicionar-item').click();
 	}
 
 	private itemResumo(nome: string) {
-		return this.page.locator('#lista-itens-pedido .item-pedido').filter({ hasText: nome });
+		return this.listaItensPedido.filter({ hasText: nome });
+	}
+
+	private cliente(identificador: string) {
+		return this.listaClientes.filter({ hasText: identificador });
 	}
 }

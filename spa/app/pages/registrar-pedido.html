@@ -1,10 +1,10 @@
 <div class="container pb-5">
 	<ul class="nav nav-tabs mb-4" id="etapas">
 		<li class="nav-item">
-			<button class="nav-link active" data-etapa="produtos">Produtos</button>
+			<button class="nav-link active" data-etapa="produtos" data-testid="botao-etapa-produtos">Produtos</button>
 		</li>
 		<li class="nav-item">
-			<button class="nav-link" data-etapa="atendimento">Atendimento</button>
+			<button class="nav-link" data-etapa="atendimento" data-testid="botao-etapa-atendimento">Atendimento</button>
 		</li>
 	</ul>
 
@@ -14,14 +14,14 @@
 				<p class="fw-medium small text-body-secondary mb-2">Cardápio</p>
 				<div class="d-flex align-items-center gap-4 mb-3" id="categorias-cardapio">
 					<div class="btn-group flex-shrink-0">
-						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-pizza-radio" value="pizza" autocomplete="off" checked />
-						<label class="btn btn-outline-secondary" for="categoria-pizza-radio">Pizzas</label>
+						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-pizza" value="pizza" autocomplete="off" checked />
+						<label class="btn btn-outline-secondary" for="categoria-pizza">Pizzas</label>
 
-						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-bebida-radio" value="bebida" autocomplete="off" />
-						<label class="btn btn-outline-secondary" for="categoria-bebida-radio">Bebidas</label>
+						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-bebida" value="bebida" autocomplete="off" />
+						<label class="btn btn-outline-secondary" for="categoria-bebida">Bebidas</label>
 
-						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-sobremesa-radio" value="sobremesa" autocomplete="off" />
-						<label class="btn btn-outline-secondary" for="categoria-sobremesa-radio">Sobremesas</label>
+						<input type="radio" class="btn-check" name="categoria-cardapio" id="categoria-sobremesa" value="sobremesa" autocomplete="off" />
+						<label class="btn btn-outline-secondary" for="categoria-sobremesa">Sobremesas</label>
 					</div>
 
 					<form id="formulario-filtro-cardapio">
@@ -51,22 +51,22 @@
 				<p class="fw-medium small text-body-secondary mb-2">Tipo atendimento</p>
 				<div class="btn-group mb-4" id="tipos-atendimento">
 					<input type="radio" class="btn-check" name="tipo-atendimento" id="tipo-balcao" value="BALCAO" autocomplete="off" checked />
-					<label class="btn btn-outline-secondary" for="tipo-balcao"> Balcão </label>
+					<label class="btn btn-outline-secondary" for="tipo-balcao" data-testid="tipo-atendimento-balcao"> Balcão </label>
 
 					<input type="radio" class="btn-check" name="tipo-atendimento" id="tipo-entrega" value="ENTREGA" autocomplete="off" />
-					<label class="btn btn-outline-secondary" for="tipo-entrega"> Entrega </label>
+					<label class="btn btn-outline-secondary" for="tipo-entrega" data-testid="tipo-atendimento-entrega"> Entrega </label>
 
 					<input type="radio" class="btn-check" name="tipo-atendimento" id="tipo-retirada" value="RETIRADA" autocomplete="off" />
-					<label class="btn btn-outline-secondary" for="tipo-retirada"> Retirada </label>
+					<label class="btn btn-outline-secondary" for="tipo-retirada" data-testid="tipo-atendimento-retirada"> Retirada </label>
 				</div>
 
 				<p class="fw-medium small text-body-secondary mb-2">Cliente</p>
 				<div class="btn-group mb-3" id="tipos-cliente">
 					<input type="radio" class="btn-check" name="tipo-cliente" id="tipo-cliente-identificado" value="cliente-identificado" autocomplete="off" checked />
-					<label class="btn btn-outline-secondary" for="tipo-cliente-identificado"> Cliente </label>
+					<label class="btn btn-outline-secondary" for="tipo-cliente-identificado" data-testid="tipo-cliente-identificado"> Cliente </label>
 
 					<input type="radio" class="btn-check" name="tipo-cliente" id="tipo-consumidor-final" value="consumidor-final" autocomplete="off" />
-					<label class="btn btn-outline-secondary" for="tipo-consumidor-final"> Consumidor Final </label>
+					<label class="btn btn-outline-secondary" for="tipo-consumidor-final" data-testid="tipo-cliente-consumidor-final"> Consumidor Final </label>
 				</div>
 
 				<div id="secao-cliente">
@@ -197,10 +197,10 @@
 
 <template id="template-card-pizza">
 	<div class="col-6">
-		<div class="card card-item h-100">
+		<div class="card card-item h-100" data-testid="card-produto">
 			<img class="card-img-top" alt="" />
 			<div class="card-body d-flex flex-column">
-				<h5 class="card-title"></h5>
+				<h5 class="card-title" data-testid="card-nome"></h5>
 				<p class="card-text text-muted"></p>
 
 				<div class="btn-group w-100 mb-3 tamanhos-pizza" role="group"></div>
@@ -221,10 +221,10 @@
 
 <template id="template-card-produto-simples">
 	<div class="col-6">
-		<div class="card card-item h-100">
+		<div class="card card-item h-100" data-testid="card-produto">
 			<img class="card-img-top" alt="" />
 			<div class="card-body d-flex flex-column">
-				<h5 class="card-title"></h5>
+				<h5 class="card-title" data-testid="card-nome"></h5>
 
 				<div class="d-flex justify-content-between align-items-center mt-auto">
 					<span class="fw-semibold preco"></span>
@@ -261,7 +261,6 @@
 	<div class="toast text-bg-danger border-0">
 		<div class="d-flex">
 			<div class="toast-body mensagem"></div>
-			<button type="button" class="btn-close btn-close-white me-2 m-auto"></button>
 		</div>
 	</div>
 </template>
@@ -271,7 +270,7 @@
 		<div class="row align-items-center g-2">
 			<div class="col-4 small text-start text-truncate">
 				<div class="fw-medium nome-item"></div>
-				<div class="text-body-secondary sabores-item text-truncate"></div>
+				<div class="text-body-secondary descricao-item text-truncate"></div>
 			</div>
 
 			<div class="col-4 d-flex justify-content-center">

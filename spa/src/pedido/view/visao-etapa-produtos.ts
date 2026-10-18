@@ -188,6 +188,7 @@ export class VisaoEtapaProdutos {
 
 	private criarOpcaoTamanho(idPizza: number, precoPorTamanho: PrecoPorTamanho, selecionado: boolean): DocumentFragment {
 		const template = clonarTemplate('template-tamanho-pizza');
+		const rotulo = rotuloTamanho(precoPorTamanho.tamanhoPizza);
 
 		const input = template.querySelector<HTMLInputElement>('input[type="radio"]')!;
 		input.id = `tamanho-${idPizza}-${precoPorTamanho.tamanhoPizza}`;
@@ -198,7 +199,8 @@ export class VisaoEtapaProdutos {
 
 		const label = template.querySelector<HTMLLabelElement>('label')!;
 		label.htmlFor = input.id;
-		label.textContent = `${rotuloTamanho(precoPorTamanho.tamanhoPizza)} - ${formatarDinheiro(precoPorTamanho.preco)}`;
+		label.textContent = `${rotulo} - ${formatarDinheiro(precoPorTamanho.preco)}`;
+		label.dataset.testid = `tamanho-pizza-${rotulo}`;
 
 		return template;
 	}

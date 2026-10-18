@@ -77,8 +77,8 @@ export class VisaoResumoPedido {
 		const divNomeItem = elemento.querySelector<HTMLElement>('.nome-item')!;
 		divNomeItem.textContent = `Pizza ${rotuloTamanho(item.tamanhoPizza)}`;
 
-		const divSaboresItem = elemento.querySelector<HTMLElement>('.sabores-item')!;
-		divSaboresItem.textContent = pizzas.join(' / ');
+		const divDescricaoItem = elemento.querySelector<HTMLElement>('.descricao-item')!;
+		divDescricaoItem.textContent = pizzas.join(' / ');
 
 		const inputQuantidade = elemento.querySelector<HTMLInputElement>('.quantidade-item')!;
 		inputQuantidade.value = String(item.quantidade);
@@ -97,8 +97,8 @@ export class VisaoResumoPedido {
 		const divNomeItem = elemento.querySelector<HTMLElement>('.nome-item')!;
 		divNomeItem.textContent = item.nome;
 
-		const divSaboresItem = elemento.querySelector<HTMLElement>('.sabores-item')!;
-		divSaboresItem.textContent = '';
+		const divDescricaoItem = elemento.querySelector<HTMLElement>('.descricao-item')!;
+		divDescricaoItem.textContent = '';
 
 		const inputQuantidade = elemento.querySelector<HTMLInputElement>('.quantidade-item')!;
 		inputQuantidade.value = String(item.quantidade);

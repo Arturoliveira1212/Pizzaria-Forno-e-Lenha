@@ -120,7 +120,7 @@ test.describe('Registro de pedido', () => {
 			test('Adição de pizza no pedido', async ({}) => {
 				await tela.buscarPizza('2');
 				await tela.adicionarPizzaAoPedido('Calabresa');
-				await tela.deveAparecerPizzaNoResumo('Calabresa');
+				await tela.deveAparecerProdutoNoResumo('Pizza P', 'Calabresa');
 			});
 
 			/*	Cenário: Adição de pizza com tamanho diferente do padrão
@@ -133,7 +133,7 @@ test.describe('Registro de pedido', () => {
 				await tela.buscarPizza('Catupiry');
 				await tela.selecionarTamanhoPizza('Frango com Catupiry', 'G');
 				await tela.adicionarPizzaAoPedido('Frango com Catupiry');
-				await tela.deveAparecerPizzaNoResumo('Frango com Catupiry', 'G');
+				await tela.deveAparecerProdutoNoResumo('Pizza G', 'Frango com Catupiry');
 			});
 
 			/*	Cenário: Adição da mesma pizza duas vezes
@@ -145,7 +145,7 @@ test.describe('Registro de pedido', () => {
 				await tela.buscarPizza('8');
 				await tela.adicionarPizzaAoPedido('Napolitana');
 				await tela.adicionarPizzaAoPedido('Napolitana');
-				await tela.deveTerQuantidadeNoResumo('Napolitana', '2');
+				await tela.deveAparecerProdutoNoResumo('Pizza P', 'Napolitana', '2');
 			});
 
 			/*	Cenário: Adição de sobremesa no pedido
@@ -155,7 +155,7 @@ test.describe('Registro de pedido', () => {
 			*/
 			test('Adição de sobremesa no pedido', async () => {
 				await tela.buscarSobremesa('Pudim');
-				await tela.adicionarProdutoSimplesAoPedido('Pudim de Leite');
+				await tela.adicionarSobremesaAoPedido('Pudim de Leite');
 				await tela.deveAparecerProdutoNoResumo('Pudim de Leite');
 			});
 
@@ -166,9 +166,9 @@ test.describe('Registro de pedido', () => {
 			*/
 			test('Adição da mesma sobremesa duas vezes', async () => {
 				await tela.buscarSobremesa('5');
-				await tela.adicionarProdutoSimplesAoPedido('Pudim de Leite');
-				await tela.adicionarProdutoSimplesAoPedido('Pudim de Leite');
-				await tela.deveTerQuantidadeNoResumo('Pudim de Leite', '2');
+				await tela.adicionarSobremesaAoPedido('Pudim de Leite');
+				await tela.adicionarSobremesaAoPedido('Pudim de Leite');
+				await tela.deveAparecerProdutoNoResumo('Pudim de Leite', '', '2');
 			});
 
 			/*
@@ -181,7 +181,7 @@ test.describe('Registro de pedido', () => {
 				await tela.buscarPizza('2');
 				await tela.adicionarPizzaAoPedido('Calabresa');
 				await tela.aumentarQuantidadeDoItem('Calabresa');
-				await tela.deveTerQuantidadeNoResumo('Calabresa', '2');
+				await tela.deveAparecerProdutoNoResumo('Pizza P', 'Calabresa', '2');
 			});
 
 			/*
@@ -196,7 +196,7 @@ test.describe('Registro de pedido', () => {
 				await tela.adicionarPizzaAoPedido('Portuguesa');
 				await tela.adicionarPizzaAoPedido('Portuguesa');
 				await tela.diminuirQuantidadeDoItem('Portuguesa');
-				await tela.deveTerQuantidadeNoResumo('Portuguesa', '2');
+				await tela.deveAparecerProdutoNoResumo('Pizza P', 'Portuguesa', '2');
 			});
 
 			/*
@@ -284,9 +284,9 @@ test.describe('Registro de pedido', () => {
 				await tela.buscarPizza('2');
 				await tela.adicionarPizzaAoPedido('Calabresa');
 				await tela.selecionarEtapaAtendimento();
+				await tela.selecionarTipoAtendimento('Entrega');
 				await tela.buscarCliente('Ana Beatriz Souza');
 				await tela.selecionarCliente('Ana Beatriz Souza');
-				await tela.selecionarTipoAtendimento('Entrega');
 				await tela.deveExibirTaxaDeEntrega();
 			});
 
@@ -352,7 +352,7 @@ test.describe('Registro de pedido', () => {
 				await tela.buscarPizza('Vegetariana');
 				await tela.selecionarTamanhoPizza('Vegetariana', 'G');
 				await tela.adicionarPizzaAoPedido('Vegetariana');
-				await tela.deveNaoExibirDescontoFidelidade();
+				await tela.deveNaoExibirDescontoPromocao();
 			});
 		});
 	});
