@@ -7,6 +7,7 @@ import { IngredienteAdicional } from '../../pizza/dominio/ingrediente-adicional'
 import { Ingrediente } from '../../ingrediente/dominio/ingrediente';
 import { formatarDinheiro } from '../../util/dinheiro';
 import { rotuloTamanho, TamanhoPizza } from '../../pizza/dominio/tamanho-pizza';
+import { DadosItemPizza } from '../dados-item-pizza';
 
 export class VisaoPersonalizacaoPizza {
 	private controladoraRegistroPedido!: ControladoraRegistroPedido;
@@ -14,17 +15,21 @@ export class VisaoPersonalizacaoPizza {
 	private readonly modal = bootstrap.Modal.getOrCreateInstance('#modal-personalizacao-pizza')! as bootstrap.Modal;
 	private readonly nomePizza = document.querySelector<HTMLElement>('#nome-pizza')!;
 	private readonly informacaoTamanho = document.querySelector<HTMLElement>('#informacao-tamanho')!;
+	private readonly inputTamanho = this.informacaoTamanho.querySelector<HTMLInputElement>('#tamanho')!;
 	private readonly labelTamanho = this.informacaoTamanho.querySelector<HTMLLabelElement>('label')!;
 	private readonly inputTipoInteira = document.querySelector<HTMLInputElement>('#tipo-inteira')!;
 	private readonly inputTipoMetade = document.querySelector<HTMLInputElement>('#tipo-meia')!;
-	private readonly listaIngredientes = document.querySelector<HTMLElement>('#lista-ingredientes')!;
-	private readonly tituloAdicionais = document.querySelector<HTMLElement>('#titulo-adicionais')!;
-	private readonly listaAdicionais = document.querySelector<HTMLElement>('#lista-adicionais')!;
-	private readonly secaoPizza1 = document.querySelector<HTMLElement>('#secao-pizza1')!;
-	private readonly secaoPizza2 = document.querySelector<HTMLElement>('#secao-pizza2')!;
 	private readonly valorTotalPersonalizacao = document.querySelector<HTMLElement>('#valor-total-personalizacao')!;
-	private readonly formularioFiltroSegundaMetade = this.secaoPizza2.querySelector<HTMLElement>('#formulario-filtro-segunda-metade')!;
-	private readonly inputFiltroCliente = this.secaoPizza2.querySelector<HTMLInputElement>('#filtro-segunda-metade')!;
+	private readonly botaoAdicionarPersonalizacaoPizza = document.querySelector<HTMLButtonElement>('#botao-adicionar-personalizacao-pizza')!;
+
+	private readonly listaIngredientesPrimeiroSabor = document.querySelector<HTMLElement>('#lista-ingredientes-primeiro-sabor')!;
+	private readonly tituloAdicionaisPrimeiroSabor = document.querySelector<HTMLElement>('#titulo-adicionais-primeiro-sabor')!;
+	private readonly listaAdicionaisPrimeiroSabor = document.querySelector<HTMLElement>('#lista-adicionais-primeiro-sabor')!;
+	private readonly secaoPizzaPrimeiroSabor = document.querySelector<HTMLElement>('#secao-pizza-primeiro-sabor')!;
+	private readonly secaoPizzaSegundoSabor = document.querySelector<HTMLElement>('#secao-pizza-segundo-sabor')!;
+
+	private readonly formularioFiltroSegundoSabor = this.secaoPizzaSegundoSabor.querySelector<HTMLElement>('#formulario-filtro-segundo-sabor')!;
+	private readonly inputFiltroSegundoSabor = this.secaoPizzaSegundoSabor.querySelector<HTMLInputElement>('#filtro-segundo-sabor')!;
 
 	iniciar(controladora: ControladoraRegistroPedido): void {
 		this.controladoraRegistroPedido = controladora;
@@ -33,7 +38,7 @@ export class VisaoPersonalizacaoPizza {
 	}
 
 	registrarEventos(): void {
-		this.listaIngredientes.addEventListener('click', (event: Event) => {
+		this.listaIngredientesPrimeiroSabor.addEventListener('click', (event: Event) => {
 			const elementoClicado = event.target as HTMLInputElement;
 			const ingredientePersonalizavel = elementoClicado.closest<HTMLElement>('.ingrediente-personalizavel');
 			if (!ingredientePersonalizavel) {
@@ -46,7 +51,7 @@ export class VisaoPersonalizacaoPizza {
 			}
 		});
 
-		this.listaAdicionais.addEventListener('click', (event: Event) => {
+		this.listaAdicionaisPrimeiroSabor.addEventListener('click', (event: Event) => {
 			const elementoClicado = event.target as HTMLInputElement;
 			const ingredienteAdicional = elementoClicado.closest<HTMLElement>('.ingrediente-adicional');
 			if (!ingredienteAdicional) {
@@ -59,6 +64,10 @@ export class VisaoPersonalizacaoPizza {
 				this.atualizarQuantidadeAdicional(ingredienteAdicional, -1);
 			}
 		});
+
+		this.botaoAdicionarPersonalizacaoPizza.addEventListener('click', async () => {
+			this.controladoraRegistroPedido.adicionarPersonalizacaoItemPizza();
+		});
 	}
 
 	exibirPizzaParaPersonalizacao(pizza: Pizza, tamanho: TamanhoPizza): void {
@@ -67,16 +76,24 @@ export class VisaoPersonalizacaoPizza {
 		this.modal.show();
 	}
 
+	abrirModal(): void {
+		this.modal.show();
+	}
+
+	fecharModal(): void {
+		this.modal.hide();
+	}
+
 	private resetarModal(): void {
 		this.labelTamanho.textContent = '';
 		this.inputTipoInteira.checked = true;
 		this.inputTipoMetade.checked = false;
-		this.listaIngredientes.replaceChildren();
-		this.tituloAdicionais.classList.add('d-none');
-		this.listaAdicionais.replaceChildren();
-		this.secaoPizza1.classList.remove('d-none');
-		this.secaoPizza2.classList.add('d-none');
-		this.inputFiltroCliente.value = '';
+		this.listaIngredientesPrimeiroSabor.replaceChildren();
+		this.tituloAdicionaisPrimeiroSabor.classList.add('d-none');
+		this.listaAdicionaisPrimeiroSabor.replaceChildren();
+		this.secaoPizzaPrimeiroSabor.classList.remove('d-none');
+		this.secaoPizzaSegundoSabor.classList.add('d-none');
+		this.inputFiltroSegundoSabor.value = '';
 	}
 
 	private povoarModal(pizza: Pizza, tamanho: TamanhoPizza): void {
@@ -85,7 +102,9 @@ export class VisaoPersonalizacaoPizza {
 
 		this.nomePizza.textContent = pizza.nome;
 		this.informacaoTamanho.dataset.preco = String(preco);
+		this.inputTamanho.value = tamanho;
 		this.labelTamanho.textContent = `${rotuloTamanho(tamanho)} - ${precoFormatado}`;
+		this.valorTotalPersonalizacao.dataset.preco = String(preco);
 		this.valorTotalPersonalizacao.textContent = precoFormatado;
 
 		const ingredientesPadrao = pizza.ingredientesPadrao;
@@ -93,12 +112,12 @@ export class VisaoPersonalizacaoPizza {
 			return;
 		}
 
-		this.listaIngredientes.append(...this.criarListaIngredientes(pizza));
+		this.listaIngredientesPrimeiroSabor.append(...this.criarListaIngredientes(pizza));
 
 		const adicionais = pizza.adicionais;
 		if (adicionais.length > 0) {
-			this.tituloAdicionais.classList.remove('d-none');
-			this.listaAdicionais.append(...this.criarListaAdicionais(adicionais));
+			this.tituloAdicionaisPrimeiroSabor.classList.remove('d-none');
+			this.listaAdicionaisPrimeiroSabor.append(...this.criarListaAdicionais(adicionais));
 		}
 	}
 
@@ -209,7 +228,7 @@ export class VisaoPersonalizacaoPizza {
 	private atualizarValorTotalPersonalizacao(): void {
 		let valorTotal = Number(this.informacaoTamanho.dataset.preco);
 
-		const ingredientesAdicionais = this.listaAdicionais.querySelectorAll<HTMLElement>('.ingrediente-adicional');
+		const ingredientesAdicionais = this.listaAdicionaisPrimeiroSabor.querySelectorAll<HTMLElement>('.ingrediente-adicional');
 		ingredientesAdicionais.forEach((ingredienteAdicional) => {
 			const precoAdicional = Number(ingredienteAdicional.dataset.preco) || 0;
 			const quantidade = Number(ingredienteAdicional.querySelector<HTMLInputElement>('.quantidade-adicional')?.value || 0);
@@ -217,6 +236,7 @@ export class VisaoPersonalizacaoPizza {
 			valorTotal += precoAdicional * quantidade;
 		});
 
+		this.valorTotalPersonalizacao.dataset.preco = String(valorTotal);
 		this.valorTotalPersonalizacao.textContent = formatarDinheiro(valorTotal);
 	}
 }
