@@ -110,26 +110,47 @@ Funcionalidade: Personalizar ingredientes da pizza
             Então o modal de personalização da pizza "Vegetariana" deve ser exibido
 
         Cenário: Fechmento do modal de personalização de pizza
-            Dado que o modal de personalização da pizza "Vegetariana" está aberto
+            Dado que o modal de personalização da pizza "Vegetariana" no tamanho "Pequena" está aberto
             Quando clico em fechar o modal
             Então o modal de personalização da pizza "Vegetariana" deve ser fechado
 
         Cenário: Carregamento dos ingredientes da pizza no modal
-            Dado que o modal de personalização da pizza "Napolitana" está aberto
+            Dado que o modal de personalização da pizza "Napolitana" no tamanho "Grande" está aberto
             Então devem ser exibidos os ingredientes padrão da pizza "Napolitana"
             E devem ser exibidos os adicionais disponíveis para a pizza "Napolitana"
             E deve ser exibido o valor total da personalização da pizza "Napolitana"
 
         Cenário: Tentativa de remoção de ingrediente não permitido
-            Dado que o modal de personalização da pizza "Napolitana" está aberto
+            Dado que o modal de personalização da pizza "Napolitana" no tamanho "Grande" está aberto
             E a pizza "Napolitana" possui o ingrediente "Mussarela" como obrigatório
             Então o checkbox para remoção correspondente a "Mussarela" deve estar desabilitado
 
         Cenário: Remoção de ingrediente permitido
-            Dado que o modal de personalização da pizza "Napolitana" está aberto
+            Dado que o modal de personalização da pizza "Napolitana" no tamanho "Grande" está aberto
             E a pizza "Napolitana" possui o ingrediente "Tomate" como removível
             Quando removo o ingrediente "Tomate"
             Então o checkbox para remoção correspondente a "Tomate" deve estar marcado
+
+        Cenário: Adição de ingrediente adicional
+            Dado que o modal de personalização da pizza "Napolitana" no tamanho "Média" está aberto
+            E a pizza "Napolitana" possui o ingrediente "Bacon" como adicional
+            Quando aumento a quantidade do "Bacon" para "1"
+            Então o valor do adicional "Bacon" deve ser adicionado ao valor total da personalização da pizza "Napolitana"
+
+        Cenário: Remoção de ingrediente adicional
+            Dado que o modal de personalização da pizza "Napolitana" no tamanho "Pequena" está aberto
+            E a pizza "Napolitana" possui o ingrediente "Bacon" como adicional
+            E a quantidade do "Bacon" está em "1"
+            Quando diminuo a quantidade do "Bacon" para "0"
+            Então o valor do adicional "Bacon" deve ser removido do valor total da personalização da pizza "Napolitana"
+
+        Cenário: Adição de pizza personalizada ao pedido
+            Dado que o modal de personalização da pizza "Napolitana" no tamanho "Grande" está aberto
+            E a pizza "Napolitana" possui o ingrediente "Bacon" como adicional
+            E a quantidade do "Bacon" está em "1"
+            E a quantidade do "Pimentão" está em "2"
+            Quando clico em adicionar a pizza personalizada ao pedido
+            Então o resumo deve exibir a pizza "Napolitana" com o valor correspondente à personalização realizada
 
 Funcionalidade: Definir atendimento e cliente
     A fim de registrar corretamente como o pedido será atendido e para quem

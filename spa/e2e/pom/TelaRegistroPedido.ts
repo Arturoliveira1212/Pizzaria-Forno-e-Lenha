@@ -42,6 +42,8 @@ export class TelaRegistroPedido {
 	private readonly listaIngredientesSegundoSabor: Locator;
 	private readonly listaAdicionaisSegundoSabor: Locator;
 	private readonly valorTotalPersonalizacaoPizza: Locator;
+	private readonly botaoAdicionarPersonalizacaoPizza: Locator;
+	private readonly valorTotalPedido: Locator;
 
 	constructor(page: Page) {
 		this.page = page;
@@ -79,6 +81,8 @@ export class TelaRegistroPedido {
 		this.listaIngredientesSegundoSabor = this.page.locator('#lista-ingredientes-segundo-sabor');
 		this.listaAdicionaisSegundoSabor = this.page.locator('#lista-adicionais-segundo-sabor');
 		this.valorTotalPersonalizacaoPizza = this.page.locator('#valor-total-personalizacao');
+		this.botaoAdicionarPersonalizacaoPizza = this.page.locator('#botao-adicionar-personalizacao-pizza');
+		this.valorTotalPedido = this.page.locator('#valor-total');
 	}
 
 	async abrir(): Promise<void> {
@@ -141,8 +145,20 @@ export class TelaRegistroPedido {
 		await this.botaoFecharModalPersonalizacaoPizza.click();
 	}
 
-	async removerIngredientePersonalizavel(nomeIngrediente: string, sabor: Sabor): Promise<void> {
+	async removerIngredientePersonalizavel(nomeIngrediente: string, sabor: Sabor = 1): Promise<void> {
 		await this.ingredientePersonalizavel(nomeIngrediente, sabor).locator('.remover-ingrediente').click();
+	}
+
+	async aumentarQuantidadeIngredienteAdicional(nome: string, sabor: Sabor = 1): Promise<void> {
+		await this.ingredienteAdicional(nome, sabor).locator('.aumentar-quantidade-adicional').click();
+	}
+
+	async diminuirQuantidadeIngredienteAdicional(nome: string, sabor: Sabor = 1): Promise<void> {
+		await this.ingredienteAdicional(nome, sabor).locator('.diminuir-quantidade-adicional').click();
+	}
+
+	async adicionarPersonalizacaoAoPedido(): Promise<void> {
+		await this.botaoAdicionarPersonalizacaoPizza.click();
 	}
 
 	async selecionarTipoAtendimento(tipoAtendimento: TipoAtendimento): Promise<void> {
@@ -227,15 +243,17 @@ export class TelaRegistroPedido {
 		await expect(cards).toHaveCount(3);
 	}
 
-	async deveAparecerProdutoNoResumo(nome: string, descricao: string = '', quantidade: string = '1'): Promise<void> {
+	async deveAparecerProdutoNoResumo(nome: string, preco: string, descricao: string = '', quantidade: string = '1'): Promise<void> {
 		const item = this.itemResumo(nome);
 		const quantidadeItem = item.locator('.quantidade-item');
 		const nomeItem = item.locator('.nome-item');
 		const descricaoItem = item.locator('.descricao-item');
+		const precoItem = item.locator('.preco-item');
 
 		await expect(item).toHaveCount(1);
 		await expect(nomeItem).toHaveText(nome);
 		await expect(descricaoItem).toHaveText(descricao);
+		await expect(precoItem).toHaveText(preco);
 		await expect(quantidadeItem).toHaveValue(quantidade);
 	}
 
@@ -260,8 +278,12 @@ export class TelaRegistroPedido {
 		await expect(this.obterListaAdicionais(sabor).locator('li')).toHaveCount(quantidade);
 	}
 
-	async deveAparecerValorTotalDaPersonalizacaoPizza(valor: string): Promise<void> {
+	async deveExibirValorTotalDaPersonalizacaoPizza(valor: string): Promise<void> {
 		await expect(this.valorTotalPersonalizacaoPizza).toHaveText(valor);
+	}
+
+	async deveExibirValorTotalDoPedido(valor: string): Promise<void> {
+		await expect(this.valorTotalPedido).toHaveText(valor);
 	}
 
 	async deveEstarMarcadoParaRemocaoOIngredientePersonalizavel(nome: string, sabor: Sabor = 1): Promise<void> {
@@ -294,18 +316,18 @@ export class TelaRegistroPedido {
 		await expect(this.valorEntrega).toHaveText('R$ 10,00');
 	}
 
-	async deveExibirDescontoFidelidade(): Promise<void> {
+	async deveExibirDescontoFidelidade(valor: string): Promise<void> {
 		await expect(this.secaoFidelidade).toBeVisible();
-		await expect(this.valorDescontoFidelidade).toHaveText(/-R\$\s*[1-9]/);
+		await expect(this.valorDescontoFidelidade).toHaveText(valor);
 	}
 
 	async deveNaoExibirDescontoFidelidade(): Promise<void> {
 		await expect(this.secaoFidelidade).toBeHidden();
 	}
 
-	async deveExibirDescontoPromocao(): Promise<void> {
+	async deveExibirDescontoPromocao(valor: string): Promise<void> {
 		await expect(this.secaoPromocoes).toBeVisible();
-		await expect(this.valorDescontoPromocao).toHaveText(/-R\$\s*[1-9]/);
+		await expect(this.valorDescontoPromocao).toHaveText(valor);
 	}
 
 	async deveNaoExibirDescontoPromocao(): Promise<void> {
@@ -370,11 +392,15 @@ export class TelaRegistroPedido {
 		return this.listaAdicionaisSegundoSabor;
 	}
 
-	private ingredientePersonalizavel(nomeIngrediente: string, sabor: Sabor): Locator {
+	private ingredientePersonalizavel(nomeIngrediente: string, sabor: Sabor = 1): Locator {
 		return this.obterListaIngredientes(sabor).locator(`.ingrediente-personalizavel`).filter({ hasText: nomeIngrediente });
 	}
 
-	private checkboxRemoverIngredientePersonalizavel(nomeIngrediente: string, sabor: Sabor): Locator {
+	private checkboxRemoverIngredientePersonalizavel(nomeIngrediente: string, sabor: Sabor = 1): Locator {
 		return this.ingredientePersonalizavel(nomeIngrediente, sabor).locator('input[type="checkbox"]');
+	}
+
+	private ingredienteAdicional(nomeIngrediente: string, sabor: Sabor = 1): Locator {
+		return this.obterListaAdicionais(sabor).locator(`.ingrediente-adicional`).filter({ hasText: nomeIngrediente });
 	}
 }

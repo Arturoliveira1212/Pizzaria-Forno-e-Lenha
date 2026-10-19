@@ -120,7 +120,8 @@ test.describe('Registro de pedido', () => {
 			test('Adição de pizza no pedido', async ({}) => {
 				await tela.buscarPizza('2');
 				await tela.adicionarPizzaAoPedido('Calabresa');
-				await tela.deveAparecerProdutoNoResumo('Pizza P', 'Calabresa');
+				await tela.deveAparecerProdutoNoResumo('Pizza P', 'R$ 33,00', 'Calabresa');
+				await tela.deveExibirValorTotalDoPedido('R$ 33,00');
 			});
 
 			/*	Cenário: Adição de pizza com tamanho diferente do padrão
@@ -133,7 +134,8 @@ test.describe('Registro de pedido', () => {
 				await tela.buscarPizza('Catupiry');
 				await tela.selecionarTamanhoPizza('Frango com Catupiry', 'G');
 				await tela.adicionarPizzaAoPedido('Frango com Catupiry');
-				await tela.deveAparecerProdutoNoResumo('Pizza G', 'Frango com Catupiry');
+				await tela.deveAparecerProdutoNoResumo('Pizza G', 'R$ 58,00', 'Frango com Catupiry');
+				await tela.deveExibirValorTotalDoPedido('R$ 58,00');
 			});
 
 			/*	Cenário: Adição da mesma pizza duas vezes
@@ -145,7 +147,8 @@ test.describe('Registro de pedido', () => {
 				await tela.buscarPizza('8');
 				await tela.adicionarPizzaAoPedido('Napolitana');
 				await tela.adicionarPizzaAoPedido('Napolitana');
-				await tela.deveAparecerProdutoNoResumo('Pizza P', 'Napolitana', '2');
+				await tela.deveAparecerProdutoNoResumo('Pizza P', 'R$ 36,00', 'Napolitana', '2');
+				await tela.deveExibirValorTotalDoPedido('R$ 72,00');
 			});
 
 			/*	Cenário: Adição de sobremesa no pedido
@@ -156,7 +159,8 @@ test.describe('Registro de pedido', () => {
 			test('Adição de sobremesa no pedido', async () => {
 				await tela.buscarSobremesa('Pudim');
 				await tela.adicionarSobremesaAoPedido('Pudim de Leite');
-				await tela.deveAparecerProdutoNoResumo('Pudim de Leite');
+				await tela.deveAparecerProdutoNoResumo('Pudim de Leite', 'R$ 15,00');
+				await tela.deveExibirValorTotalDoPedido('R$ 15,00');
 			});
 
 			/*	Cenário: Adição da mesma sobremesa duas vezes
@@ -168,7 +172,8 @@ test.describe('Registro de pedido', () => {
 				await tela.buscarSobremesa('5');
 				await tela.adicionarSobremesaAoPedido('Pudim de Leite');
 				await tela.adicionarSobremesaAoPedido('Pudim de Leite');
-				await tela.deveAparecerProdutoNoResumo('Pudim de Leite', '', '2');
+				await tela.deveAparecerProdutoNoResumo('Pudim de Leite', 'R$ 15,00', '', '2');
+				await tela.deveExibirValorTotalDoPedido('R$ 30,00');
 			});
 
 			/*
@@ -181,7 +186,8 @@ test.describe('Registro de pedido', () => {
 				await tela.buscarPizza('2');
 				await tela.adicionarPizzaAoPedido('Calabresa');
 				await tela.aumentarQuantidadeDoItem('Calabresa');
-				await tela.deveAparecerProdutoNoResumo('Pizza P', 'Calabresa', '2');
+				await tela.deveAparecerProdutoNoResumo('Pizza P', 'R$ 33,00', 'Calabresa', '2');
+				await tela.deveExibirValorTotalDoPedido('R$ 66,00');
 			});
 
 			/*
@@ -196,7 +202,8 @@ test.describe('Registro de pedido', () => {
 				await tela.adicionarPizzaAoPedido('Portuguesa');
 				await tela.adicionarPizzaAoPedido('Portuguesa');
 				await tela.diminuirQuantidadeDoItem('Portuguesa');
-				await tela.deveAparecerProdutoNoResumo('Pizza P', 'Portuguesa', '2');
+				await tela.deveAparecerProdutoNoResumo('Pizza P', 'R$ 37,00', 'Portuguesa', '2');
+				await tela.deveExibirValorTotalDoPedido('R$ 74,00');
 			});
 
 			/*
@@ -243,12 +250,13 @@ test.describe('Registro de pedido', () => {
 
 			/*
 				Cenário: Fechmento do modal de personalização de pizza
-					Dado que o modal de personalização da pizza "Vegetariana" está aberto
+					Dado que o modal de personalização da pizza "Vegetariana" no tamanho "Pequena" está aberto
 					Quando clico em fechar o modal
 					Então o modal de personalização da pizza "Vegetariana" deve ser fechado
 			*/
 			test('Fechamento do modal de personalização de pizza', async () => {
 				await tela.buscarPizza('Vegetariana');
+				await tela.selecionarTamanhoPizza('Vegetariana', 'P');
 				await tela.abrirModalPersonalizacaoPizza('Vegetariana');
 				await tela.fecharModalPersonalizacaoPizza();
 				await tela.deveNaoExibirModalPersonalizacaoPizza();
@@ -256,44 +264,101 @@ test.describe('Registro de pedido', () => {
 
 			/*
 				Cenário: Carregamento dos ingredientes da pizza no modal
-					Dado que o modal de personalização da pizza "Napolitana" está aberto
+					Dado que o modal de personalização da pizza "Napolitana" no tamanho "Grande" está aberto
 					Então devem ser exibidos os ingredientes padrão da pizza "Napolitana"
 					E devem ser exibidos os adicionais disponíveis para a pizza "Napolitana"
 					E deve ser exibido o valor total da personalização da pizza "Napolitana"
 			*/
 			test('Carregamento dos ingredientes da pizza no modal', async () => {
 				await tela.buscarPizza('Napolitana');
+				await tela.selecionarTamanhoPizza('Napolitana', 'G');
 				await tela.abrirModalPersonalizacaoPizza('Napolitana');
 				await tela.deveTerQuantidadeDeIngredientes(5, 1);
 				await tela.deveTerQuantidadeDeAdicionais(2, 1);
-				await tela.deveAparecerValorTotalDaPersonalizacaoPizza('R$ 36,00');
+				await tela.deveExibirValorTotalDaPersonalizacaoPizza('R$ 56,00');
 			});
 
 			/*
 				Cenário: Tentativa de remoção de ingrediente não permitido
-					Dado que o modal de personalização da pizza "Napolitana" está aberto
+					Dado que o modal de personalização da pizza "Napolitana" no tamanho "Grande" está aberto
 					E a pizza "Napolitana" possui o ingrediente "Mussarela" como obrigatório
 					Então o checkbox para remoção correspondente a "Mussarela" deve estar desabilitado
 			*/
 			test('Tentativa de remoção de ingrediente não permitido', async () => {
 				await tela.buscarPizza('Napolitana');
+				await tela.selecionarTamanhoPizza('Napolitana', 'G');
 				await tela.abrirModalPersonalizacaoPizza('Napolitana');
 				await tela.deveEstarDesmarcadoParaRemocaoOIngredientePersonalizavel('Mussarela');
 			});
 
 			/*
 				Cenário: Remoção de ingrediente permitido
-					Dado que o modal de personalização da pizza "Napolitana" está aberto
+					Dado que o modal de personalização da pizza "Napolitana" no tamanho "Grande" está aberto
 					E a pizza "Napolitana" possui o ingrediente "Tomate" como removível
 					Quando removo o ingrediente "Tomate"
 					Então o checkbox para remoção correspondente a "Tomate" deve estar marcado
 			*/
 			test('Remoção de ingrediente permitido', async () => {
 				await tela.buscarPizza('Napolitana');
+				await tela.selecionarTamanhoPizza('Napolitana', 'G');
 				await tela.abrirModalPersonalizacaoPizza('Napolitana');
-				await tela.removerIngredientePersonalizavel('Tomate', 1);
+				await tela.removerIngredientePersonalizavel('Tomate');
 				await tela.deveEstarMarcadoParaRemocaoOIngredientePersonalizavel('Tomate');
 				await tela.deveTerFundoVermelhoOIngredientePersonalizavel('Tomate');
+			});
+
+			/*
+				 Cenário: Adição de ingrediente adicional
+					Dado que o modal de personalização da pizza "Napolitana" no tamanho "Média" está aberto
+					E a pizza "Napolitana" possui o ingrediente "Bacon" como adicional
+					Quando aumento a quantidade do "Bacon" para "1"
+					Então o valor do adicional "Bacon" deve ser adicionado ao valor total da personalização da pizza "Napolitana"
+			*/
+			test('Adição de ingrediente adicional', async () => {
+				await tela.buscarPizza('Napolitana');
+				await tela.selecionarTamanhoPizza('Napolitana', 'M');
+				await tela.abrirModalPersonalizacaoPizza('Napolitana');
+				await tela.aumentarQuantidadeIngredienteAdicional('Bacon');
+				await tela.deveExibirValorTotalDaPersonalizacaoPizza('R$ 52,00');
+			});
+
+			/*
+				Cenário: Remoção de ingrediente adicional
+					Dado que o modal de personalização da pizza "Napolitana" no tamanho "Pequena" está aberto
+					E a pizza "Napolitana" possui o ingrediente "Bacon" como adicional
+					E a quantidade do "Bacon" está em "1"
+					Quando diminuo a quantidade do "Bacon" para "0"
+					Então o valor do adicional "Bacon" deve ser removido do valor total da personalização da pizza "Napolitana"
+			*/
+			test('Remoção de ingrediente adicional', async () => {
+				await tela.buscarPizza('Napolitana');
+				await tela.selecionarTamanhoPizza('Napolitana', 'P');
+				await tela.abrirModalPersonalizacaoPizza('Napolitana');
+				await tela.aumentarQuantidadeIngredienteAdicional('Bacon');
+				await tela.deveExibirValorTotalDaPersonalizacaoPizza('R$ 42,00');
+				await tela.diminuirQuantidadeIngredienteAdicional('Bacon');
+				await tela.deveExibirValorTotalDaPersonalizacaoPizza('R$ 36,00');
+			});
+
+			/*
+				Cenário: Adição de pizza personalizada ao pedido
+					Dado que o modal de personalização da pizza "Napolitana" no tamanho "Grande" está aberto
+					E a pizza "Napolitana" possui o ingrediente "Bacon" como adicional
+					E a quantidade do "Bacon" está em "1"
+					E a quantidade do "Pimentão" está em "2"
+					Quando clico em adicionar a pizza personalizada ao pedido
+					Então o resumo deve exibir a pizza "Napolitana" com o valor correspondente à personalização realizada
+			*/
+			test.skip('Adição de pizza personalizada ao pedido', async () => {
+				await tela.buscarPizza('Napolitana');
+				await tela.selecionarTamanhoPizza('Napolitana', 'G');
+				await tela.abrirModalPersonalizacaoPizza('Napolitana');
+				await tela.aumentarQuantidadeIngredienteAdicional('Bacon');
+				await tela.aumentarQuantidadeIngredienteAdicional('Pimentão');
+				await tela.aumentarQuantidadeIngredienteAdicional('Pimentão');
+				await tela.adicionarPersonalizacaoAoPedido();
+				await tela.deveAparecerProdutoNoResumo('Pizza G', 'R$ 69,00', 'Napolitana');
+				await tela.deveExibirValorTotalDoPedido('R$ 69,00');
 			});
 		});
 	});
@@ -372,6 +437,7 @@ test.describe('Registro de pedido', () => {
 				await tela.buscarCliente('Ana Beatriz Souza');
 				await tela.selecionarCliente('Ana Beatriz Souza');
 				await tela.deveExibirTaxaDeEntrega();
+				await tela.deveExibirValorTotalDoPedido('R$ 43,00');
 			});
 
 			/*
@@ -389,7 +455,8 @@ test.describe('Registro de pedido', () => {
 				await tela.selecionarEtapaAtendimento();
 				await tela.buscarCliente('Artur Alves');
 				await tela.selecionarCliente('Artur Alves');
-				await tela.deveExibirDescontoFidelidade();
+				await tela.deveExibirDescontoFidelidade('-R$ 3,80');
+				await tela.deveExibirValorTotalDoPedido('R$ 34,20');
 			});
 
 			/*
@@ -408,6 +475,7 @@ test.describe('Registro de pedido', () => {
 				await tela.buscarCliente('Gabriel Santos Rocha');
 				await tela.selecionarCliente('Gabriel Santos Rocha');
 				await tela.deveNaoExibirDescontoFidelidade();
+				await tela.deveExibirValorTotalDoPedido('R$ 39,00');
 			});
 
 			/*
@@ -422,7 +490,8 @@ test.describe('Registro de pedido', () => {
 				await tela.selecionarTamanhoPizza('Frango com Catupiry', 'G');
 				await tela.adicionarPizzaAoPedido('Frango com Catupiry');
 				await tela.adicionarPizzaAoPedido('Frango com Catupiry');
-				await tela.deveExibirDescontoPromocao();
+				await tela.deveExibirDescontoPromocao('-R$ 11,60');
+				await tela.deveExibirValorTotalDoPedido('R$ 104,40');
 			});
 
 			/*
@@ -437,6 +506,7 @@ test.describe('Registro de pedido', () => {
 				await tela.selecionarTamanhoPizza('Vegetariana', 'G');
 				await tela.adicionarPizzaAoPedido('Vegetariana');
 				await tela.deveNaoExibirDescontoPromocao();
+				await tela.deveExibirValorTotalDoPedido('R$ 54,00');
 			});
 		});
 	});
@@ -478,6 +548,7 @@ test.describe('Registro de pedido', () => {
 				await tela.selecionarEtapaAtendimento();
 				await tela.buscarCliente('Artur Alves');
 				await tela.selecionarCliente('Artur Alves');
+				await tela.deveExibirValorTotalDoPedido('R$ 38,00');
 				await tela.registrarPedido();
 				await tela.deveRedirecionarParaInicio();
 			});
