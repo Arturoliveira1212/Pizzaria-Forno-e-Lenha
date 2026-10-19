@@ -1,4 +1,4 @@
-import { expect, Locator, type Page } from '@playwright/test';
+import { expect, Locator, Response, type Page } from '@playwright/test';
 
 type Categoria = 'pizza' | 'bebida' | 'sobremesa';
 type Tamanho = 'P' | 'M' | 'G';
@@ -361,7 +361,18 @@ export class TelaRegistroPedido {
 	private async buscarProduto(categoria: Categoria, filtro: string): Promise<void> {
 		await this.page.locator(`label[for="categoria-${categoria}"]`).click();
 		await this.filtroCardapio.fill(filtro);
+
+		const respostaApi = this.aguardarBuscaProduto(categoria);
 		await this.botaoFiltrarCardapio.click();
+		await respostaApi;
+	}
+
+	private aguardarBuscaProduto(categoria: Categoria): Promise<Response> {
+		const caminho = categoria === 'pizza' ? '/pizzas' : '/produtos-simples';
+
+		return this.page.waitForResponse((resposta) => {
+			return resposta.url().includes(caminho) && resposta.request().method() === 'GET' && resposta.ok();
+		});
 	}
 
 	private async adicionarProdutoAoPedido(categoria: Categoria, nome: string): Promise<void> {

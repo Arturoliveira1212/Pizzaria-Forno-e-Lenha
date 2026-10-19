@@ -349,7 +349,7 @@ test.describe('Registro de pedido', () => {
 					Quando clico em adicionar a pizza personalizada ao pedido
 					Então o resumo deve exibir a pizza "Napolitana" com o valor correspondente à personalização realizada
 			*/
-			test.skip('Adição de pizza personalizada ao pedido', async () => {
+			test('Adição de pizza personalizada ao pedido', async () => {
 				await tela.buscarPizza('Napolitana');
 				await tela.selecionarTamanhoPizza('Napolitana', 'G');
 				await tela.abrirModalPersonalizacaoPizza('Napolitana');
