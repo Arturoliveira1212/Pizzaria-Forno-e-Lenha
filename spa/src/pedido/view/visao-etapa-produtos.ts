@@ -4,7 +4,7 @@ import { rotuloTamanho, TamanhoPizza } from '../../pizza/dominio/tamanho-pizza';
 import { ProdutoSimples } from '../../produto-simples/dominio/produto-simples';
 import { TipoProdutoSimples } from '../../produto-simples/dominio/tipo-produto-simples';
 import { formatarDinheiro } from '../../util/dinheiro';
-import { clonarTemplate } from '../../util/dom';
+import { clonarTemplate, limparInputEAdicionarFoco } from '../../util/dom';
 import { CategoriaCardapio } from '../categoria-cardapio';
 import { ControladoraRegistroPedido } from '../controller/controladora-registro-pedido';
 import { DadosItemPizza } from '../dados-item-pizza';
@@ -109,8 +109,7 @@ export class VisaoEtapaProdutos {
 	}
 
 	limparInputFiltroEAdicionarFoco(): void {
-		this.inputFiltroCardapio.value = '';
-		this.inputFiltroCardapio.focus();
+		limparInputEAdicionarFoco(this.inputFiltroCardapio);
 	}
 
 	obterFiltroCardapio(): FiltroCardapio {

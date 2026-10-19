@@ -6,3 +6,8 @@ export function clonarTemplate(id: string): DocumentFragment {
 
 	return template.content.cloneNode(true) as DocumentFragment;
 }
+
+export function limparInputEAdicionarFoco(input: HTMLInputElement): void {
+	input.value = '';
+	input.focus();
+}

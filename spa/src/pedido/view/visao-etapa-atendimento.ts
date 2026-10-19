@@ -3,6 +3,7 @@ import { clonarTemplate } from '../../util/dom';
 import { ControladoraRegistroPedido } from '../controller/controladora-registro-pedido';
 import { TipoAtendimento } from '../dominio/tipo-atendimento';
 import { TipoCliente } from '../tipo-cliente';
+import { limparInputEAdicionarFoco } from '../../util/dom';
 
 export class VisaoEtapaAtendimento {
 	private controladoraRegistroPedido!: ControladoraRegistroPedido;
@@ -91,8 +92,7 @@ export class VisaoEtapaAtendimento {
 	}
 
 	limparInputFiltroEAdicionarFoco(): void {
-		this.inputFiltroCliente.value = '';
-		this.inputFiltroCliente.focus();
+		limparInputEAdicionarFoco(this.inputFiltroCliente);
 	}
 
 	obterFiltroCliente(): string {
