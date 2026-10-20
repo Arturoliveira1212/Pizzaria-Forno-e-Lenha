@@ -41,6 +41,23 @@ export class RepositorioPizzaNoServidor implements RepositorioPizza {
 		);
 	}
 
+	async obterPizzas(identificador: string = ''): Promise<Pizza[]> {
+		const pizzas: Pizza[] = [];
+
+		try {
+			const parametros = new URLSearchParams();
+			parametros.set('identificador', identificador);
+
+			const resultado = await this.servicoHttp.get(`${API}/pizzas?${parametros.toString()}`);
+			resultado.data.pizzas.forEach((pizza: any) => pizzas.push(this.criarPizza(pizza)));
+		} catch (error) {
+			const mensagemErro = error instanceof HttpError ? error.data?.erros?.join(', ') : 'Ocorreu um erro ao obter as pizzas.';
+			throw new RepositorioError(mensagemErro);
+		}
+
+		return pizzas;
+	}
+
 	async obterPizzaPorId(idPizza: number): Promise<Pizza> {
 		try {
 			const resultado = await this.servicoHttp.get(`${API}/pizzas/${idPizza}`);

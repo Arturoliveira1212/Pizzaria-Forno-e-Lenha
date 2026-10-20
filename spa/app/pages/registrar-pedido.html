@@ -128,7 +128,7 @@
 	<div class="modal-dialog modal-lg modal-dialog-scrollable modal-fullscreen-sm-down">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="nome-pizza"></h5>
+				<h5 class="modal-title">Personalizar Pizza</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" data-testid="botao-fechar-modal-personalizacao"></button>
 			</div>
 
@@ -142,26 +142,30 @@
 					</div>
 
 					<div class="col-sm-8">
-						<div class="btn-group w-100" role="group">
-							<input type="radio" class="btn-check" name="tipo-inteira" id="tipo-inteira" value="inteira" checked />
+						<div class="btn-group w-100" role="group" id="tipos-pizza">
+							<input type="radio" class="btn-check" name="tipos-pizza" id="tipo-inteira" value="inteira" autocomplete="off" checked />
 							<label class="btn btn-outline-secondary" for="tipo-inteira">Inteira</label>
 
-							<input type="radio" class="btn-check" name="tipo-meia" id="tipo-meia" value="meia" />
+							<input type="radio" class="btn-check" name="tipos-pizza" id="tipo-meia" value="meia" autocomplete="off" />
 							<label class="btn btn-outline-secondary" for="tipo-meia">Meia Pizza</label>
 						</div>
 					</div>
 				</div>
 
-				<ul class="nav nav-tabs mb-3 d-none" id="abas-metade">
+				<ul class="nav nav-tabs mb-3 d-none" id="sabores">
 					<li class="nav-item">
-						<button class="nav-link active" type="button">1ª metade</button>
+						<button class="nav-link active" data-sabor="primeiro-sabor" data-testid="botao-primeiro-sabor">1ª Sabor</button>
 					</li>
 					<li class="nav-item">
-						<button class="nav-link" type="button">2ª metade</button>
+						<button class="nav-link" data-sabor="segundo-sabor" data-testid="botao-segundo-sabor">2ª Sabor</button>
 					</li>
 				</ul>
 
 				<div id="secao-pizza-primeiro-sabor">
+					<div class="d-flex justify-content-between align-items-center mb-3">
+						<h6 id="nome-pizza-primeiro-sabor"></h6>
+					</div>
+
 					<div class="fw-semibold small mb-1">Ingredientes</div>
 					<ul class="list-group mb-3" id="lista-ingredientes-primeiro-sabor"></ul>
 
@@ -170,7 +174,11 @@
 				</div>
 
 				<div class="d-none" id="secao-pizza-segundo-sabor">
-					<div class="fw-semibold small mb-1">Segunda Metade</div>
+					<div class="d-flex justify-content-between align-items-center mb-3 d-none" id="cabecalho-segundo-sabor">
+						<h6 id="nome-pizza-segundo-sabor"></h6>
+						<button class="btn btn-sm btn-outline-secondary" id="botao-trocar-segundo-sabor">Trocar sabor</button>
+					</div>
+
 					<form id="formulario-filtro-segundo-sabor" class="mb-3">
 						<div class="flex-grow-1">
 							<div class="input-group">
@@ -180,7 +188,13 @@
 						</div>
 					</form>
 
-					<div class="list-group" id="lista-opcoes-segundo-sabor"></div>
+					<div class="list-group" id="lista-opcoes-pizza-segundo-sabor"></div>
+
+					<div class="fw-semibold small mb-1 d-none" id="titulo-ingredientes-segundo-sabor">Ingredientes</div>
+					<ul class="list-group mb-3" id="lista-ingredientes-segundo-sabor"></ul>
+
+					<div class="fw-semibold small mb-1 d-none" id="titulo-adicionais-segundo-sabor">Adicionais</div>
+					<ul class="list-group" id="lista-adicionais-segundo-sabor"></ul>
 				</div>
 			</div>
 
@@ -257,14 +271,6 @@
 	</div>
 </template>
 
-<template id="template-mensagem-erro">
-	<div class="toast text-bg-danger border-0">
-		<div class="d-flex">
-			<div class="toast-body mensagem"></div>
-		</div>
-	</div>
-</template>
-
 <template id="template-item-pedido">
 	<div class="border rounded p-2 mb-2 item-pedido">
 		<div class="row align-items-center g-2">
@@ -334,4 +340,12 @@
 			</div>
 		</div>
 	</li>
+</template>
+
+<template id="template-opcao-pizza-segundo-sabor">
+	<label class="list-group-item d-flex align-items-center gap-3">
+		<input class="form-check-input flex-shrink-0" type="radio" name="pizza-segundo-sabor" value="" />
+		<span class="flex-grow-1"></span>
+		<small class="text-body-secondary"></small>
+	</label>
 </template>

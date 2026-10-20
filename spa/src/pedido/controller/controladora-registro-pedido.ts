@@ -15,6 +15,7 @@ import { DadosItemPizza } from '../dados-item-pizza';
 import { DadosItemSimples } from '../dados-item-simples';
 import { VisaoPersonalizacaoPizza } from '../view/visao-personalizacao-pizza';
 import { TamanhoPizza } from '../../pizza/dominio/tamanho-pizza';
+import { Pizza } from '../../pizza/dominio/pizza';
 
 type VisoesRegistroPedido = {
 	principal: VisaoRegistroPedido;
@@ -27,6 +28,7 @@ type VisoesRegistroPedido = {
 export class ControladoraRegistroPedido {
 	private readonly visoes: VisoesRegistroPedido;
 	private readonly gestor: GestorRegistroPedido;
+	private opcoesPizzaParaSegundoSabor: Map<number, Pizza> = new Map();
 
 	constructor(visoes: VisoesRegistroPedido) {
 		this.visoes = visoes;
@@ -78,11 +80,43 @@ export class ControladoraRegistroPedido {
 
 	async personalizarItemPizza(idPizza: number, tamanho: TamanhoPizza): Promise<void> {
 		try {
-			const pizza = await this.gestor.obterPizzaParaPersonalizacao(idPizza);
+			const pizza = await this.gestor.obterPizzaPorId(idPizza);
 			this.visoes.personalizacao.exibirPizzaParaPersonalizacao(pizza, tamanho);
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível personalizar o produto.';
 			this.visoes.resumo.exibirErroNoPedido(mensagem);
+		}
+	}
+
+	async obterPizzasParaSegundoSabor(): Promise<void> {
+		try {
+			const filtro = this.visoes.personalizacao.obterFiltroSegundoSabor();
+			const pizzas = await this.gestor.obterPizzas(filtro);
+			this.atualizarOpcoesPizzaParaSegundoSabor(pizzas);
+
+			this.visoes.personalizacao.exibirPizzasParaSegundoSabor(pizzas);
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível obter as pizzas para o segundo sabor.';
+			this.visoes.personalizacao.exibirErroAoObterPizzasParaSegundoSabor(mensagem);
+		}
+	}
+
+	private atualizarOpcoesPizzaParaSegundoSabor(pizzas: Pizza[]): void {
+		this.opcoesPizzaParaSegundoSabor.clear();
+		this.opcoesPizzaParaSegundoSabor = new Map(pizzas.map((pizza) => [pizza.id, pizza]));
+	}
+
+	async adicionarPizzaComoSegundoSabor(idPizza: number): Promise<void> {
+		try {
+			const pizza = this.opcoesPizzaParaSegundoSabor.get(idPizza);
+			if (!pizza) {
+				throw new Error('Pizza não encontrada');
+			}
+
+			this.visoes.personalizacao.adicionarPizzaComoSegundoSabor(pizza);
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar a pizza como segundo sabor.';
+			this.visoes.personalizacao.exibirErroAoObterPizzasParaSegundoSabor(mensagem);
 		}
 	}
 

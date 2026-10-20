@@ -34,7 +34,11 @@ export class GestorRegistroPedido {
 		return this.repositorioPizza.obterPizzasParaCardapio(busca);
 	}
 
-	async obterPizzaParaPersonalizacao(idPizza: number): Promise<Pizza> {
+	async obterPizzas(busca: string): Promise<Pizza[]> {
+		return this.repositorioPizza.obterPizzas(busca);
+	}
+
+	async obterPizzaPorId(idPizza: number): Promise<Pizza> {
 		return this.repositorioPizza.obterPizzaPorId(idPizza);
 	}
 

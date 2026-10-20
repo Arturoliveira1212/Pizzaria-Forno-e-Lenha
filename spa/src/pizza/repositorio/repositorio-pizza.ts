@@ -4,5 +4,7 @@ import { PizzaParaCardapio } from '../dominio/pizza-para-cardapio';
 export interface RepositorioPizza {
 	obterPizzasParaCardapio(identificador: string): Promise<PizzaParaCardapio[]>;
 
+	obterPizzas(identificador: string): Promise<Pizza[]>;
+
 	obterPizzaPorId(idPizza: number): Promise<Pizza>;
 }
