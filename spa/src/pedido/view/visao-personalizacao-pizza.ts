@@ -40,6 +40,7 @@ export class VisaoPersonalizacaoPizza {
 	private readonly listaAdicionaisPrimeiroSabor = document.querySelector<HTMLElement>('#lista-adicionais-primeiro-sabor')!;
 	private readonly listaAdicionaisSegundoSabor = document.querySelector<HTMLElement>('#lista-adicionais-segundo-sabor')!;
 	private readonly listaOpcoesPizzaSegundoSabor = document.querySelector<HTMLElement>('#lista-opcoes-pizza-segundo-sabor')!;
+	private readonly botaoTrocarSegundoSabor = document.querySelector<HTMLButtonElement>('#botao-trocar-segundo-sabor')!;
 
 	private readonly menuTiposPizza = document.querySelector<HTMLElement>('#tipos-pizza')!;
 	private readonly menuSabores = document.querySelector<HTMLElement>('#sabores')!;
@@ -57,31 +58,35 @@ export class VisaoPersonalizacaoPizza {
 			this.resetarModal();
 		});
 
-		this.listaIngredientesPrimeiroSabor.addEventListener('click', (event: Event) => {
-			const elementoClicado = event.target as HTMLInputElement;
-			const ingredientePersonalizavel = elementoClicado.closest<HTMLElement>('.ingrediente-personalizavel');
-			if (!ingredientePersonalizavel) {
-				return;
-			}
+		[this.listaIngredientesPrimeiroSabor, this.listaIngredientesSegundoSabor].forEach((lista) => {
+			lista.addEventListener('click', (event: Event) => {
+				const elementoClicado = event.target as HTMLInputElement;
+				const ingredientePersonalizavel = elementoClicado.closest<HTMLElement>('.ingrediente-personalizavel');
+				if (!ingredientePersonalizavel) {
+					return;
+				}
 
-			if (elementoClicado.closest('.remover-ingrediente')) {
-				const marcado = elementoClicado.checked;
-				this.removerIngrediente(ingredientePersonalizavel, marcado);
-			}
+				if (elementoClicado.closest('.remover-ingrediente')) {
+					const marcado = elementoClicado.checked;
+					this.removerIngrediente(ingredientePersonalizavel, marcado);
+				}
+			});
 		});
 
-		this.listaAdicionaisPrimeiroSabor.addEventListener('click', (event: Event) => {
-			const elementoClicado = event.target as HTMLInputElement;
-			const ingredienteAdicional = elementoClicado.closest<HTMLElement>('.ingrediente-adicional');
-			if (!ingredienteAdicional) {
-				return;
-			}
+		[this.listaAdicionaisPrimeiroSabor, this.listaAdicionaisSegundoSabor].forEach((lista) => {
+			lista.addEventListener('click', (event: Event) => {
+				const elementoClicado = event.target as HTMLInputElement;
+				const ingredienteAdicional = elementoClicado.closest<HTMLElement>('.ingrediente-adicional');
+				if (!ingredienteAdicional) {
+					return;
+				}
 
-			if (elementoClicado.closest('.aumentar-quantidade-adicional')) {
-				this.atualizarQuantidadeAdicional(ingredienteAdicional, 1);
-			} else if (elementoClicado.closest('.diminuir-quantidade-adicional')) {
-				this.atualizarQuantidadeAdicional(ingredienteAdicional, -1);
-			}
+				if (elementoClicado.closest('.aumentar-quantidade-adicional')) {
+					this.atualizarQuantidadeAdicional(ingredienteAdicional, 1);
+				} else if (elementoClicado.closest('.diminuir-quantidade-adicional')) {
+					this.atualizarQuantidadeAdicional(ingredienteAdicional, -1);
+				}
+			});
 		});
 
 		this.menuTiposPizza.addEventListener('change', (event: Event) => {
@@ -120,6 +125,12 @@ export class VisaoPersonalizacaoPizza {
 			this.controladoraRegistroPedido.adicionarPizzaComoSegundoSabor(idPizza);
 		});
 
+		this.botaoTrocarSegundoSabor.addEventListener('click', () => {
+			this.resetarMenuSegundoSabor();
+			this.resetarListaIngredientesSegundoSabor();
+			this.exibirSabor(SaborPizza.SEGUNDO_SABOR);
+		});
+
 		this.botaoAdicionarPersonalizacaoPizza.addEventListener('click', () => {
 			this.controladoraRegistroPedido.adicionarPersonalizacaoItemPizza();
 		});
@@ -127,6 +138,7 @@ export class VisaoPersonalizacaoPizza {
 
 	exibirPizzaParaPersonalizacao(pizza: Pizza, tamanho: TamanhoPizza): void {
 		this.povoarModal(pizza, tamanho);
+		this.exibirSabor(SaborPizza.PRIMEIRO_SABOR);
 		this.abrirModal();
 	}
 
@@ -140,28 +152,40 @@ export class VisaoPersonalizacaoPizza {
 
 	private resetarModal(): void {
 		this.resetarMenuModal();
-		this.resetarAtributosMeiaPizza();
+		this.resetarPrimeiroSabor();
+		this.resetarSegundoSabor();
 	}
 
 	private resetarMenuModal() {
 		this.labelTamanho.textContent = '';
 		this.inputTipoInteira.checked = true;
 		this.inputTipoMetade.checked = false;
-		this.exibirSabor(SaborPizza.PRIMEIRO_SABOR);
 	}
 
-	private resetarAtributosMeiaPizza() {
+	private resetarPrimeiroSabor() {
+		this.listaIngredientesPrimeiroSabor.replaceChildren();
+		this.tituloAdicionaisPrimeiroSabor.classList.add('d-none');
+		this.listaAdicionaisPrimeiroSabor.replaceChildren();
+	}
+
+	private resetarSegundoSabor() {
 		this.menuSabores.classList.add('d-none');
+		this.resetarMenuSegundoSabor();
+		this.resetarListaIngredientesSegundoSabor();
+	}
+
+	private resetarMenuSegundoSabor() {
 		this.listaOpcoesPizzaSegundoSabor.replaceChildren();
 		this.cabecalhoSegundoSabor.classList.add('d-none');
+		this.formularioFiltroSegundoSabor.classList.remove('d-none');
+		this.inputFiltroSegundoSabor.value = '';
+	}
 
+	private resetarListaIngredientesSegundoSabor() {
 		this.listaIngredientesSegundoSabor.replaceChildren();
 		this.tituloAdicionaisSegundoSabor.classList.add('d-none');
 		this.tituloIngredientesSegundoSabor.classList.add('d-none');
 		this.listaAdicionaisSegundoSabor.replaceChildren();
-
-		this.formularioFiltroSegundoSabor.classList.remove('d-none');
-		this.inputFiltroSegundoSabor.value = '';
 	}
 
 	private povoarModal(pizza: Pizza, tamanho: TamanhoPizza): void {
@@ -347,7 +371,7 @@ export class VisaoPersonalizacaoPizza {
 		this.exibirSabor(SaborPizza.PRIMEIRO_SABOR);
 
 		if (tipoEhInteira) {
-			this.resetarAtributosMeiaPizza();
+			this.resetarSegundoSabor();
 		}
 
 		this.atualizarValoresPersonalizacao();
@@ -413,8 +437,8 @@ export class VisaoPersonalizacaoPizza {
 
 	adicionarPizzaComoSegundoSabor(pizza: Pizza): void {
 		this.secaoPizzaSegundoSabor.classList.remove('d-none');
-		this.cabecalhoSegundoSabor.classList.remove('d-none');
 		this.nomePizzaSegundoSabor.textContent = pizza.nome;
+		this.cabecalhoSegundoSabor.classList.remove('d-none');
 		this.formularioFiltroSegundoSabor.classList.add('d-none');
 		this.inputFiltroSegundoSabor.value = '';
 		this.listaOpcoesPizzaSegundoSabor.replaceChildren();
