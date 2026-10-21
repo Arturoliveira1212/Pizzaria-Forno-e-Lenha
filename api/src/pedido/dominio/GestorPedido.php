@@ -129,6 +129,8 @@ class GestorPedido {
         $erros = [];
         $saboresEscolhidos = [];
 
+        $quantidadeSabores = count($saboresEscolhidosParaCadastro);
+
         foreach ($saboresEscolhidosParaCadastro as $saborEscolhidoParaCadastro) {
             $pizza = $this->repositorioPizza->obterPizzaPorId($saborEscolhidoParaCadastro->idPizza);
             if (!$pizza instanceof Pizza) {
@@ -138,6 +140,7 @@ class GestorPedido {
 
             $ingredientesEscolhidos = $this->criarIngredientesEscolhidos(
                 pizza: $pizza,
+                quantidadeSabores: $quantidadeSabores,
                 ingredientesEscolhidosParaCadastro: $saborEscolhidoParaCadastro->ingredientesEscolhidos,
             );
 
@@ -166,7 +169,7 @@ class GestorPedido {
      * @param IngredienteEscolhidoParaCadastro[] $ingredientesEscolhidosParaCadastro
      * @return IngredienteEscolhido[]
      */
-    private function criarIngredientesEscolhidos(Pizza $pizza, array $ingredientesEscolhidosParaCadastro): array {
+    private function criarIngredientesEscolhidos(Pizza $pizza, int $quantidadeSabores, array $ingredientesEscolhidosParaCadastro): array {
         $erros = [];
         $ingredientesEscolhidos = [];
 
@@ -191,7 +194,7 @@ class GestorPedido {
                     continue;
                 }
 
-                $custo = $adicional->preco;
+                $custo = $adicional->preco->dividir($quantidadeSabores);
             }
 
             try {

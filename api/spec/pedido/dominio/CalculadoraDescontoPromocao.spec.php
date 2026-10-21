@@ -14,27 +14,51 @@ describe('CalculadoraDescontoPromocao', function () {
         $this->manjericao = new Ingrediente(9, 'Manjericão');
         $this->calabresa = new Ingrediente(10, 'Calabresa');
 
+        $this->pizzaCalabresa = new Pizza(
+            id: 3,
+            nome: 'Calabresa',
+            descricao: 'Descrição',
+            ingredientesPadrao: [
+                new IngredientePadrao(id: 1, ingrediente: $this->molho, removivel: false, substituivel: false),
+                new IngredientePadrao(id: 2, ingrediente: $this->mussarela, removivel: false, substituivel: false),
+                new IngredientePadrao(id: 3, ingrediente: $this->calabresa, removivel: true, substituivel: true),
+            ],
+            ingredientesSubstitutos: [$this->cebola, $this->milho],
+            adicionais: [
+                new IngredienteAdicional(id: 1, ingrediente: $this->bacon, preco: new Dinheiro(899)),
+            ],
+            precosPorTamanho: [
+                new PrecoPorTamanho(id: 1, tamanhoPizza: TamanhoPizza::PEQUENA, preco: new Dinheiro(2290)),
+                new PrecoPorTamanho(id: 2, tamanhoPizza: TamanhoPizza::MEDIA, preco: new Dinheiro(3290)),
+                new PrecoPorTamanho(id: 3, tamanhoPizza: TamanhoPizza::GRANDE, preco: new Dinheiro(4399)),
+            ],
+        );
+
+        $this->pizzaMargherita = new Pizza(
+            id: 2,
+            nome: 'Margherita',
+            descricao: 'Descrição',
+            ingredientesPadrao: [
+                new IngredientePadrao(id: 1, ingrediente: $this->molho, removivel: false, substituivel: false),
+                new IngredientePadrao(id: 2, ingrediente: $this->mussarela, removivel: false, substituivel: false),
+                new IngredientePadrao(id: 3, ingrediente: $this->catupiry, removivel: true, substituivel: true),
+                new IngredientePadrao(id: 4, ingrediente: $this->manjericao, removivel: true, substituivel: true),
+            ],
+            ingredientesSubstitutos: [$this->cebola, $this->milho],
+            adicionais: [
+                new IngredienteAdicional(id: 1, ingrediente: $this->bacon, preco: new Dinheiro(899)),
+                new IngredienteAdicional(id: 2, ingrediente: $this->calabresa, preco: new Dinheiro(799)),
+            ],
+            precosPorTamanho: [
+                new PrecoPorTamanho(id: 1, tamanhoPizza: TamanhoPizza::PEQUENA, preco: new Dinheiro(2190)),
+                new PrecoPorTamanho(id: 2, tamanhoPizza: TamanhoPizza::MEDIA, preco: new Dinheiro(3090)),
+                new PrecoPorTamanho(id: 3, tamanhoPizza: TamanhoPizza::GRANDE, preco: new Dinheiro(4599)),
+            ],
+        );
+
         $this->saborEscolhidoCalabresa = new SaborEscolhido(
             id: 3,
-            pizza: new Pizza(
-                id: 3,
-                nome: 'Calabresa',
-                descricao: 'Descrição',
-                ingredientesPadrao: [
-                    new IngredientePadrao(id: 1, ingrediente: $this->molho, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 2, ingrediente: $this->mussarela, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 3, ingrediente: $this->calabresa, removivel: true, substituivel: true),
-                ],
-                ingredientesSubstitutos: [$this->cebola, $this->milho],
-                adicionais: [
-                    new IngredienteAdicional(id: 1, ingrediente: $this->bacon, preco: new Dinheiro(899)),
-                ],
-                precosPorTamanho: [
-                    new PrecoPorTamanho(id: 1, tamanhoPizza: TamanhoPizza::PEQUENA, preco: new Dinheiro(2290)),
-                    new PrecoPorTamanho(id: 2, tamanhoPizza: TamanhoPizza::MEDIA, preco: new Dinheiro(3290)),
-                    new PrecoPorTamanho(id: 3, tamanhoPizza: TamanhoPizza::GRANDE, preco: new Dinheiro(4399)),
-                ],
-            ),
+            pizza: $this->pizzaCalabresa,
             ingredientesEscolhidos: [
                 new IngredienteEscolhido(
                     id: 1,
@@ -57,29 +81,34 @@ describe('CalculadoraDescontoPromocao', function () {
             ],
         );
 
-        $this->saborEscolhidoMargherita = new SaborEscolhido(
+        $this->saborEscolhidoCalabresaMeiaPizza = new SaborEscolhido(
+            id: 4,
+            pizza: $this->pizzaCalabresa,
+            ingredientesEscolhidos: [
+                new IngredienteEscolhido(
+                    id: 1,
+                    ingrediente: $this->molho,
+                    papel: PapelIngrediente::PADRAO,
+                    custoAdicional: Dinheiro::zero(),
+                ),
+                new IngredienteEscolhido(
+                    id: 2,
+                    ingrediente: $this->mussarela,
+                    papel: PapelIngrediente::PADRAO,
+                    custoAdicional: Dinheiro::zero(),
+                ),
+                new IngredienteEscolhido(
+                    id: 3,
+                    ingrediente: $this->bacon,
+                    papel: PapelIngrediente::ADICIONAL,
+                    custoAdicional: new Dinheiro(450),
+                ),
+            ],
+        );
+
+        $this->saborEscolhidoMargheritaMeiaPizza = new SaborEscolhido(
             id: 2,
-            pizza: new Pizza(
-                id: 2,
-                nome: 'Margherita',
-                descricao: 'Descrição',
-                ingredientesPadrao: [
-                    new IngredientePadrao(id: 1, ingrediente: $this->molho, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 2, ingrediente: $this->mussarela, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 3, ingrediente: $this->catupiry, removivel: true, substituivel: true),
-                    new IngredientePadrao(id: 4, ingrediente: $this->manjericao, removivel: true, substituivel: true),
-                ],
-                ingredientesSubstitutos: [$this->cebola, $this->milho],
-                adicionais: [
-                    new IngredienteAdicional(id: 1, ingrediente: $this->bacon, preco: new Dinheiro(899)),
-                    new IngredienteAdicional(id: 2, ingrediente: $this->calabresa, preco: new Dinheiro(799)),
-                ],
-                precosPorTamanho: [
-                    new PrecoPorTamanho(id: 1, tamanhoPizza: TamanhoPizza::PEQUENA, preco: new Dinheiro(2190)),
-                    new PrecoPorTamanho(id: 2, tamanhoPizza: TamanhoPizza::MEDIA, preco: new Dinheiro(3090)),
-                    new PrecoPorTamanho(id: 3, tamanhoPizza: TamanhoPizza::GRANDE, preco: new Dinheiro(4599)),
-                ],
-            ),
+            pizza: $this->pizzaMargherita,
             ingredientesEscolhidos: [
                 new IngredienteEscolhido(
                     id: 1,
@@ -103,7 +132,7 @@ describe('CalculadoraDescontoPromocao', function () {
                     id: 3,
                     ingrediente: $this->bacon,
                     papel: PapelIngrediente::ADICIONAL,
-                    custoAdicional: new Dinheiro(899),
+                    custoAdicional: new Dinheiro(450),
                 ),
             ],
         );
@@ -119,7 +148,7 @@ describe('CalculadoraDescontoPromocao', function () {
             id: ItemPedido::MENOR_ID_PERMITIDO,
             quantidade: ItemPedido::QUANTIDADE_MINIMA_PERMITIDA,
             tamanhoPizza: TamanhoPizza::GRANDE,
-            saboresEscolhidos: [$this->saborEscolhidoMargherita, $this->saborEscolhidoCalabresa],
+            saboresEscolhidos: [$this->saborEscolhidoMargheritaMeiaPizza, $this->saborEscolhidoCalabresaMeiaPizza],
         );
     });
 

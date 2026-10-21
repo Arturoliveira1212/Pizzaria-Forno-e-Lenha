@@ -28,7 +28,7 @@ class ItemPizza extends ItemPedido {
         foreach ($this->saboresEscolhidos as $saborEscolhido) {
             $nome = $saborEscolhido->pizza->nome;
 
-            if (in_array($saborEscolhido->id, $idsSaboresEscolhidos, true)) {
+            if (in_array($saborEscolhido->pizza->id, $idsSaboresEscolhidos, true)) {
                 $erros[] = "O sabor {$nome} foi escolhido mais de uma vez.";
                 continue;
             }
@@ -38,20 +38,22 @@ class ItemPizza extends ItemPedido {
                 continue;
             }
 
-            $idsSaboresEscolhidos[] = $saborEscolhido->id;
+            $idsSaboresEscolhidos[] = $saborEscolhido->pizza->id;
         }
     }
 
     protected function calcularPrecoUnitario(): Dinheiro {
         $preco = Dinheiro::zero();
 
+        $quantidadeSabores = count($this->saboresEscolhidos);
+
         foreach ($this->saboresEscolhidos as $saborEscolhido) {
-            $precoPizza = $saborEscolhido->pizza->obterPrecoPorTamanho($this->tamanhoPizza);
+            $precoPizza = $saborEscolhido->pizza->obterPrecoPorTamanho($this->tamanhoPizza)->dividir($quantidadeSabores);
             $precoAdicionais = $saborEscolhido->calcularPrecoDosAdicionais();
 
             $preco = $preco->somar($precoPizza->somar($precoAdicionais));
         }
 
-        return $preco->dividir(count($this->saboresEscolhidos));
+        return $preco;
     }
 }

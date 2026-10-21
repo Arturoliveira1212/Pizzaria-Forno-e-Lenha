@@ -105,7 +105,9 @@ class SaborEscolhido {
             return;
         }
 
-        if (!$ingredienteEscolhido->custoAdicional->ehIgualA($adicional->preco)) {
+        $precoAdicional = $adicional->preco;
+        $precoMetadeAdicional = $precoAdicional->dividir(2);
+        if (!$ingredienteEscolhido->custoAdicional->ehIgualA($precoAdicional) && !$ingredienteEscolhido->custoAdicional->ehIgualA($precoMetadeAdicional)) {
             $erros[] = "O custo adicional do ingrediente {$nomeIngrediente}({$idIngrediente}) não corresponde ao preço definido para a pizza.";
 
             return;
