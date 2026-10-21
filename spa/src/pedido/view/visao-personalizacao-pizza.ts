@@ -129,6 +129,7 @@ export class VisaoPersonalizacaoPizza {
 			this.resetarMenuSegundoSabor();
 			this.resetarListaIngredientesSegundoSabor();
 			this.exibirSabor(SaborPizza.SEGUNDO_SABOR);
+			this.atualizarValoresPersonalizacao();
 		});
 
 		this.botaoAdicionarPersonalizacaoPizza.addEventListener('click', () => {
@@ -172,9 +173,12 @@ export class VisaoPersonalizacaoPizza {
 		this.menuSabores.classList.add('d-none');
 		this.resetarMenuSegundoSabor();
 		this.resetarListaIngredientesSegundoSabor();
+		this.botaoAdicionarPersonalizacaoPizza.disabled = false;
 	}
 
 	private resetarMenuSegundoSabor() {
+		this.secaoPizzaSegundoSabor.dataset.preco = '';
+		this.secaoPizzaSegundoSabor.dataset.idPizza = '';
 		this.listaOpcoesPizzaSegundoSabor.replaceChildren();
 		this.cabecalhoSegundoSabor.classList.add('d-none');
 		this.formularioFiltroSegundoSabor.classList.remove('d-none');
@@ -193,8 +197,8 @@ export class VisaoPersonalizacaoPizza {
 		const precoFormatado = formatarDinheiro(preco);
 
 		this.secaoPizzaPrimeiroSabor.dataset.idPizza = String(pizza.id);
+		this.secaoPizzaPrimeiroSabor.dataset.preco = String(preco);
 		this.nomePizzaPrimeiroSabor.textContent = pizza.nome;
-		this.informacaoTamanho.dataset.preco = String(preco);
 		this.inputTamanho.value = tamanho;
 		this.labelTamanho.textContent = rotuloTamanho(tamanho);
 		this.valorTotalPersonalizacao.dataset.preco = String(preco);
@@ -338,10 +342,15 @@ export class VisaoPersonalizacaoPizza {
 		const tipo = this.obterTipoPizzaSelecionada();
 		const multiplicador = tipo === TipoPizza.MEIA ? 0.5 : 1;
 
-		let valorTotal = Number(this.informacaoTamanho.dataset.preco) * multiplicador;
+		const precoPrimeiroSabor = Number(this.secaoPizzaPrimeiroSabor.dataset.preco);
+		const precoSegundoSabor = Number(this.secaoPizzaSegundoSabor.dataset.preco ?? 0);
+		const preco = precoPrimeiroSabor + precoSegundoSabor;
+		let valorTotal = preco * multiplicador;
 
-		const ingredientesAdicionais = this.listaAdicionaisPrimeiroSabor.querySelectorAll<HTMLElement>('.ingrediente-adicional');
-		ingredientesAdicionais.forEach((ingredienteAdicional) => {
+		const ingredientesAdicionaisPrimeiroSabor = this.listaAdicionaisPrimeiroSabor.querySelectorAll<HTMLElement>('.ingrediente-adicional');
+		const ingredientesAdicionaisSegundoSabor = this.listaAdicionaisSegundoSabor.querySelectorAll<HTMLElement>('.ingrediente-adicional');
+
+		[...ingredientesAdicionaisPrimeiroSabor, ...ingredientesAdicionaisSegundoSabor].forEach((ingredienteAdicional) => {
 			const precoAdicionalAtual = Number(ingredienteAdicional.dataset.precoOriginal);
 			const novoPrecoAdicional = precoAdicionalAtual * multiplicador;
 
@@ -366,12 +375,17 @@ export class VisaoPersonalizacaoPizza {
 
 	private exibirTipoPizza(tipo: TipoPizza): void {
 		const tipoEhInteira = tipo === TipoPizza.INTEIRA;
-		this.menuSabores.classList.toggle('d-none', tipoEhInteira);
+		const tipoEhMeia = tipo === TipoPizza.MEIA;
 
+		this.menuSabores.classList.toggle('d-none', tipoEhInteira);
 		this.exibirSabor(SaborPizza.PRIMEIRO_SABOR);
 
 		if (tipoEhInteira) {
 			this.resetarSegundoSabor();
+		}
+
+		if (tipoEhMeia && !this.secaoPizzaSegundoSabor.dataset.idPizza) {
+			this.botaoAdicionarPersonalizacaoPizza.disabled = true;
 		}
 
 		this.atualizarValoresPersonalizacao();
@@ -437,22 +451,32 @@ export class VisaoPersonalizacaoPizza {
 
 	adicionarPizzaComoSegundoSabor(pizza: Pizza): void {
 		this.secaoPizzaSegundoSabor.classList.remove('d-none');
+		this.secaoPizzaSegundoSabor.dataset.idPizza = String(pizza.id);
+		this.secaoPizzaSegundoSabor.dataset.preco = String(pizza.obterPrecoPorTamanho(this.inputTamanho.value as TamanhoPizza));
 		this.nomePizzaSegundoSabor.textContent = pizza.nome;
 		this.cabecalhoSegundoSabor.classList.remove('d-none');
 		this.formularioFiltroSegundoSabor.classList.add('d-none');
 		this.inputFiltroSegundoSabor.value = '';
 		this.listaOpcoesPizzaSegundoSabor.replaceChildren();
+		this.botaoAdicionarPersonalizacaoPizza.disabled = false;
 
 		this.povoarIngredientes(SaborPizza.SEGUNDO_SABOR, pizza);
 		this.exibirSabor(SaborPizza.SEGUNDO_SABOR);
+		this.atualizarValoresPersonalizacao();
 	}
 
 	obterDadosPersonalizacaoItemPizza(): DadosItemPizza {
+		const saboresEscolhidos: DadosSaborEscolhido[] = [this.obterDadosPrimeiroSabor()];
+		const dadosSegundoSabor = this.obterDadosSegundoSabor();
+		if (dadosSegundoSabor) {
+			saboresEscolhidos.push(dadosSegundoSabor);
+		}
+
 		return {
 			quantidade: 1,
 			tamanho: this.inputTamanho.value as TamanhoPizza,
 			preco: Number(this.valorTotalPersonalizacao.dataset.preco),
-			saboresEscolhidos: [this.obterDadosPrimeiroSabor()],
+			saboresEscolhidos: saboresEscolhidos,
 		};
 	}
 
@@ -462,6 +486,20 @@ export class VisaoPersonalizacaoPizza {
 		return {
 			idPizza: Number(this.secaoPizzaPrimeiroSabor.dataset.idPizza),
 			nome: this.nomePizzaPrimeiroSabor.textContent ?? '',
+			ingredientesEscolhidos: ingredientesEscolhidos,
+		};
+	}
+
+	private obterDadosSegundoSabor(): DadosSaborEscolhido | null {
+		if (!this.secaoPizzaSegundoSabor.dataset.idPizza) {
+			return null;
+		}
+
+		const ingredientesEscolhidos = this.obterIngredientesEscolhidos(this.listaIngredientesSegundoSabor, this.listaIngredientesSegundoSabor, this.listaAdicionaisSegundoSabor);
+
+		return {
+			idPizza: Number(this.secaoPizzaSegundoSabor.dataset.idPizza),
+			nome: this.nomePizzaSegundoSabor.textContent ?? '',
 			ingredientesEscolhidos: ingredientesEscolhidos,
 		};
 	}
