@@ -88,19 +88,27 @@ export class ControladoraRegistroPedido {
 	async obterPizzasParaSegundoSabor(): Promise<void> {
 		try {
 			const filtro = this.visoes.personalizacao.obterFiltroSegundoSabor();
-			const pizzas = await this.gestor.obterPizzas(filtro);
-			this.atualizarOpcoesPizzaParaSegundoSabor(pizzas);
+			const idPizzaPrimeiroSabor = this.visoes.personalizacao.obterIdPizzaPrimeiroSabor();
 
-			this.visoes.personalizacao.exibirPizzasParaSegundoSabor(pizzas);
+			const pizzas = await this.gestor.obterPizzas(filtro);
+			this.atualizarOpcoesPizzaParaSegundoSabor(pizzas, idPizzaPrimeiroSabor);
+
+			const pizzasParaSegundoSabor = this.obterPizzasSalvasComoOpcoesParaSegundoSabor();
+			this.visoes.personalizacao.exibirPizzasParaSegundoSabor(pizzasParaSegundoSabor);
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível obter as pizzas para o segundo sabor.';
 			this.visoes.personalizacao.exibirErroAoObterPizzasParaSegundoSabor(mensagem);
 		}
 	}
 
-	private atualizarOpcoesPizzaParaSegundoSabor(pizzas: Pizza[]): void {
+	private atualizarOpcoesPizzaParaSegundoSabor(pizzas: Pizza[], idPizzaPrimeiroSabor: number): void {
 		this.opcoesPizzaParaSegundoSabor.clear();
 		this.opcoesPizzaParaSegundoSabor = new Map(pizzas.map((pizza) => [pizza.id, pizza]));
+		this.opcoesPizzaParaSegundoSabor.delete(idPizzaPrimeiroSabor);
+	}
+
+	private obterPizzasSalvasComoOpcoesParaSegundoSabor(): Pizza[] {
+		return Array.from(this.opcoesPizzaParaSegundoSabor.values());
 	}
 
 	async adicionarPizzaComoSegundoSabor(idPizza: number): Promise<void> {

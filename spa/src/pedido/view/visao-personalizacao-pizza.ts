@@ -14,6 +14,8 @@ export interface VisaoPersonalizacaoPizza {
 
 	obterFiltroSegundoSabor(): string;
 
+	obterIdPizzaPrimeiroSabor(): number;
+
 	exibirPizzasParaSegundoSabor(pizzas: Pizza[]): void;
 
 	exibirErroAoObterPizzasParaSegundoSabor(mensagem: string): void;

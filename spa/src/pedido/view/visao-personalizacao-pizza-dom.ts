@@ -406,6 +406,10 @@ export class VisaoPersonalizacaoPizzaDom implements VisaoPersonalizacaoPizza {
 		return this.inputFiltroSegundoSabor.value.trim();
 	}
 
+	obterIdPizzaPrimeiroSabor(): number {
+		return Number(this.secaoPizzaPrimeiroSabor.dataset.idPizza);
+	}
+
 	exibirPizzasParaSegundoSabor(pizzas: Pizza[]): void {
 		this.listaOpcoesPizzaSegundoSabor.replaceChildren();
 

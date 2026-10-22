@@ -15,10 +15,9 @@ import { TipoProdutoSimples } from '../../produto-simples/dominio/tipo-produto-s
 import { ProdutoSimples } from '../../produto-simples/dominio/produto-simples';
 import { RepositorioCliente } from '../../cliente/repositorio/repositorio-cliente';
 import { PizzaParaCardapio } from '../../pizza/dominio/pizza-para-cardapio';
-import { DadosItemPizza } from '../dados-item-pizza';
 import { IngredienteEscolhido } from './ingrediente-escolhido';
 import { Ingrediente } from '../../ingrediente/dominio/ingrediente';
-import { DadosItemSimples } from '../dados-item-simples';
+import { DadosItemPizza, DadosItemSimples } from '../view/visao-registro-pedido';
 
 export class GestorRegistroPedido {
 	private pedidoAtual: Pedido = new Pedido();
