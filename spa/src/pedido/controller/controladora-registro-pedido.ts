@@ -1,21 +1,18 @@
 import { RepositorioPizzaNoServidor } from '../../pizza/repositorio/repositorio-pizza-no-servidor';
 import { GestorRegistroPedido } from '../dominio/gestor-registro-pedido';
 import { RepositorioPedidoNoServidor } from '../repositorio/repositorio-pedido-no-servidor';
-import { VisaoRegistroPedido } from '../view/visao-registro-pedido';
 import { ServicoHttpComFetch } from '../../infra/http/servico-http-com-fetch';
-import { CategoriaCardapio } from '../categoria-cardapio';
 import { TipoProdutoSimples } from '../../produto-simples/dominio/tipo-produto-simples';
 import { RepositorioProdutoSimplesNoServidor } from '../../produto-simples/repositorio/repositorio-produto-simples-no-servidor';
 import { RepositorioClienteNoServidor } from '../../cliente/repositorio/repositorio-cliente-no-servidor';
 import { TipoAtendimento } from '../dominio/tipo-atendimento';
-import { VisaoResumoPedido } from '../view/visao-resumo-pedido';
-import { VisaoEtapaProdutos } from '../view/visao-etapa-produtos';
-import { VisaoEtapaAtendimento } from '../view/visao-etapa-atendimento';
-import { DadosItemPizza } from '../dados-item-pizza';
-import { DadosItemSimples } from '../dados-item-simples';
-import { VisaoPersonalizacaoPizza } from '../view/visao-personalizacao-pizza';
 import { TamanhoPizza } from '../../pizza/dominio/tamanho-pizza';
 import { Pizza } from '../../pizza/dominio/pizza';
+import { CategoriaCardapio, DadosItemPizza, DadosItemSimples, VisaoRegistroPedido } from '../view/visao-registro-pedido';
+import { VisaoEtapaProdutos } from '../view/visao-etapa-produtos';
+import { VisaoPersonalizacaoPizza } from '../view/visao-personalizacao-pizza';
+import { VisaoEtapaAtendimento } from '../view/visao-etapa-atendimento';
+import { VisaoResumoPedido } from '../view/visao-resumo-pedido';
 
 type VisoesRegistroPedido = {
 	principal: VisaoRegistroPedido;

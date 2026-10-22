@@ -1,6 +1,6 @@
-import { VisaoRegistroPedido } from '../../src/pedido/view/visao-registro-pedido';
+import { VisaoRegistroPedidoDom } from '../../src/pedido/view/visao-registro-pedido-dom';
 
 export default function registroPedido() {
-	const visaoRegistroPedido = new VisaoRegistroPedido();
+	const visaoRegistroPedido = new VisaoRegistroPedidoDom();
 	visaoRegistroPedido.iniciar();
 }
