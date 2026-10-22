@@ -6,6 +6,7 @@ class Pedido {
     /**
      * @param ItemPedido[] $itensPedido
      * @param DescontoPromocao[] $descontosPromocao
+     * @param MovimentacaoEstoque[] $movimentacoesEstoque
      */
     public function __construct(
         public readonly int $id,
@@ -19,6 +20,7 @@ class Pedido {
         public readonly ?Entrega $entrega = null,
         public readonly ?Cancelamento $cancelamento = null,
         public readonly ?Dinheiro $taxaEntrega = null,
+        public readonly array $movimentacoesEstoque = [],
     ) {
         $this->validar();
     }

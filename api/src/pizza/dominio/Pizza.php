@@ -3,7 +3,7 @@
 class Pizza {
     /**
      * @param IngredientePadrao[] $ingredientesPadrao
-     * @param Ingrediente[] $ingredientesSubstitutos
+     * @param IngredienteSubstituto[] $ingredientesSubstitutos
      * @param IngredienteAdicional[] $adicionais
      * @param PrecoPorTamanho[] $precosPorTamanho
      */
@@ -39,7 +39,7 @@ class Pizza {
 
     public function temComoIngredienteSubstituto(Ingrediente $ingrediente): bool {
         foreach ($this->ingredientesSubstitutos as $ingredienteSubstituto) {
-            if ($ingredienteSubstituto->id === $ingrediente->id) {
+            if ($ingredienteSubstituto->ingrediente->id === $ingrediente->id) {
                 return true;
             }
         }

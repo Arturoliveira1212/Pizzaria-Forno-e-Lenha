@@ -49,6 +49,8 @@
                 "src/infra/exceptions/",
                 "src/ingrediente/dominio/",
                 "src/ingrediente/repositorio/",
+                "src/movimentacao-estoque/dominio/",
+                "src/movimentacao-estoque/repositorio/",
                 "src/pedido/dominio/",
                 "src/pedido/dto/",
                 "src/pedido/repositorio/",
@@ -60,7 +62,9 @@
                 "src/produto-simples/repositorio/",
                 "src/promocao/dominio/",
                 "src/promocao/dto/",
-                "src/promocao/repositorio/"
+                "src/promocao/repositorio/",
+                "src/usuario/dominio/",
+                "src/usuario/repositorio/"
             ]
         }
     },
