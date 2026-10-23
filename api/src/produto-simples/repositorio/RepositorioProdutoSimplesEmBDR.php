@@ -21,6 +21,7 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
                     descricao: $linha['descricao'],
                     tipo: TipoProdutoSimples::from($linha['tipo']),
                     preco: new Dinheiro((int) $linha['preco']),
+                    estoque: new Quantidade(1, UnidadeMedidaFactory::gramas()), // TODO: Temporário apenas para os ajustes dos testes
                 );
             }
 
@@ -60,6 +61,7 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
                 descricao: $linha['descricao'],
                 tipo: TipoProdutoSimples::from($linha['tipo']),
                 preco: new Dinheiro((int) $linha['preco']),
+                estoque: new Quantidade(1, UnidadeMedidaFactory::gramas()), // TODO: Temporário apenas para os ajustes dos testes
             );
         } catch (Throwable $e) {
             throw new RepositorioException('Erro ao obter produto por ID.');

@@ -33,4 +33,15 @@ class ProdutoSimplesFactory {
             estoque: new Quantidade(1, UnidadeMedidaFactory::litros()),
         );
     }
+
+    public static function inexistente(): ProdutoSimples {
+        return new ProdutoSimples(
+            id: 9999999999999,
+            nome: 'Produto Inexistente',
+            descricao: 'Produto que não existe no banco de dados',
+            tipo: TipoProdutoSimples::BEBIDA,
+            preco: new Dinheiro(1000),
+            estoque: new Quantidade(10, UnidadeMedidaFactory::litros()),
+        );
+    }
 }

@@ -184,9 +184,13 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
                 ingrediente: new Ingrediente(
                     id: (int) $linha['idIngrediente'],
                     nome: $linha['nomeIngrediente'],
+                    estoque: new Quantidade(1, UnidadeMedidaFactory::gramas()), // TODO: Temporário apenas para os ajustes dos testes
                 ),
                 removivel: (bool) $linha['removivel'],
                 substituivel: (bool) $linha['substituivel'],
+                quantidadesPorTamanho: [// TODO: Temporário apenas para os ajustes dos testes
+
+                ],
             );
         });
     }
@@ -212,6 +216,7 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
             return new Ingrediente(
                 id: (int) $linha['idIngrediente'],
                 nome: $linha['nomeIngrediente'],
+                estoque: new Quantidade(1, UnidadeMedidaFactory::gramas()), // TODO: Temporário apenas para os ajustes dos testes
             );
         });
     }
@@ -242,8 +247,10 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
                 ingrediente: new Ingrediente(
                     id: (int) $linha['idIngrediente'],
                     nome: $linha['nomeIngrediente'],
+                    estoque: new Quantidade(1, UnidadeMedidaFactory::gramas()), // TODO: Temporário apenas para os ajustes dos testes
                 ),
                 preco: new Dinheiro((int) $linha['preco']),
+                quantidade: new Quantidade(1, UnidadeMedidaFactory::gramas()), // TODO: Temporário apenas para os ajustes dos testes
             );
         });
     }

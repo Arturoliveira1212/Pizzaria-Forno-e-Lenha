@@ -2,14 +2,16 @@
 
 describe('SaborEscolhido', function () {
 
-    describe('validar()', function () {
-
+    beforeAll(function () {
         $this->pizza = PizzaFactory::portuguesa();
 
         $this->ingredientesEscolhidosNaoPersonalizaveis = [
             IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
             IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
         ];
+    });
+
+    describe('validar()', function () {
 
         it('lança exceção quando o identificador é menor que o mínimo permitido', function () {
             expect(function () {
@@ -202,19 +204,12 @@ describe('SaborEscolhido', function () {
 
     describe('calcularPrecoDosAdicionais()', function () {
 
-        $this->pizza = PizzaFactory::portuguesa();
-
-        $this->ingredientesEscolhidosPadrao = [
-            IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
-            IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
-        ];
-
         it('calcula o preço dos adicionais corretamente (0 adicionais)', function () {
             $saborEscolhido = new SaborEscolhido(
                 id: SaborEscolhido::MENOR_ID_PERMITIDO,
                 pizza: $this->pizza,
                 ingredientesEscolhidos: [
-                    ...$this->ingredientesEscolhidosPadrao,
+                    ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                 ],
             );
 
@@ -226,7 +221,7 @@ describe('SaborEscolhido', function () {
                 id: SaborEscolhido::MENOR_ID_PERMITIDO,
                 pizza: $this->pizza,
                 ingredientesEscolhidos: [
-                    ...$this->ingredientesEscolhidosPadrao,
+                    ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                     IngredienteEscolhidoFactory::adicional(3, IngredienteFactory::bacon(), 899),
                 ],
             );
@@ -239,7 +234,7 @@ describe('SaborEscolhido', function () {
                 id: SaborEscolhido::MENOR_ID_PERMITIDO,
                 pizza: $this->pizza,
                 ingredientesEscolhidos: [
-                    ...$this->ingredientesEscolhidosPadrao,
+                    ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                     IngredienteEscolhidoFactory::adicional(3, IngredienteFactory::bacon(), 899),
                     IngredienteEscolhidoFactory::adicional(4, IngredienteFactory::catupiry(), 799),
                 ],
@@ -253,7 +248,7 @@ describe('SaborEscolhido', function () {
                 id: SaborEscolhido::MENOR_ID_PERMITIDO,
                 pizza: $this->pizza,
                 ingredientesEscolhidos: [
-                    ...$this->ingredientesEscolhidosPadrao,
+                    ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                     IngredienteEscolhidoFactory::adicional(3, IngredienteFactory::bacon(), 899),
                     IngredienteEscolhidoFactory::adicional(4, IngredienteFactory::bacon(), 899),
                 ],

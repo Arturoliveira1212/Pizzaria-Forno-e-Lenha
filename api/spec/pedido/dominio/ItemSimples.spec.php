@@ -4,7 +4,9 @@ describe('ItemSimples', function () {
 
     describe('validar()', function () {
 
-        $this->produtoSimples = ProdutoSimplesFactory::cocaCola();
+        beforeAll(function () {
+            $this->produtoSimples = ProdutoSimplesFactory::cocaCola();
+        });
 
         it('lança exceção quando o identificador é menor que o mínimo permitido', function () {
             expect(function () {

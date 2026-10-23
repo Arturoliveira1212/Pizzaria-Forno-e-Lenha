@@ -1,4 +1,3 @@
-// fetch-servico-http.ts
 import { ServicoHttp } from './servico-http';
 import { RespostaHttp } from './resposta-http';
 import { HttpError } from '../exceptions/http-error';

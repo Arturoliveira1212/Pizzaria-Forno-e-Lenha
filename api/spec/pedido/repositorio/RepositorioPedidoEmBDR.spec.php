@@ -16,53 +16,29 @@ describe('RepositorioPedidoEmBDR', function () {
     describe('registrarPedido()', function () {
 
         beforeAll(function () {
-            $molho = new Ingrediente(1, 'Molho de Tomate');
-            $mussarela = new Ingrediente(2, 'Mussarela');
-
-            $pizza = new Pizza(
-                id: 1,
-                nome: 'Margherita',
-                descricao: 'Pizza margherita',
-                ingredientesPadrao: [
-                    new IngredientePadrao(id: 1, ingrediente: $molho, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 2, ingrediente: $mussarela, removivel: false, substituivel: false),
-                ],
-                ingredientesSubstitutos: [],
-                adicionais: [],
-                precosPorTamanho: [
-                    new PrecoPorTamanho(id: 1, tamanhoPizza: TamanhoPizza::MEDIA, preco: new Dinheiro(4200)),
-                ],
-            );
-
-            $saborEscolhido = new SaborEscolhido(
-                id: 0,
-                pizza: $pizza,
-                ingredientesEscolhidos: [
-                    new IngredienteEscolhido(0, $molho, PapelIngrediente::PADRAO, Dinheiro::zero()),
-                    new IngredienteEscolhido(0, $mussarela, PapelIngrediente::PADRAO, Dinheiro::zero()),
-                ],
-            );
-
-            $itemPizza = new ItemPizza(
+            $this->itemPizza = new ItemPizza(
                 id: 0,
                 quantidade: 1,
-                saboresEscolhidos: [$saborEscolhido],
+                saboresEscolhidos: [
+                    new SaborEscolhido(
+                        id: 0,
+                        pizza: PizzaFactory::margherita(),
+                        ingredientesEscolhidos: [
+                            IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+                            IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
+                        ],
+                    ),
+                ],
                 tamanhoPizza: TamanhoPizza::MEDIA,
             );
 
-            $itemSimples = new ItemSimples(
+            $this->itemSimples = new ItemSimples(
                 id: 0,
                 quantidade: 1,
-                produtoSimples: new ProdutoSimples(
-                    1,
-                    'Coca-Cola 2L',
-                    'Refrigerante',
-                    TipoProdutoSimples::BEBIDA,
-                    new Dinheiro(1200),
-                ),
+                produtoSimples: ProdutoSimplesFactory::cocaCola(),
             );
 
-            $cliente = new Cliente(
+            $this->cliente = new Cliente(
                 id: 11,
                 nome: 'Artur Alves',
                 telefone: new Telefone('22', '99999-9999'),
@@ -89,29 +65,31 @@ describe('RepositorioPedidoEmBDR', function () {
                 id: 0,
                 data: new DateTime(),
                 tipoAtendimento: TipoAtendimento::ENTREGA,
-                cliente: $cliente,
+                cliente: $this->cliente,
                 itensPedido: [
-                    $itemSimples,
-                    $itemPizza,
+                    $this->itemSimples,
+                    $this->itemPizza,
                 ],
                 status: StatusPedido::RECEBIDO,
-                descontosPromocao: [new DescontoPromocao(
-                    0,
-                    new Dinheiro(500),
-                    new Promocao(
+                descontosPromocao: [
+                    new DescontoPromocao(
                         1,
-                        'Promocao de teste',
-                        1,
-                        TamanhoPizza::MEDIA,
-                        new Percentual(10),
-                        null,
-                        null,
+                        new Dinheiro(309),
+                        new Promocao(
+                            1,
+                            'Promocao de teste',
+                            1,
+                            TamanhoPizza::MEDIA,
+                            new Percentual(10),
+                            null,
+                            null,
+                        ),
                     ),
-                )],
+                ],
                 descontoFidelidade: new DescontoFidelidade(
-                    0,
-                    new Dinheiro(490),
-                    $cliente->beneficioFidelidade,
+                    1,
+                    new Dinheiro(337),
+                    $this->cliente->beneficioFidelidade,
                 ),
             );
 
@@ -120,7 +98,13 @@ describe('RepositorioPedidoEmBDR', function () {
                 data: new DateTime('-1 minute'),
                 tipoAtendimento: TipoAtendimento::BALCAO,
                 cliente: null,
-                itensPedido: [new ItemSimples(0, 1, new ProdutoSimples(999999, 'Inexistente', 'Inexistente', TipoProdutoSimples::BEBIDA, new Dinheiro(100)))],
+                itensPedido: [
+                    new ItemSimples(
+                        1,
+                        1,
+                        ProdutoSimplesFactory::inexistente(),
+                    ),
+                ],
                 status: StatusPedido::RECEBIDO,
             );
         });
@@ -131,7 +115,7 @@ describe('RepositorioPedidoEmBDR', function () {
             $pedidoPersistido = $this->bancoDados->consultar('SELECT * FROM pedido ORDER BY id DESC LIMIT 1')[0];
             $idPedido = (int) $pedidoPersistido['id'];
 
-            expect($pedidoPersistido['valorTotal'])->toBe(5410);
+            expect($pedidoPersistido['valorTotal'])->toBe(4034);
             expect($pedidoPersistido['taxaEntrega'])->toBe(1000);
             expect($pedidoPersistido['status'])->toBe('RECEBIDO');
             expect($pedidoPersistido['tipoAtendimento'])->toBe('ENTREGA');
@@ -142,7 +126,7 @@ describe('RepositorioPedidoEmBDR', function () {
                 ['pedidoId' => $idPedido],
             );
             expect($dadosItemSimples)->toBe([
-                ['quantidade' => 1, 'precoPraticado' => 1200, 'idProdutoSimples' => 1],
+                ['quantidade' => 1, 'precoPraticado' => 590, 'idProdutoSimples' => 1],
             ]);
 
             $dadosItemPizza = $this->bancoDados->consultar(
@@ -151,7 +135,7 @@ describe('RepositorioPedidoEmBDR', function () {
             );
 
             expect($dadosItemPizza)->toBe([
-                ['quantidade' => 1, 'precoPraticado' => 4200, 'tamanho' => 'MEDIA'],
+                ['quantidade' => 1, 'precoPraticado' => 3090, 'tamanho' => 'MEDIA'],
             ]);
 
             $dadosSaboresEscolhidos = $this->bancoDados->consultar(
@@ -162,7 +146,7 @@ describe('RepositorioPedidoEmBDR', function () {
                 ['pedidoId' => $idPedido],
             );
             expect($dadosSaboresEscolhidos)->toBe([
-                ['idPizza' => 1],
+                ['idPizza' => 2],
             ]);
 
             $dadosIngredientesEscolhidos = $this->bancoDados->consultar(
@@ -184,7 +168,7 @@ describe('RepositorioPedidoEmBDR', function () {
                 ['pedidoId' => $idPedido],
             );
             expect($dadosDescontosPromocao)->toBe([
-                ['valorDesconto' => 500, 'idPromocao' => 1],
+                ['valorDesconto' => 309, 'idPromocao' => 1],
             ]);
 
             $dadosDescontoFidelidade = $this->bancoDados->consultar(
@@ -192,7 +176,7 @@ describe('RepositorioPedidoEmBDR', function () {
                 ['pedidoId' => $idPedido],
             );
             expect($dadosDescontoFidelidade)->toBe([
-                ['valorDesconto' => 490, 'idBeneficioFidelidade' => 1],
+                ['valorDesconto' => 337, 'idBeneficioFidelidade' => 1],
             ]);
         });
 

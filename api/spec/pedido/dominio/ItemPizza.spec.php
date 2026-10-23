@@ -3,36 +3,39 @@
 describe('ItemPizza', function () {
 
     describe('validar()', function () {
-        $this->pizzaPortuguesa = PizzaFactory::portuguesa();
 
-        $this->saborEscolhidoPortuguesa = new SaborEscolhido(
-            id: 1,
-            pizza: $this->pizzaPortuguesa,
-            ingredientesEscolhidos: [
-                IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
-                IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
-                IngredienteEscolhidoFactory::substituto(3, IngredienteFactory::milho()),
-                IngredienteEscolhidoFactory::adicional(4, IngredienteFactory::bacon(), 899),
-            ],
-        );
+        beforeAll(function () {
+            $this->pizzaPortuguesa = PizzaFactory::portuguesa();
 
-        $this->saborEscolhidoQuatroQueijos = new SaborEscolhido(
-            id: 2,
-            pizza: PizzaFactory::quatroQueijos(),
-            ingredientesEscolhidos: [
-                IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
-                IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
-            ],
-        );
+            $this->saborEscolhidoPortuguesa = new SaborEscolhido(
+                id: 1,
+                pizza: $this->pizzaPortuguesa,
+                ingredientesEscolhidos: [
+                    IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+                    IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
+                    IngredienteEscolhidoFactory::substituto(3, IngredienteFactory::milho()),
+                    IngredienteEscolhidoFactory::adicional(4, IngredienteFactory::bacon(), 899),
+                ],
+            );
 
-        $this->saborEscolhidoCalabresa = new SaborEscolhido(
-            id: 3,
-            pizza: PizzaFactory::calabresa(),
-            ingredientesEscolhidos: [
-                IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
-                IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
-            ],
-        );
+            $this->saborEscolhidoQuatroQueijos = new SaborEscolhido(
+                id: 2,
+                pizza: PizzaFactory::quatroQueijos(),
+                ingredientesEscolhidos: [
+                    IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+                    IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
+                ],
+            );
+
+            $this->saborEscolhidoCalabresa = new SaborEscolhido(
+                id: 3,
+                pizza: PizzaFactory::calabresa(),
+                ingredientesEscolhidos: [
+                    IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+                    IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
+                ],
+            );
+        });
 
         it('lança exceção quando o identificador é menor que o mínimo permitido', function () {
             expect(function () {

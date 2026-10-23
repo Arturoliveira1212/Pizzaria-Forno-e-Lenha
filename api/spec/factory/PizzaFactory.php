@@ -44,6 +44,7 @@ class PizzaFactory {
             adicionais: [
                 IngredienteAdicionalFactory::bacon(),
                 IngredienteAdicionalFactory::calabresa(),
+                IngredienteAdicionalFactory::catupiry(),
             ],
             precosPorTamanho: [
                 PrecoPorTamanhoFactory::pequena(2190),

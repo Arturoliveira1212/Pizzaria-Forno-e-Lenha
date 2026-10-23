@@ -82,7 +82,6 @@ describe('GeradorBeneficioFidelidade', function () {
     describe('gerarBeneficioFidelidade()', function () {
 
         it('não gera benefício se o valor do pedido for menor que o mínimo', function () {
-            var_dump($this->pedido->calcularValorTotal()->centavos); // Adicione esta linha para depuração
             $beneficio = new GeradorBeneficioFidelidade()->gerarBeneficioFidelidade(
                 pedido: $this->pedido,
                 configuracaoFidelidade: new ConfiguracaoFidelidade(

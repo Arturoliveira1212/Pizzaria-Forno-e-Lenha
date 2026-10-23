@@ -23,6 +23,7 @@ class RepositorioIngredienteEmBDR implements RepositorioIngrediente {
             return new Ingrediente(
                 id: (int) $linha['id'],
                 nome: $linha['nome'],
+                estoque: new Quantidade(1, UnidadeMedidaFactory::gramas()), // TODO: Temporário apenas para os ajustes dos testes
             );
         } catch (Throwable $e) {
             throw new RepositorioException('Erro ao obter ingrediente por ID.');

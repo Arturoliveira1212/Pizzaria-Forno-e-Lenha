@@ -79,7 +79,7 @@ describe('GestorPedido', function () {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
                             tipoAtendimento: $tipoQueNaoExiste,
-                            idCliente: 'dasdsadasdsadas',
+                            idCliente: 1,
                             itensPedido: [],
                         ),
                     );
@@ -96,7 +96,7 @@ describe('GestorPedido', function () {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
                             tipoAtendimento: TipoAtendimento::BALCAO->value,
-                            idCliente: 'dasdsadasdsadas',
+                            idCliente: 1,
                             itensPedido: [
                                 new ItemPizzaParaCadastro(
                                     tamanho: $tamanhoQueNaoExiste,
@@ -128,7 +128,7 @@ describe('GestorPedido', function () {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
                             tipoAtendimento: TipoAtendimento::BALCAO->value,
-                            idCliente: 'dasdsadasdsadas',
+                            idCliente: 1,
                             itensPedido: [
                                 new ItemPizzaParaCadastro(
                                     tamanho: TamanhoPizza::MEDIA->value,
@@ -161,7 +161,7 @@ describe('GestorPedido', function () {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
                             tipoAtendimento: TipoAtendimento::BALCAO->value,
-                            idCliente: 'dasdsadasdsadas',
+                            idCliente: 1,
                             itensPedido: [
                                 new ItemPizzaParaCadastro(
                                     tamanho: TamanhoPizza::MEDIA->value,
@@ -194,7 +194,7 @@ describe('GestorPedido', function () {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
                             tipoAtendimento: TipoAtendimento::BALCAO->value,
-                            idCliente: 'dasdsadasdsadas',
+                            idCliente: 1,
                             itensPedido: [
                                 new ItemPizzaParaCadastro(
                                     tamanho: TamanhoPizza::MEDIA->value,
@@ -225,7 +225,7 @@ describe('GestorPedido', function () {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
                             tipoAtendimento: TipoAtendimento::BALCAO->value,
-                            idCliente: 'dasdsadasdsadas',
+                            idCliente: 1,
                             itensPedido: [
                                 new ItemPizzaParaCadastro(
                                     tamanho: TamanhoPizza::MEDIA->value,
@@ -265,7 +265,7 @@ describe('GestorPedido', function () {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
                             tipoAtendimento: TipoAtendimento::BALCAO->value,
-                            idCliente: 'dasdsadasdsadas',
+                            idCliente: 1,
                             itensPedido: [
                                 new ItemSimplesParaCadastro(
                                     idProduto: $idInexistente,
@@ -623,7 +623,7 @@ describe('GestorPedido - integração com banco de dados', function () {
                 ['idCliente' => 11],
             )[0] ?? null;
 
-            $pedido = $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
+            $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
                 tipoAtendimento: TipoAtendimento::BALCAO->value,
                 idCliente: '11',
                 itensPedido: [
