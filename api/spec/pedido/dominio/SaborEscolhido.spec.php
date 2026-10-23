@@ -2,49 +2,13 @@
 
 describe('SaborEscolhido', function () {
 
-    $this->molho = new Ingrediente(1, 'Molho');
-    $this->mussarela = new Ingrediente(2, 'Mussarela');
-    $this->presunto = new Ingrediente(3, 'Presunto');
-    $this->azeitona = new Ingrediente(4, 'Azeitona');
-    $this->cebola = new Ingrediente(5, 'Cebola');
-    $this->milho = new Ingrediente(6, 'Milho');
-    $this->bacon = new Ingrediente(7, 'Bacon');
-    $this->catupiry = new Ingrediente(8, 'Catupiry');
-    $this->manjericao = new Ingrediente(9, 'Manjericão');
-    $this->calabresa = new Ingrediente(10, 'Calabresa');
-
     describe('validar()', function () {
 
-        $this->pizza = new Pizza(
-            id: 1,
-            nome: 'Portuguesa',
-            descricao: 'Descrição',
-            ingredientesPadrao: [
-                new IngredientePadrao(id: 1, ingrediente: $this->molho, removivel: false, substituivel: false),
-                new IngredientePadrao(id: 2, ingrediente: $this->mussarela, removivel: false, substituivel: false),
-                new IngredientePadrao(id: 3, ingrediente: $this->presunto, removivel: true, substituivel: true),
-                new IngredientePadrao(id: 4, ingrediente: $this->azeitona, removivel: true, substituivel: true),
-            ],
-            ingredientesSubstitutos: [$this->cebola, $this->milho],
-            adicionais: [
-                new IngredienteAdicional(id: 1, ingrediente: $this->bacon, preco: new Dinheiro(500)),
-            ],
-            precosPorTamanho: [],
-        );
+        $this->pizza = PizzaFactory::portuguesa();
 
         $this->ingredientesEscolhidosNaoPersonalizaveis = [
-            new IngredienteEscolhido(
-                id: 1,
-                ingrediente: $this->molho,
-                papel: PapelIngrediente::PADRAO,
-                custoAdicional: Dinheiro::zero(),
-            ),
-            new IngredienteEscolhido(
-                id: 2,
-                ingrediente: $this->mussarela,
-                papel: PapelIngrediente::PADRAO,
-                custoAdicional: Dinheiro::zero(),
-            ),
+            IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+            IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
         ];
 
         it('lança exceção quando o identificador é menor que o mínimo permitido', function () {
@@ -76,12 +40,7 @@ describe('SaborEscolhido', function () {
                     pizza: $this->pizza,
                     ingredientesEscolhidos: [
                         ...$this->ingredientesEscolhidosNaoPersonalizaveis,
-                        new IngredienteEscolhido(
-                            id: 1,
-                            ingrediente: $this->molho,
-                            papel: PapelIngrediente::PADRAO,
-                            custoAdicional: Dinheiro::zero(),
-                        ),
+                        IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
                     ],
                 );
             })->toThrow(new DominioException('O ingrediente Molho(1) já foi selecionado como padrão.'));
@@ -94,12 +53,7 @@ describe('SaborEscolhido', function () {
                     pizza: $this->pizza,
                     ingredientesEscolhidos: [
                         ...$this->ingredientesEscolhidosNaoPersonalizaveis,
-                        new IngredienteEscolhido(
-                            id: 1,
-                            ingrediente: $this->catupiry,
-                            papel: PapelIngrediente::PADRAO,
-                            custoAdicional: Dinheiro::zero(),
-                        ),
+                        IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::catupiry()),
                     ],
                 );
             })->toThrow(new DominioException('O ingrediente Catupiry(8) não é permitido como padrão para a pizza.'));
@@ -112,12 +66,7 @@ describe('SaborEscolhido', function () {
                     pizza: $this->pizza,
                     ingredientesEscolhidos: [
                         ...$this->ingredientesEscolhidosNaoPersonalizaveis,
-                        new IngredienteEscolhido(
-                            id: 1,
-                            ingrediente: $this->bacon,
-                            papel: PapelIngrediente::SUBSTITUTO,
-                            custoAdicional: Dinheiro::zero(),
-                        ),
+                        IngredienteEscolhidoFactory::substituto(1, IngredienteFactory::bacon()),
                     ],
                 );
             })->toThrow(new DominioException('O ingrediente Bacon(7) não é permitido como substituto para a pizza.'));
@@ -130,12 +79,7 @@ describe('SaborEscolhido', function () {
                     pizza: $this->pizza,
                     ingredientesEscolhidos: [
                         ...$this->ingredientesEscolhidosNaoPersonalizaveis,
-                        new IngredienteEscolhido(
-                            id: 1,
-                            ingrediente: $this->cebola,
-                            papel: PapelIngrediente::ADICIONAL,
-                            custoAdicional: new Dinheiro(500),
-                        ),
+                        IngredienteEscolhidoFactory::adicional(1, IngredienteFactory::cebola(), 500),
                     ],
                 );
             })->toThrow(new DominioException('O ingrediente Cebola(5) não é permitido como adicional para a pizza.'));
@@ -148,12 +92,7 @@ describe('SaborEscolhido', function () {
                     pizza: $this->pizza,
                     ingredientesEscolhidos: [
                         ...$this->ingredientesEscolhidosNaoPersonalizaveis,
-                        new IngredienteEscolhido(
-                            id: 1,
-                            ingrediente: $this->bacon,
-                            papel: PapelIngrediente::ADICIONAL,
-                            custoAdicional: new Dinheiro(400),
-                        ),
+                        IngredienteEscolhidoFactory::adicional(1, IngredienteFactory::bacon(), 500),
                     ],
                 );
             })->toThrow(new DominioException('O custo adicional do ingrediente Bacon(7) não corresponde ao preço definido para a pizza.'));
@@ -165,12 +104,8 @@ describe('SaborEscolhido', function () {
                     id: 1,
                     pizza: $this->pizza,
                     ingredientesEscolhidos: [
-                        new IngredienteEscolhido(
-                            id: 1,
-                            ingrediente: $this->molho,
-                            papel: PapelIngrediente::PADRAO,
-                            custoAdicional: Dinheiro::zero(),
-                        ),
+                        IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+
                     ],
                 );
             })->toThrow(new DominioException('É necessário escolher todos os ingredientes padrão da pizza.'));
@@ -183,24 +118,9 @@ describe('SaborEscolhido', function () {
                     pizza: $this->pizza,
                     ingredientesEscolhidos: [
                         ...$this->ingredientesEscolhidosNaoPersonalizaveis,
-                        new IngredienteEscolhido(
-                            id: 1,
-                            ingrediente: $this->cebola,
-                            papel: PapelIngrediente::SUBSTITUTO,
-                            custoAdicional: Dinheiro::zero(),
-                        ),
-                        new IngredienteEscolhido(
-                            id: 2,
-                            ingrediente: $this->milho,
-                            papel: PapelIngrediente::SUBSTITUTO,
-                            custoAdicional: Dinheiro::zero(),
-                        ),
-                        new IngredienteEscolhido(
-                            id: 3,
-                            ingrediente: $this->milho,
-                            papel: PapelIngrediente::SUBSTITUTO,
-                            custoAdicional: Dinheiro::zero(),
-                        ),
+                        IngredienteEscolhidoFactory::substituto(1, IngredienteFactory::cebola()),
+                        IngredienteEscolhidoFactory::substituto(2, IngredienteFactory::milho()),
+                        IngredienteEscolhidoFactory::substituto(3, IngredienteFactory::milho()),
                     ],
                 );
             })->toThrow(new DominioException('A quantidade total de ingredientes padrão e substitutos excede o número de vagas da pizza.'));
@@ -213,24 +133,9 @@ describe('SaborEscolhido', function () {
                     pizza: $this->pizza,
                     ingredientesEscolhidos: [
                         ...$this->ingredientesEscolhidosNaoPersonalizaveis,
-                        new IngredienteEscolhido(
-                            id: 1,
-                            ingrediente: $this->presunto,
-                            papel: PapelIngrediente::PADRAO,
-                            custoAdicional: Dinheiro::zero(),
-                        ),
-                        new IngredienteEscolhido(
-                            id: 2,
-                            ingrediente: $this->milho,
-                            papel: PapelIngrediente::SUBSTITUTO,
-                            custoAdicional: Dinheiro::zero(),
-                        ),
-                        new IngredienteEscolhido(
-                            id: 3,
-                            ingrediente: $this->cebola,
-                            papel: PapelIngrediente::SUBSTITUTO,
-                            custoAdicional: Dinheiro::zero(),
-                        ),
+                        IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::presunto()),
+                        IngredienteEscolhidoFactory::substituto(2, IngredienteFactory::milho()),
+                        IngredienteEscolhidoFactory::substituto(3, IngredienteFactory::cebola()),
                     ],
                 );
             })->toThrow(new DominioException('A quantidade total de ingredientes padrão e substitutos excede o número de vagas da pizza.'));
@@ -244,24 +149,9 @@ describe('SaborEscolhido', function () {
                 pizza: $this->pizza,
                 ingredientesEscolhidos: [
                     ...$this->ingredientesEscolhidosNaoPersonalizaveis,
-                    new IngredienteEscolhido(
-                        id: 1,
-                        ingrediente: $this->presunto,
-                        papel: PapelIngrediente::PADRAO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 2,
-                        ingrediente: $this->azeitona,
-                        papel: PapelIngrediente::PADRAO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 3,
-                        ingrediente: $this->bacon,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(500),
-                    ),
+                    IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::presunto()),
+                    IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::azeitona()),
+                    IngredienteEscolhidoFactory::adicional(3, IngredienteFactory::bacon(), 899),
                 ],
             );
 
@@ -278,24 +168,9 @@ describe('SaborEscolhido', function () {
                 pizza: $this->pizza,
                 ingredientesEscolhidos: [
                     ...$this->ingredientesEscolhidosNaoPersonalizaveis,
-                    new IngredienteEscolhido(
-                        id: 1,
-                        ingrediente: $this->presunto,
-                        papel: PapelIngrediente::PADRAO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 2,
-                        ingrediente: $this->cebola,
-                        papel: PapelIngrediente::SUBSTITUTO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 3,
-                        ingrediente: $this->bacon,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(500),
-                    ),
+                    IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::presunto()),
+                    IngredienteEscolhidoFactory::substituto(2, IngredienteFactory::cebola()),
+                    IngredienteEscolhidoFactory::adicional(3, IngredienteFactory::bacon(), 899),
                 ],
             );
 
@@ -312,24 +187,9 @@ describe('SaborEscolhido', function () {
                 pizza: $this->pizza,
                 ingredientesEscolhidos: [
                     ...$this->ingredientesEscolhidosNaoPersonalizaveis,
-                    new IngredienteEscolhido(
-                        id: 1,
-                        ingrediente: $this->milho,
-                        papel: PapelIngrediente::SUBSTITUTO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 2,
-                        ingrediente: $this->cebola,
-                        papel: PapelIngrediente::SUBSTITUTO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 3,
-                        ingrediente: $this->bacon,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(500),
-                    ),
+                    IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::presunto()),
+                    IngredienteEscolhidoFactory::substituto(1, IngredienteFactory::cebola()),
+                    IngredienteEscolhidoFactory::adicional(3, IngredienteFactory::bacon(), 899),
                 ],
             );
 
@@ -342,43 +202,11 @@ describe('SaborEscolhido', function () {
 
     describe('calcularPrecoDosAdicionais()', function () {
 
-        $this->pizza = new Pizza(
-            id: 1,
-            nome: 'Marguerita',
-            descricao: 'Descrição',
-            ingredientesPadrao: [
-                new IngredientePadrao(id: 1, ingrediente: $this->molho, removivel: false, substituivel: false),
-                new IngredientePadrao(id: 2, ingrediente: $this->mussarela, removivel: false, substituivel: false),
-                new IngredientePadrao(id: 3, ingrediente: $this->manjericao, removivel: true, substituivel: true),
-            ],
-            ingredientesSubstitutos: [$this->cebola, $this->milho],
-            adicionais: [
-                new IngredienteAdicional(id: 1, ingrediente: $this->bacon, preco: new Dinheiro(599)),
-                new IngredienteAdicional(id: 2, ingrediente: $this->catupiry, preco: new Dinheiro(799)),
-                new IngredienteAdicional(id: 3, ingrediente: $this->calabresa, preco: new Dinheiro(699)),
-            ],
-            precosPorTamanho: [],
-        );
+        $this->pizza = PizzaFactory::portuguesa();
 
         $this->ingredientesEscolhidosPadrao = [
-            new IngredienteEscolhido(
-                id: 1,
-                ingrediente: $this->molho,
-                papel: PapelIngrediente::PADRAO,
-                custoAdicional: Dinheiro::zero(),
-            ),
-            new IngredienteEscolhido(
-                id: 2,
-                ingrediente: $this->mussarela,
-                papel: PapelIngrediente::PADRAO,
-                custoAdicional: Dinheiro::zero(),
-            ),
-            new IngredienteEscolhido(
-                id: 3,
-                ingrediente: $this->manjericao,
-                papel: PapelIngrediente::PADRAO,
-                custoAdicional: Dinheiro::zero(),
-            ),
+            IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+            IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
         ];
 
         it('calcula o preço dos adicionais corretamente (0 adicionais)', function () {
@@ -399,16 +227,11 @@ describe('SaborEscolhido', function () {
                 pizza: $this->pizza,
                 ingredientesEscolhidos: [
                     ...$this->ingredientesEscolhidosPadrao,
-                    new IngredienteEscolhido(
-                        id: 3,
-                        ingrediente: $this->bacon,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(599),
-                    ),
+                    IngredienteEscolhidoFactory::adicional(3, IngredienteFactory::bacon(), 899),
                 ],
             );
 
-            expect($saborEscolhido->calcularPrecoDosAdicionais()->centavos)->toBe(599);
+            expect($saborEscolhido->calcularPrecoDosAdicionais()->centavos)->toBe(899);
         });
 
         it('calcula o preço dos adicionais corretamente (2 adicionais)', function () {
@@ -417,22 +240,12 @@ describe('SaborEscolhido', function () {
                 pizza: $this->pizza,
                 ingredientesEscolhidos: [
                     ...$this->ingredientesEscolhidosPadrao,
-                    new IngredienteEscolhido(
-                        id: 3,
-                        ingrediente: $this->bacon,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(599),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 4,
-                        ingrediente: $this->catupiry,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(799),
-                    ),
+                    IngredienteEscolhidoFactory::adicional(3, IngredienteFactory::bacon(), 899),
+                    IngredienteEscolhidoFactory::adicional(4, IngredienteFactory::catupiry(), 799),
                 ],
             );
 
-            expect($saborEscolhido->calcularPrecoDosAdicionais()->centavos)->toBe(1398);
+            expect($saborEscolhido->calcularPrecoDosAdicionais()->centavos)->toBe(1698);
         });
 
         it('calcula o preço dos adicionais corretamente (2 adicionais repetidos)', function () {
@@ -441,28 +254,12 @@ describe('SaborEscolhido', function () {
                 pizza: $this->pizza,
                 ingredientesEscolhidos: [
                     ...$this->ingredientesEscolhidosPadrao,
-                    new IngredienteEscolhido(
-                        id: 3,
-                        ingrediente: $this->bacon,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(599),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 4,
-                        ingrediente: $this->bacon,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(599),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 5,
-                        ingrediente: $this->calabresa,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(699),
-                    ),
+                    IngredienteEscolhidoFactory::adicional(3, IngredienteFactory::bacon(), 899),
+                    IngredienteEscolhidoFactory::adicional(4, IngredienteFactory::bacon(), 899),
                 ],
             );
 
-            expect($saborEscolhido->calcularPrecoDosAdicionais()->centavos)->toBe(1897);
+            expect($saborEscolhido->calcularPrecoDosAdicionais()->centavos)->toBe(1798);
         });
 
     });

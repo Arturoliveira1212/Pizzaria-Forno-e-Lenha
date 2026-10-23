@@ -4,13 +4,7 @@ describe('ItemSimples', function () {
 
     describe('validar()', function () {
 
-        $this->produtoSimples = new ProdutoSimples(
-            id: 1,
-            nome: 'Coca-Cola',
-            descricao: 'Descrição',
-            tipo: TipoProdutoSimples::BEBIDA,
-            preco: new Dinheiro(1000),
-        );
+        $this->produtoSimples = ProdutoSimplesFactory::cocaCola();
 
         it('lança exceção quando o identificador é menor que o mínimo permitido', function () {
             expect(function () {
@@ -47,19 +41,13 @@ describe('ItemSimples', function () {
 
             expect($itemSimples->id)->toBe(ItemPedido::MENOR_ID_PERMITIDO);
             expect($itemSimples->quantidade)->toBe($quantidade);
-            expect($itemSimples->precoPraticado->centavos)->toBe(1000);
+            expect($itemSimples->precoPraticado->centavos)->toBe(590);
         });
     });
 
     describe('calcularPrecoTotal()', function () {
 
-        $this->produtoSimples = new ProdutoSimples(
-            id: 1,
-            nome: 'Coca-Cola',
-            descricao: 'Descrição',
-            tipo: TipoProdutoSimples::BEBIDA,
-            preco: new Dinheiro(998),
-        );
+        $this->produtoSimples = ProdutoSimplesFactory::sucoLaranja();
 
         it('calcula o preço total corretamente (1 quantidade)', function () {
             $itemSimples = new ItemSimples(

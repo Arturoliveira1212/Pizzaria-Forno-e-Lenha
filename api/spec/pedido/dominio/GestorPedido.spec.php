@@ -38,14 +38,11 @@ describe('GestorPedido', function () {
             adicionais: [],
             ingredientesSubstitutos: [],
         );
-        $this->produtoSimples = new ProdutoSimples(
-            id: 1,
-            nome: 'Coca-Cola 2L',
-            descricao: 'Refrigerante de cola',
-            tipo: TipoProdutoSimples::BEBIDA,
-            preco: new Dinheiro(10.0),
-        );
-        $this->queijo = new Ingrediente(1, 'Queijo');
+
+        $this->produtoSimples = ProdutoSimplesFactory::cocaCola();
+
+        $this->queijo = IngredienteFactory::mussarela();
+
         $this->promocao = new Promocao(
             id: 1,
             descricao: 'Promoção Teste',
@@ -55,6 +52,7 @@ describe('GestorPedido', function () {
             dataInicio: null,
             dataFim: null,
         );
+
         $this->endereco = new Endereco(
             id: 1,
             logradouro: 'Rua Viviane Verly Pereira',
@@ -64,7 +62,9 @@ describe('GestorPedido', function () {
             estado: 'Rio de Janeiro',
             uf: 'RJ',
         );
+
         $this->cpf = new Cpf('123.456.789-00');
+
         $this->telefone = new Telefone('22', '99999-9999');
     });
 
@@ -249,7 +249,7 @@ describe('GestorPedido', function () {
                             ],
                         ),
                     );
-                })->toThrow(new DominioException('Ingrediente adicional (ID 1) não encontrado para a pizza (ID 1).'));
+                })->toThrow(new DominioException('Ingrediente adicional (ID 2) não encontrado para a pizza (ID 1).'));
             });
 
         });

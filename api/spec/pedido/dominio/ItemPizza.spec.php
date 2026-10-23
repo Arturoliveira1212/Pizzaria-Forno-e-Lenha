@@ -2,147 +2,35 @@
 
 describe('ItemPizza', function () {
 
-    $this->molho = new Ingrediente(1, 'Molho');
-    $this->mussarela = new Ingrediente(2, 'Mussarela');
-    $this->presunto = new Ingrediente(3, 'Presunto');
-    $this->azeitona = new Ingrediente(4, 'Azeitona');
-    $this->cebola = new Ingrediente(5, 'Cebola');
-    $this->milho = new Ingrediente(6, 'Milho');
-    $this->bacon = new Ingrediente(7, 'Bacon');
-    $this->catupiry = new Ingrediente(8, 'Catupiry');
-    $this->manjericao = new Ingrediente(9, 'Manjericão');
-    $this->calabresa = new Ingrediente(10, 'Calabresa');
-
     describe('validar()', function () {
+        $this->pizzaPortuguesa = PizzaFactory::portuguesa();
 
         $this->saborEscolhidoPortuguesa = new SaborEscolhido(
             id: 1,
-            pizza: new Pizza(
-                id: 1,
-                nome: 'Portuguesa',
-                descricao: 'Descrição',
-                ingredientesPadrao: [
-                    new IngredientePadrao(id: 1, ingrediente: $this->molho, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 2, ingrediente: $this->mussarela, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 3, ingrediente: $this->presunto, removivel: true, substituivel: true),
-                    new IngredientePadrao(id: 4, ingrediente: $this->azeitona, removivel: true, substituivel: true),
-                ],
-                ingredientesSubstitutos: [$this->cebola, $this->milho],
-                adicionais: [
-                    new IngredienteAdicional(id: 1, ingrediente: $this->bacon, preco: new Dinheiro(500)),
-                ],
-                precosPorTamanho: [
-                    new PrecoPorTamanho(id: 1, tamanhoPizza: TamanhoPizza::PEQUENA, preco: new Dinheiro(2000)),
-                    new PrecoPorTamanho(id: 2, tamanhoPizza: TamanhoPizza::MEDIA, preco: new Dinheiro(3000)),
-                ],
-            ),
+            pizza: $this->pizzaPortuguesa,
             ingredientesEscolhidos: [
-                new IngredienteEscolhido(
-                    id: 1,
-                    ingrediente: $this->molho,
-                    papel: PapelIngrediente::PADRAO,
-                    custoAdicional: Dinheiro::zero(),
-                ),
-                new IngredienteEscolhido(
-                    id: 2,
-                    ingrediente: $this->mussarela,
-                    papel: PapelIngrediente::PADRAO,
-                    custoAdicional: Dinheiro::zero(),
-                ),
-                new IngredienteEscolhido(
-                    id: 1,
-                    ingrediente: $this->milho,
-                    papel: PapelIngrediente::SUBSTITUTO,
-                    custoAdicional: Dinheiro::zero(),
-                ),
-                new IngredienteEscolhido(
-                    id: 1,
-                    ingrediente: $this->bacon,
-                    papel: PapelIngrediente::ADICIONAL,
-                    custoAdicional: new Dinheiro(500),
-                ),
+                IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+                IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
+                IngredienteEscolhidoFactory::substituto(3, IngredienteFactory::milho()),
+                IngredienteEscolhidoFactory::adicional(4, IngredienteFactory::bacon(), 899),
             ],
         );
 
         $this->saborEscolhidoQuatroQueijos = new SaborEscolhido(
             id: 2,
-            pizza: new Pizza(
-                id: 2,
-                nome: 'Quatro Queijos',
-                descricao: 'Descrição',
-                ingredientesPadrao: [
-                    new IngredientePadrao(id: 1, ingrediente: $this->molho, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 2, ingrediente: $this->mussarela, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 3, ingrediente: $this->catupiry, removivel: true, substituivel: true),
-                    new IngredientePadrao(id: 4, ingrediente: $this->manjericao, removivel: true, substituivel: true),
-                ],
-                ingredientesSubstitutos: [$this->cebola, $this->milho],
-                adicionais: [
-                    new IngredienteAdicional(id: 1, ingrediente: $this->bacon, preco: new Dinheiro(500)),
-                    new IngredienteAdicional(id: 2, ingrediente: $this->calabresa, preco: new Dinheiro(700)),
-                ],
-                precosPorTamanho: [
-                    new PrecoPorTamanho(id: 1, tamanhoPizza: TamanhoPizza::PEQUENA, preco: new Dinheiro(2500)),
-                    new PrecoPorTamanho(id: 2, tamanhoPizza: TamanhoPizza::MEDIA, preco: new Dinheiro(3500)),
-                    new PrecoPorTamanho(id: 3, tamanhoPizza: TamanhoPizza::GRANDE, preco: new Dinheiro(4500)),
-                ],
-            ),
+            pizza: PizzaFactory::quatroQueijos(),
             ingredientesEscolhidos: [
-                new IngredienteEscolhido(
-                    id: 1,
-                    ingrediente: $this->molho,
-                    papel: PapelIngrediente::PADRAO,
-                    custoAdicional: Dinheiro::zero(),
-                ),
-                new IngredienteEscolhido(
-                    id: 2,
-                    ingrediente: $this->mussarela,
-                    papel: PapelIngrediente::PADRAO,
-                    custoAdicional: Dinheiro::zero(),
-                ),
-                new IngredienteEscolhido(
-                    id: 4,
-                    ingrediente: $this->manjericao,
-                    papel: PapelIngrediente::PADRAO,
-                    custoAdicional: Dinheiro::zero(),
-                ),
+                IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+                IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
             ],
         );
 
         $this->saborEscolhidoCalabresa = new SaborEscolhido(
             id: 3,
-            pizza: new Pizza(
-                id: 3,
-                nome: 'Calabresa',
-                descricao: 'Descrição',
-                ingredientesPadrao: [
-                    new IngredientePadrao(id: 1, ingrediente: $this->molho, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 2, ingrediente: $this->mussarela, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 3, ingrediente: $this->calabresa, removivel: true, substituivel: true),
-                ],
-                ingredientesSubstitutos: [$this->cebola, $this->milho],
-                adicionais: [
-                    new IngredienteAdicional(id: 1, ingrediente: $this->bacon, preco: new Dinheiro(500)),
-                ],
-                precosPorTamanho: [
-                    new PrecoPorTamanho(id: 1, tamanhoPizza: TamanhoPizza::PEQUENA, preco: new Dinheiro(2200)),
-                    new PrecoPorTamanho(id: 2, tamanhoPizza: TamanhoPizza::MEDIA, preco: new Dinheiro(3200)),
-                    new PrecoPorTamanho(id: 3, tamanhoPizza: TamanhoPizza::GRANDE, preco: new Dinheiro(4200)),
-                ],
-            ),
+            pizza: PizzaFactory::calabresa(),
             ingredientesEscolhidos: [
-                new IngredienteEscolhido(
-                    id: 1,
-                    ingrediente: $this->molho,
-                    papel: PapelIngrediente::PADRAO,
-                    custoAdicional: Dinheiro::zero(),
-                ),
-                new IngredienteEscolhido(
-                    id: 2,
-                    ingrediente: $this->mussarela,
-                    papel: PapelIngrediente::PADRAO,
-                    custoAdicional: Dinheiro::zero(),
-                ),
+                IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+                IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
             ],
         );
 
@@ -247,76 +135,18 @@ describe('ItemPizza', function () {
     describe('calcularPrecoTotal()', function () {
 
         beforeAll(function () {
-            $this->pizzaPortuguesa = new Pizza(
-                id: 1,
-                nome: 'Portuguesa',
-                descricao: 'Descrição',
-                ingredientesPadrao: [
-                    new IngredientePadrao(id: 1, ingrediente: $this->molho, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 2, ingrediente: $this->mussarela, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 3, ingrediente: $this->presunto, removivel: true, substituivel: true),
-                    new IngredientePadrao(id: 4, ingrediente: $this->azeitona, removivel: true, substituivel: true),
-                ],
-                ingredientesSubstitutos: [$this->cebola, $this->milho],
-                adicionais: [
-                    new IngredienteAdicional(id: 1, ingrediente: $this->bacon, preco: new Dinheiro(899)),
-                ],
-                precosPorTamanho: [
-                    new PrecoPorTamanho(id: 1, tamanhoPizza: TamanhoPizza::PEQUENA, preco: new Dinheiro(2990)),
-                    new PrecoPorTamanho(id: 2, tamanhoPizza: TamanhoPizza::MEDIA, preco: new Dinheiro(3990)),
-                ],
-            );
+            $this->pizzaPortuguesa = PizzaFactory::portuguesa();
 
-            $this->pizzaQuatroQueijos = new Pizza(
-                id: 2,
-                nome: 'Quatro Queijos',
-                descricao: 'Descrição',
-                ingredientesPadrao: [
-                    new IngredientePadrao(id: 1, ingrediente: $this->molho, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 2, ingrediente: $this->mussarela, removivel: false, substituivel: false),
-                    new IngredientePadrao(id: 3, ingrediente: $this->catupiry, removivel: true, substituivel: true),
-                    new IngredientePadrao(id: 4, ingrediente: $this->manjericao, removivel: true, substituivel: true),
-                ],
-                ingredientesSubstitutos: [$this->cebola, $this->milho],
-                adicionais: [
-                    new IngredienteAdicional(id: 1, ingrediente: $this->bacon, preco: new Dinheiro(899)),
-                    new IngredienteAdicional(id: 2, ingrediente: $this->calabresa, preco: new Dinheiro(1099)),
-                ],
-                precosPorTamanho: [
-                    new PrecoPorTamanho(id: 1, tamanhoPizza: TamanhoPizza::PEQUENA, preco: new Dinheiro(2599)),
-                    new PrecoPorTamanho(id: 2, tamanhoPizza: TamanhoPizza::MEDIA, preco: new Dinheiro(3599)),
-                    new PrecoPorTamanho(id: 3, tamanhoPizza: TamanhoPizza::GRANDE, preco: new Dinheiro(4590)),
-                ],
-            );
+            $this->pizzaQuatroQueijos = PizzaFactory::quatroQueijos();
 
             $this->saborEscolhidoPortuguesa = new SaborEscolhido(
                 id: 1,
                 pizza: $this->pizzaPortuguesa,
                 ingredientesEscolhidos: [
-                    new IngredienteEscolhido(
-                        id: 1,
-                        ingrediente: $this->molho,
-                        papel: PapelIngrediente::PADRAO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 2,
-                        ingrediente: $this->mussarela,
-                        papel: PapelIngrediente::PADRAO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 1,
-                        ingrediente: $this->milho,
-                        papel: PapelIngrediente::SUBSTITUTO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 1,
-                        ingrediente: $this->bacon,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(899),
-                    ),
+                    IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+                    IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
+                    IngredienteEscolhidoFactory::substituto(1, IngredienteFactory::milho()),
+                    IngredienteEscolhidoFactory::adicional(1, IngredienteFactory::bacon(), 899),
                 ],
             );
 
@@ -324,42 +154,11 @@ describe('ItemPizza', function () {
                 id: 2,
                 pizza: $this->pizzaQuatroQueijos,
                 ingredientesEscolhidos: [
-                    new IngredienteEscolhido(
-                        id: 1,
-                        ingrediente: $this->molho,
-                        papel: PapelIngrediente::PADRAO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 2,
-                        ingrediente: $this->mussarela,
-                        papel: PapelIngrediente::PADRAO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 4,
-                        ingrediente: $this->manjericao,
-                        papel: PapelIngrediente::PADRAO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 1,
-                        ingrediente: $this->bacon,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(899),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 2,
-                        ingrediente: $this->calabresa,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(1099),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 2,
-                        ingrediente: $this->calabresa,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(1099),
-                    ),
+                    IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+                    IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
+                    IngredienteEscolhidoFactory::adicional(3, IngredienteFactory::bacon(), 899),
+                    IngredienteEscolhidoFactory::adicional(4, IngredienteFactory::calabresa(), 799),
+                    IngredienteEscolhidoFactory::adicional(5, IngredienteFactory::calabresa(), 799),
                 ],
             );
 
@@ -367,30 +166,10 @@ describe('ItemPizza', function () {
                 id: 1,
                 pizza: $this->pizzaPortuguesa,
                 ingredientesEscolhidos: [
-                    new IngredienteEscolhido(
-                        id: 1,
-                        ingrediente: $this->molho,
-                        papel: PapelIngrediente::PADRAO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 2,
-                        ingrediente: $this->mussarela,
-                        papel: PapelIngrediente::PADRAO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 1,
-                        ingrediente: $this->milho,
-                        papel: PapelIngrediente::SUBSTITUTO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 1,
-                        ingrediente: $this->bacon,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(450),
-                    ),
+                    IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+                    IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
+                    IngredienteEscolhidoFactory::substituto(3, IngredienteFactory::milho()),
+                    IngredienteEscolhidoFactory::adicional(4, IngredienteFactory::bacon(), 450),
                 ],
             );
 
@@ -398,42 +177,11 @@ describe('ItemPizza', function () {
                 id: 2,
                 pizza: $this->pizzaQuatroQueijos,
                 ingredientesEscolhidos: [
-                    new IngredienteEscolhido(
-                        id: 1,
-                        ingrediente: $this->molho,
-                        papel: PapelIngrediente::PADRAO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 2,
-                        ingrediente: $this->mussarela,
-                        papel: PapelIngrediente::PADRAO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 4,
-                        ingrediente: $this->manjericao,
-                        papel: PapelIngrediente::PADRAO,
-                        custoAdicional: Dinheiro::zero(),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 1,
-                        ingrediente: $this->bacon,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(450),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 2,
-                        ingrediente: $this->calabresa,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(550),
-                    ),
-                    new IngredienteEscolhido(
-                        id: 2,
-                        ingrediente: $this->calabresa,
-                        papel: PapelIngrediente::ADICIONAL,
-                        custoAdicional: new Dinheiro(550),
-                    ),
+                    IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+                    IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
+                    IngredienteEscolhidoFactory::adicional(1, IngredienteFactory::bacon(), 450),
+                    IngredienteEscolhidoFactory::adicional(2, IngredienteFactory::calabresa(), 400),
+                    IngredienteEscolhidoFactory::adicional(2, IngredienteFactory::calabresa(), 400),
                 ],
             );
         });
@@ -446,7 +194,7 @@ describe('ItemPizza', function () {
                 saboresEscolhidos: [$this->saborEscolhidoQuatroQueijos],
             );
 
-            expect($itemPizza->calcularPrecoTotal()->centavos)->toBe(6696);
+            expect($itemPizza->calcularPrecoTotal()->centavos)->toBe(6096);
         });
 
         it('calcula o preço total corretamente (1 sabor + 2 quantidades)', function () {
@@ -457,7 +205,7 @@ describe('ItemPizza', function () {
                 saboresEscolhidos: [$this->saborEscolhidoQuatroQueijos],
             );
 
-            expect($itemPizza->calcularPrecoTotal()->centavos)->toBe(13392);
+            expect($itemPizza->calcularPrecoTotal()->centavos)->toBe(12192);
         });
 
         it('calcula o preço total corretamente (2 sabores + 1 quantidade)', function () {
@@ -468,7 +216,7 @@ describe('ItemPizza', function () {
                 saboresEscolhidos: [$this->saborEscolhidoPortuguesaMeiaPizza, $this->saborEscolhidoQuatroQueijosMeiaPizza],
             );
 
-            expect($itemPizza->calcularPrecoTotal()->centavos)->toBe(5795);
+            expect($itemPizza->calcularPrecoTotal()->centavos)->toBe(5495);
         });
 
         it('calcula o preço total corretamente (2 sabores + 2 quantidades)', function () {
@@ -479,7 +227,7 @@ describe('ItemPizza', function () {
                 saboresEscolhidos: [$this->saborEscolhidoPortuguesaMeiaPizza, $this->saborEscolhidoQuatroQueijosMeiaPizza],
             );
 
-            expect($itemPizza->calcularPrecoTotal()->centavos)->toBe(11590);
+            expect($itemPizza->calcularPrecoTotal()->centavos)->toBe(10990);
         });
     });
 

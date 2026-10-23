@@ -4,7 +4,7 @@ describe('IngredienteEscolhido', function () {
 
     describe('validar()', function () {
 
-        $this->ingrediente = new Ingrediente(1, 'Queijo');
+        $this->ingrediente = IngredienteFactory::mussarela();
 
         it('lança exceção quando o identificador é menor que o mínimo permitido', function () {
             expect(function () {

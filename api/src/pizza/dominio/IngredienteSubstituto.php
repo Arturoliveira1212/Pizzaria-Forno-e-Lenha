@@ -7,6 +7,6 @@ class IngredienteSubstituto {
     public function __construct(
         public readonly int $id,
         public readonly Ingrediente $ingrediente,
-        public readonly array $quantidadesPorTamanho = [],
+        public readonly array $quantidadesPorTamanho,
     ) {}
 }
