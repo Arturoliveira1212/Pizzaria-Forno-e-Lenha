@@ -71,6 +71,7 @@ describe('GeradorBeneficioFidelidade', function () {
 
         $this->pedido = new Pedido(
             id: 1,
+            usuario: UsuarioFactory::atendente(),
             data: new DateTime(),
             tipoAtendimento: TipoAtendimento::RETIRADA,
             status: StatusPedido::EM_PREPARACAO,

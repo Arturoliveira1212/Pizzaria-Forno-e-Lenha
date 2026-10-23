@@ -10,6 +10,7 @@ class Pedido {
      */
     public function __construct(
         public readonly int $id,
+        public readonly Usuario $usuario,
         public readonly DateTime $data,
         public readonly TipoAtendimento $tipoAtendimento,
         public readonly ?Cliente $cliente,

@@ -72,6 +72,7 @@ class GestorPedido {
 
         return new Pedido(
             id: 0,
+            usuario: UsuarioFactory::atendente(), // TODO: Temporário para passar os testes
             data: new DateTime(),
             tipoAtendimento: $tipoAtendimento,
             cliente: $cliente,

@@ -156,6 +156,7 @@ describe('Pedido', function () {
 
                 return new Pedido(
                     id: $id,
+                    usuario: UsuarioFactory::atendente(),
                     data: new DateTime(),
                     tipoAtendimento: TipoAtendimento::BALCAO,
                     cliente: null,
@@ -169,6 +170,7 @@ describe('Pedido', function () {
             expect(function () {
                 return new Pedido(
                     id: Pedido::MENOR_ID_PERMITIDO,
+                    usuario: UsuarioFactory::atendente(),
                     data: new DateTime('+1 day'),
                     tipoAtendimento: TipoAtendimento::BALCAO,
                     cliente: null,
@@ -182,6 +184,7 @@ describe('Pedido', function () {
             expect(function () {
                 return new Pedido(
                     id: Pedido::MENOR_ID_PERMITIDO,
+                    usuario: UsuarioFactory::atendente(),
                     data: new DateTime(),
                     tipoAtendimento: TipoAtendimento::ENTREGA,
                     cliente: null,
@@ -195,6 +198,7 @@ describe('Pedido', function () {
             expect(function () {
                 return new Pedido(
                     id: Pedido::MENOR_ID_PERMITIDO,
+                    usuario: UsuarioFactory::atendente(),
                     data: new DateTime(),
                     tipoAtendimento: TipoAtendimento::BALCAO,
                     cliente: null,
@@ -208,6 +212,7 @@ describe('Pedido', function () {
             expect(function () {
                 return new Pedido(
                     id: Pedido::MENOR_ID_PERMITIDO,
+                    usuario: UsuarioFactory::atendente(),
                     data: new DateTime(),
                     tipoAtendimento: TipoAtendimento::BALCAO,
                     cliente: null,
@@ -222,6 +227,7 @@ describe('Pedido', function () {
             expect(function () {
                 return new Pedido(
                     id: Pedido::MENOR_ID_PERMITIDO,
+                    usuario: UsuarioFactory::atendente(),
                     data: new DateTime(),
                     tipoAtendimento: TipoAtendimento::BALCAO,
                     cliente: null,
@@ -236,6 +242,7 @@ describe('Pedido', function () {
             expect(function () {
                 return new Pedido(
                     id: Pedido::MENOR_ID_PERMITIDO,
+                    usuario: UsuarioFactory::atendente(),
                     data: new DateTime(),
                     tipoAtendimento: TipoAtendimento::BALCAO,
                     cliente: null,
@@ -249,6 +256,7 @@ describe('Pedido', function () {
         it('cria o pedido quando todos os campos são válidos', function () {
             $pedido = new Pedido(
                 id: Pedido::MENOR_ID_PERMITIDO,
+                usuario: UsuarioFactory::atendente(),
                 data: new DateTime(),
                 tipoAtendimento: TipoAtendimento::BALCAO,
                 cliente: null,
@@ -275,6 +283,7 @@ describe('Pedido', function () {
         it('calcula corretamente o valor total do pedido sem descontos', function () {
             $pedido = new Pedido(
                 id: Pedido::MENOR_ID_PERMITIDO,
+                usuario: UsuarioFactory::atendente(),
                 data: new DateTime(),
                 tipoAtendimento: TipoAtendimento::BALCAO,
                 cliente: null,
@@ -288,6 +297,7 @@ describe('Pedido', function () {
         it('calcula corretamente o valor total do pedido com desconto de fidelidade', function () {
             $pedido = new Pedido(
                 id: Pedido::MENOR_ID_PERMITIDO,
+                usuario: UsuarioFactory::atendente(),
                 data: new DateTime(),
                 tipoAtendimento: TipoAtendimento::BALCAO,
                 cliente: $this->cliente,
@@ -302,6 +312,7 @@ describe('Pedido', function () {
         it('calcula corretamente o valor total do pedido com desconto de promoção', function () {
             $pedido = new Pedido(
                 id: Pedido::MENOR_ID_PERMITIDO,
+                usuario: UsuarioFactory::atendente(),
                 data: new DateTime(),
                 tipoAtendimento: TipoAtendimento::BALCAO,
                 cliente: null,
@@ -316,6 +327,7 @@ describe('Pedido', function () {
         it('calcula corretamente o valor total do pedido com desconto de fidelidade e desconto de promoção', function () {
             $pedido = new Pedido(
                 id: Pedido::MENOR_ID_PERMITIDO,
+                usuario: UsuarioFactory::atendente(),
                 data: new DateTime(),
                 tipoAtendimento: TipoAtendimento::BALCAO,
                 cliente: $this->cliente,

@@ -63,6 +63,7 @@ describe('RepositorioPedidoEmBDR', function () {
 
             $this->pedidoSucesso = new Pedido(
                 id: 0,
+                usuario: UsuarioFactory::atendente(),
                 data: new DateTime(),
                 tipoAtendimento: TipoAtendimento::ENTREGA,
                 cliente: $this->cliente,
@@ -96,6 +97,7 @@ describe('RepositorioPedidoEmBDR', function () {
             $this->pedidoErro = new Pedido(
                 id: 0,
                 data: new DateTime('-1 minute'),
+                usuario: UsuarioFactory::atendente(),
                 tipoAtendimento: TipoAtendimento::BALCAO,
                 cliente: null,
                 itensPedido: [
