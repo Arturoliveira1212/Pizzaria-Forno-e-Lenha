@@ -7,9 +7,16 @@ class RepositorioIngredienteEmBDR implements RepositorioIngrediente {
 
     public function obterIngredientePorId(int $idIngrediente): ?Ingrediente {
         try {
-            $sql = 'SELECT ingrediente.id, ingrediente.nome
-                FROM ingrediente
-                    WHERE ingrediente.id = :id';
+            $sql = 'SELECT
+                ingrediente.id,
+                ingrediente.nome,
+                ingrediente.estoque AS valor,
+                unidade_medida.id AS idUnidadeMedida,
+                unidade_medida.descricao,
+                unidade_medida.sigla
+                    FROM ingrediente
+                        INNER JOIN unidade_medida ON unidade_medida.id = ingrediente.idUnidadeMedida
+                            WHERE ingrediente.id = :id';
 
             $resultado = $this->bancoDados->consultar($sql, [
                 'id' => $idIngrediente,
@@ -23,7 +30,7 @@ class RepositorioIngredienteEmBDR implements RepositorioIngrediente {
             return new Ingrediente(
                 id: (int) $linha['id'],
                 nome: $linha['nome'],
-                estoque: new Quantidade(1, UnidadeMedidaFactory::gramas()), // TODO: Temporário apenas para os ajustes dos testes
+                estoque: Quantidade::criar($linha),
             );
         } catch (Throwable $e) {
             throw new RepositorioException('Erro ao obter ingrediente por ID.');

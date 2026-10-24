@@ -21,7 +21,7 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
                     descricao: $linha['descricao'],
                     tipo: TipoProdutoSimples::from($linha['tipo']),
                     preco: new Dinheiro((int) $linha['preco']),
-                    estoque: new Quantidade(1, UnidadeMedidaFactory::gramas()), // TODO: Temporário apenas para os ajustes dos testes
+                    estoque: Quantidade::criar($linha),
                 );
             }
 
@@ -42,9 +42,14 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
                 produto_simples.nome,
                 produto_simples.descricao,
                 produto_simples.tipo,
-                produto_simples.preco
+                produto_simples.preco,
+                produto_simples.estoque AS valor,
+                produto_simples.idUnidadeMedida AS idUnidadeMedida,
+                unidade_medida.descricao,
+                unidade_medida.sigla
                     FROM produto_simples
-                        WHERE produto_simples.id = :id';
+                        INNER JOIN unidade_medida ON unidade_medida.id = produto_simples.idUnidadeMedida
+                            WHERE produto_simples.id = :id';
 
             $resultado = $this->bancoDados->consultar($sql, [
                 'id' => $idProduto,
@@ -61,7 +66,7 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
                 descricao: $linha['descricao'],
                 tipo: TipoProdutoSimples::from($linha['tipo']),
                 preco: new Dinheiro((int) $linha['preco']),
-                estoque: new Quantidade(1, UnidadeMedidaFactory::gramas()), // TODO: Temporário apenas para os ajustes dos testes
+                estoque: Quantidade::criar($linha),
             );
         } catch (Throwable $e) {
             throw new RepositorioException('Erro ao obter produto por ID.');
@@ -77,9 +82,14 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
             produto_simples.nome,
             produto_simples.descricao,
             produto_simples.tipo,
-            produto_simples.preco
+            produto_simples.preco,
+            produto_simples.estoque AS valor,
+            produto_simples.idUnidadeMedida AS idUnidadeMedida,
+            unidade_medida.descricao,
+            unidade_medida.sigla
                 FROM produto_simples
-                    WHERE 1=1';
+                    INNER JOIN unidade_medida ON unidade_medida.id = produto_simples.idUnidadeMedida
+                        WHERE 1=1';
 
         if ($filtro->identificador !== '') {
             $query .= ' AND (produto_simples.nome LIKE :nome OR produto_simples.id = :id)';
