@@ -49,7 +49,9 @@ describe('ItemSimples', function () {
 
     describe('calcularPrecoTotal()', function () {
 
-        $this->produtoSimples = ProdutoSimplesFactory::sucoLaranja();
+        beforeAll(function () {
+            $this->produtoSimples = ProdutoSimplesFactory::sucoLaranja();
+        });
 
         it('calcula o preço total corretamente (1 quantidade)', function () {
             $itemSimples = new ItemSimples(
@@ -69,6 +71,45 @@ describe('ItemSimples', function () {
             );
 
             expect($itemSimples->calcularPrecoTotal()->centavos)->toBe(2994);
+        });
+    });
+
+    describe('obterQuantidadeSolicitada()', function () {
+
+        it('retorna a quantidade solicitada corretamente', function () {
+            $produtoSimples = ProdutoSimplesFactory::cocaCola();
+            $quantidade = 5;
+
+            $itemSimples = new ItemSimples(
+                id: ItemPedido::MENOR_ID_PERMITIDO,
+                quantidade: $quantidade,
+                produtoSimples: ProdutoSimplesFactory::cocaCola(),
+            );
+
+            $quantidadeSolicitada = $itemSimples->obterQuantidadeSolicitada();
+
+            expect($quantidadeSolicitada->valor)->toBe($quantidade);
+            expect($quantidadeSolicitada->unidadeMedida->id)->toBe($produtoSimples->estoque->unidadeMedida->id);
+        });
+    });
+
+    describe('copiarComQuantidade()', function () {
+
+        it('cria uma cópia do item simples com a nova quantidade', function () {
+            $quantidadeOriginal = 2;
+            $novaQuantidade = 4;
+
+            $itemSimplesOriginal = new ItemSimples(
+                id: ItemPedido::MENOR_ID_PERMITIDO,
+                quantidade: $quantidadeOriginal,
+                produtoSimples: ProdutoSimplesFactory::cocaCola(),
+            );
+
+            $itemSimplesCopia = $itemSimplesOriginal->copiarComQuantidade($novaQuantidade);
+
+            expect($itemSimplesCopia->id)->toBe($itemSimplesOriginal->id);
+            expect($itemSimplesCopia->quantidade)->toBe($novaQuantidade);
+            expect($itemSimplesCopia->produtoSimples)->toBe($itemSimplesOriginal->produtoSimples);
         });
     });
 });

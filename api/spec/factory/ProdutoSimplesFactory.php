@@ -12,36 +12,36 @@ class ProdutoSimplesFactory {
         );
     }
 
-    public static function sorvete(): ProdutoSimples {
+    public static function sorvete(int $estoque = 1): ProdutoSimples {
         return new ProdutoSimples(
             id: 2,
             nome: 'Sorvete',
             descricao: 'Sorvete de chocolate',
             tipo: TipoProdutoSimples::SOBREMESA,
             preco: new Dinheiro(799),
-            estoque: new QuantidadeMedida(350, UnidadeMedidaFactory::gramas()),
+            estoque: new QuantidadeMedida($estoque, UnidadeMedidaFactory::gramas()),
         );
     }
 
-    public static function sucoLaranja(): ProdutoSimples {
+    public static function sucoLaranja(int $estoque = 1): ProdutoSimples {
         return new ProdutoSimples(
             id: 3,
             nome: 'Suco de Laranja',
             descricao: 'Suco natural de laranja',
             tipo: TipoProdutoSimples::BEBIDA,
             preco: new Dinheiro(998),
-            estoque: new QuantidadeMedida(1, UnidadeMedidaFactory::litros()),
+            estoque: new QuantidadeMedida($estoque, UnidadeMedidaFactory::litros()),
         );
     }
 
-    public static function inexistente(): ProdutoSimples {
+    public static function inexistente(int $estoque = 1): ProdutoSimples {
         return new ProdutoSimples(
             id: 9999999999999,
             nome: 'Produto Inexistente',
             descricao: 'Produto que não existe no banco de dados',
             tipo: TipoProdutoSimples::BEBIDA,
             preco: new Dinheiro(1000),
-            estoque: new QuantidadeMedida(10, UnidadeMedidaFactory::litros()),
+            estoque: new QuantidadeMedida($estoque, UnidadeMedidaFactory::litros()),
         );
     }
 }

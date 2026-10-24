@@ -14,7 +14,6 @@ $gestorPedido = new GestorPedido(
     new RepositorioConfiguracaoFidelidadeEmBDR($bancoDados),
 );
 
-
 $app->get('/pedidos', function (HttpRequest $request, HttpResponse $response) use ($gestorPedido) {
     try {
         $identificador = trim($request->queries()['identificador'] ?? '');
@@ -67,9 +66,10 @@ $app->post('/pedidos/valores', function (HttpRequest $request, HttpResponse $res
         $response->status(200)->json(['message' => 'Resumo dos descontos obtido com sucesso.', 'data' => [
             'resumoValores' => $resumoValores,
         ]]);
-    } catch (DominioException $e) {
+    } catch (RegistroPedidoException $e) {
         $response->status(400)->json(['message' => 'Erro ao validar pedido.', 'data' => [
-            'erros' => $e->erros(),
+            'erros' => $e->erros,
+            'itensPedidoAtualizados' => $e->itensPedidoAtualizados,
         ]]);
     } catch (Throwable $e) {
         $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
@@ -82,9 +82,10 @@ $app->post('/pedidos', function (HttpRequest $request, HttpResponse $response) u
         $gestorPedido->registrarPedido($pedidoParaCadastro);
 
         $response->status(201)->json(['message' => 'Pedido registrado com sucesso.']);
-    } catch (DominioException $e) {
+    } catch (RegistroPedidoException $e) {
         $response->status(400)->json(['message' => 'Erro ao registrar pedido.', 'data' => [
-            'erros' => $e->erros(),
+            'erros' => $e->erros,
+            'itensPedidoAtualizados' => $e->itensPedidoAtualizados,
         ]]);
     } catch (Throwable $e) {
         $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);

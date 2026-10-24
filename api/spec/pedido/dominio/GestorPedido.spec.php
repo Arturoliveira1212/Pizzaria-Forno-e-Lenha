@@ -2,6 +2,16 @@
 
 use Kahlan\Plugin\Double;
 
+function capturarExcecao(callable $operacao): ?Throwable {
+    try {
+        $operacao();
+    } catch (Throwable $e) {
+        return $e;
+    }
+
+    return null;
+}
+
 describe('GestorPedido', function () {
 
     beforeEach(function () {
@@ -39,8 +49,6 @@ describe('GestorPedido', function () {
             ingredientesSubstitutos: [],
         );
 
-        $this->produtoSimples = ProdutoSimplesFactory::cocaCola();
-
         $this->queijo = IngredienteFactory::mussarela();
 
         $this->promocao = new Promocao(
@@ -74,8 +82,9 @@ describe('GestorPedido', function () {
 
             it('lança exceção quando o tipo atendimento é inválido', function () {
                 $tipoQueNaoExiste = 'tipo_que_nao_existe';
-                expect(function () use ($tipoQueNaoExiste) {
 
+                /** @var RegistroPedidoException $e */
+                $e = capturarExcecao(function () use ($tipoQueNaoExiste) {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
                             tipoAtendimento: $tipoQueNaoExiste,
@@ -83,7 +92,10 @@ describe('GestorPedido', function () {
                             itensPedido: [],
                         ),
                     );
-                })->toThrow(new DominioException("Tipo de atendimento inválido: {$tipoQueNaoExiste}."));
+                });
+
+                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
+                expect($e->erros)->toBe(["Tipo de atendimento inválido: {$tipoQueNaoExiste}."]);
             });
         });
 
@@ -91,8 +103,9 @@ describe('GestorPedido', function () {
 
             it('lança exceção quando o tamanho da pizza é inválido', function () {
                 $tamanhoQueNaoExiste = 'tamanho_que_nao_existe';
-                expect(function () use ($tamanhoQueNaoExiste) {
 
+                /** @var RegistroPedidoException $e */
+                $e = capturarExcecao(function () use ($tamanhoQueNaoExiste) {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
                             tipoAtendimento: TipoAtendimento::BALCAO->value,
@@ -111,7 +124,10 @@ describe('GestorPedido', function () {
                             ],
                         ),
                     );
-                })->toThrow(new DominioException("Tamanho de pizza inválido: {$tamanhoQueNaoExiste}."));
+                });
+
+                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
+                expect($e->erros)->toBe(["Tamanho de pizza inválido: {$tamanhoQueNaoExiste}."]);
             });
 
         });
@@ -123,8 +139,8 @@ describe('GestorPedido', function () {
 
                 $idInexistente = 999;
 
-                expect(function () use ($idInexistente) {
-
+                /** @var RegistroPedidoException $e */
+                $e = capturarExcecao(function () use ($idInexistente) {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
                             tipoAtendimento: TipoAtendimento::BALCAO->value,
@@ -135,7 +151,7 @@ describe('GestorPedido', function () {
                                     quantidade: 1,
                                     saboresEscolhidos: [
                                         new SaborEscolhidoParaCadastro(
-                                            idPizza: 999,
+                                            idPizza: $idInexistente,
                                             ingredientesEscolhidos: [],
                                         ),
                                     ],
@@ -143,8 +159,10 @@ describe('GestorPedido', function () {
                             ],
                         ),
                     );
-                })->toThrow(new DominioException("Pizza (ID {$idInexistente}) não encontrada."));
+                });
 
+                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
+                expect($e->erros)->toBe(["Pizza (ID {$idInexistente}) não encontrada."]);
             });
 
         });
@@ -157,7 +175,8 @@ describe('GestorPedido', function () {
 
                 $idInexistente = 999;
 
-                expect(function () use ($idInexistente) {
+                /** @var RegistroPedidoException $e */
+                $e = capturarExcecao(function () use ($idInexistente) {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
                             tipoAtendimento: TipoAtendimento::BALCAO->value,
@@ -181,7 +200,10 @@ describe('GestorPedido', function () {
                             ],
                         ),
                     );
-                })->toThrow(new DominioException("Ingrediente (ID {$idInexistente}) não encontrado."));
+                });
+
+                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
+                expect($e->erros)->toBe(["Ingrediente (ID {$idInexistente}) não encontrado."]);
             });
 
             it('lança exceção quando o papel do ingrediente é inválido', function () {
@@ -190,7 +212,8 @@ describe('GestorPedido', function () {
 
                 $papelQueNaoExiste = 'papel_que_nao_existe';
 
-                expect(function () use ($papelQueNaoExiste) {
+                /** @var RegistroPedidoException $e */
+                $e = capturarExcecao(function () use ($papelQueNaoExiste) {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
                             tipoAtendimento: TipoAtendimento::BALCAO->value,
@@ -214,14 +237,18 @@ describe('GestorPedido', function () {
                             ],
                         ),
                     );
-                })->toThrow(new DominioException("Papel do ingrediente inválido: {$papelQueNaoExiste}."));
+                });
+
+                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
+                expect($e->erros)->toBe(["Papel do ingrediente inválido: {$papelQueNaoExiste}."]);
             });
 
             it('lança exceção quando o adicional não é encontrado', function () {
                 allow($this->repositorioPizza)->toReceive('obterPizzaPorId')->andReturn($this->pizza);
                 allow($this->repositorioIngrediente)->toReceive('obterIngredientePorId')->andReturn($this->queijo);
 
-                expect(function () {
+                /** @var RegistroPedidoException $e */
+                $e = capturarExcecao(function () {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
                             tipoAtendimento: TipoAtendimento::BALCAO->value,
@@ -249,7 +276,10 @@ describe('GestorPedido', function () {
                             ],
                         ),
                     );
-                })->toThrow(new DominioException('Ingrediente adicional (ID 2) não encontrado para a pizza (ID 1).'));
+                });
+
+                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
+                expect($e->erros)->toBe(['Ingrediente adicional (ID 2) não encontrado para a pizza (ID 1).']);
             });
 
         });
@@ -261,7 +291,8 @@ describe('GestorPedido', function () {
 
                 $idInexistente = 999;
 
-                expect(function () use ($idInexistente) {
+                /** @var RegistroPedidoException $e */
+                $e = capturarExcecao(function () use ($idInexistente) {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
                             tipoAtendimento: TipoAtendimento::BALCAO->value,
@@ -274,7 +305,129 @@ describe('GestorPedido', function () {
                             ],
                         ),
                     );
-                })->toThrow(new DominioException("Produto simples (ID {$idInexistente}) não encontrado."));
+                });
+
+                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
+                expect($e->erros)->toBe(["Produto simples (ID {$idInexistente}) não encontrado."]);
+            });
+
+            it('lança exceção quando o produto simples está sem estoque', function () {
+                $produtoSimplesSemEstoque = ProdutoSimplesFactory::cocaCola(0);
+                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->andReturn($produtoSimplesSemEstoque);
+
+                /** @var RegistroPedidoException $e */
+                $e = capturarExcecao(function () {
+                    $this->gestorPedido->registrarPedido(
+                        new PedidoParaCadastro(
+                            tipoAtendimento: TipoAtendimento::BALCAO->value,
+                            idCliente: 1,
+                            itensPedido: [
+                                new ItemSimplesParaCadastro(
+                                    idProduto: 1,
+                                    quantidade: 1,
+                                ),
+                            ],
+                        ),
+                    );
+                });
+
+                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
+                expect($e->erros)->toBe(['Produto simples (ID 1) está sem estoque.']);
+            });
+
+            it('lança exceção quando a quantidade do produto simples é maior que o estoque disponível (1 item simples)', function () {
+                $produtoSimplesComEstoque = ProdutoSimplesFactory::cocaCola(2);
+                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->andReturn($produtoSimplesComEstoque);
+
+                /** @var RegistroPedidoException $e */
+                $e = capturarExcecao(function () {
+                    $this->gestorPedido->registrarPedido(
+                        new PedidoParaCadastro(
+                            tipoAtendimento: TipoAtendimento::BALCAO->value,
+                            idCliente: 1,
+                            itensPedido: [
+                                new ItemSimplesParaCadastro(
+                                    idProduto: 1,
+                                    quantidade: 3,
+                                ),
+                            ],
+                        ),
+                    );
+                });
+
+                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
+                expect($e->erros)->toBe(['Produto simples (ID 1) não possui estoque suficiente. Quantidade ajustada para 2.']);
+                expect($e->itensPedidoAtualizados)->toHaveLength(1);
+                expect($e->itensPedidoAtualizados[0]->quantidade)->toBe(2);
+            });
+
+            it('lança exceção quando a quantidade do produto simples é maior que o estoque disponível (2 itens simples)', function () {
+                $produto1 = ProdutoSimplesFactory::cocaCola(2);
+                $produto12 = ProdutoSimplesFactory::sucoLaranja(12);
+
+                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->with(1)->andReturn($produto1);
+                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->with(3)->andReturn($produto12);
+
+                /** @var RegistroPedidoException $e */
+                $e = capturarExcecao(function () {
+                    $this->gestorPedido->registrarPedido(
+                        new PedidoParaCadastro(
+                            tipoAtendimento: TipoAtendimento::BALCAO->value,
+                            idCliente: 1,
+                            itensPedido: [
+                                new ItemSimplesParaCadastro(
+                                    idProduto: 1,
+                                    quantidade: 3,
+                                ),
+                                new ItemSimplesParaCadastro(
+                                    idProduto: 3,
+                                    quantidade: 4,
+                                ),
+                            ],
+                        ),
+                    );
+                });
+
+                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
+                expect($e->erros)->toBe(['Produto simples (ID 1) não possui estoque suficiente. Quantidade ajustada para 2.']);
+                expect($e->itensPedidoAtualizados)->toHaveLength(2);
+                expect($e->itensPedidoAtualizados[0]->quantidade)->toBe(2);
+                expect($e->itensPedidoAtualizados[1]->quantidade)->toBe(4);
+            });
+
+            it('lança exceção e retorna o array de itens pedido vazio quando todos os itens simples estão sem estoque', function () {
+                $produto1 = ProdutoSimplesFactory::cocaCola(0);
+                $produto2 = ProdutoSimplesFactory::sucoLaranja(0);
+
+                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->with(1)->andReturn($produto1);
+                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->with(3)->andReturn($produto2);
+
+                /** @var RegistroPedidoException $e */
+                $e = capturarExcecao(function () {
+                    $this->gestorPedido->registrarPedido(
+                        new PedidoParaCadastro(
+                            tipoAtendimento: TipoAtendimento::BALCAO->value,
+                            idCliente: 1,
+                            itensPedido: [
+                                new ItemSimplesParaCadastro(
+                                    idProduto: 1,
+                                    quantidade: 3,
+                                ),
+                                new ItemSimplesParaCadastro(
+                                    idProduto: 3,
+                                    quantidade: 4,
+                                ),
+                            ],
+                        ),
+                    );
+                });
+
+                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
+                expect($e->erros)->toBe([
+                    'Produto simples (ID 1) está sem estoque.',
+                    'Produto simples (ID 3) está sem estoque.',
+                ]);
+                expect($e->itensPedidoAtualizados)->toHaveLength(0);
             });
 
         });
@@ -552,7 +705,7 @@ describe('GestorPedido', function () {
                     ),
                 );
                 allow($this->repositorioPromocao)->toReceive('obterPromocoes')->andReturn([]);
-                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->andReturn($this->produtoSimples);
+                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->andReturn(ProdutoSimplesFactory::cocaCola(20));
                 allow($this->repositorioPizza)->toReceive('obterPizzaPorId')->andReturn($this->pizza);
 
                 $pedido = $this->gestorPedido->registrarPedido(

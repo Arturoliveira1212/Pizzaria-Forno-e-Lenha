@@ -47,79 +47,108 @@ class GestorPedido {
     }
 
     private function criarPedido(PedidoParaCadastro $pedidoParaCadastro): Pedido {
-        $tipoAtendimento = TipoAtendimento::tryFrom($pedidoParaCadastro->tipoAtendimento);
-        if ($tipoAtendimento === null) {
-            throw new DominioException("Tipo de atendimento inválido: {$pedidoParaCadastro->tipoAtendimento}.");
-        }
+        $itensPedido = [];
 
-        [$itensPizzaParaCadastro, $itensSimplesParaCadastro] = $pedidoParaCadastro->obterItensPorTipo();
-        $itensPìzza = $this->criarItensPizza($itensPizzaParaCadastro);
-        $itensSimples = $this->criarItensSimples($itensSimplesParaCadastro);
+        try {
+            $tipoAtendimento = TipoAtendimento::tryFrom($pedidoParaCadastro->tipoAtendimento);
+            if ($tipoAtendimento === null) {
+                throw DominioException::criarException("Tipo de atendimento inválido: {$pedidoParaCadastro->tipoAtendimento}.");
+            }
 
-        $itensPedido = [...$itensPìzza, ...$itensSimples];
+            $erros = [];
+            $itensPedido = $this->criarItensPedido(itensPedidoParaCadastro: $pedidoParaCadastro->itensPedido, erros: $erros);
+            if (!empty($erros)) {
+                throw DominioException::criarException(...$erros);
+            }
 
-        $descontosPromocao = $this->criarDescontosPromocao($itensPìzza);
+            $descontosPromocao = $this->criarDescontosPromocao($itensPedido);
 
-        $descontoFidelidade = null;
-        $cliente = $this->repositorioCliente->obterClientePorId($pedidoParaCadastro->idCliente);
-        if ($cliente instanceof Cliente && $cliente->temBeneficioFidelidadeValidoParaUso()) {
-            $descontoFidelidade = $this->criarDescontoFidelidade(
-                beneficioFidelidade: $cliente->beneficioFidelidade,
+            $descontoFidelidade = null;
+            $cliente = $this->repositorioCliente->obterClientePorId($pedidoParaCadastro->idCliente);
+            if ($cliente instanceof Cliente && $cliente->temBeneficioFidelidadeValidoParaUso()) {
+                $descontoFidelidade = $this->criarDescontoFidelidade(
+                    beneficioFidelidade: $cliente->beneficioFidelidade,
+                    itensPedido: $itensPedido,
+                    descontosPromocao: $descontosPromocao,
+                );
+            }
+
+            return new Pedido(
+                id: 0,
+                usuario: UsuarioFactory::atendente(), // TODO: Temporário para passar os testes
+                data: new DateTime(),
+                tipoAtendimento: $tipoAtendimento,
+                cliente: $cliente,
                 itensPedido: $itensPedido,
+                status: StatusPedido::inicial(),
                 descontosPromocao: $descontosPromocao,
+                descontoFidelidade: $descontoFidelidade,
+            );
+        } catch (DominioException $e) {
+            throw new RegistroPedidoException(
+                erros: $e->erros(),
+                itensPedidoAtualizados: $itensPedido,
             );
         }
-
-        return new Pedido(
-            id: 0,
-            usuario: UsuarioFactory::atendente(), // TODO: Temporário para passar os testes
-            data: new DateTime(),
-            tipoAtendimento: $tipoAtendimento,
-            cliente: $cliente,
-            itensPedido: $itensPedido,
-            status: StatusPedido::inicial(),
-            descontosPromocao: $descontosPromocao,
-            descontoFidelidade: $descontoFidelidade,
-        );
     }
 
     /**
-     * @param ItemPizzaParaCadastro[] $itensPizzaParaCadastro
-     * @return ItemPizza[]
+     * @param ItemPizzaParaCadastro[]|ItemSimplesParaCadastro[] $itensPedidoParaCadastro
+     * @return ItemPedido[]
      */
-    private function criarItensPizza(array $itensPizzaParaCadastro): array {
-        $erros = [];
-        $itensPìzza = [];
+    private function criarItensPedido(array $itensPedidoParaCadastro, array &$erros): array {
+        $itensPedido = [];
 
-        foreach ($itensPizzaParaCadastro as $itemPizzaParaCadastro) {
-            $tamanhoPizza = TamanhoPizza::tryFrom($itemPizzaParaCadastro->tamanho);
-            if ($tamanhoPizza === null) {
-                $erros[] = "Tamanho de pizza inválido: {$itemPizzaParaCadastro->tamanho}.";
+        foreach ($itensPedidoParaCadastro as $itemPedidoParaCadastro) {
+            if ($itemPedidoParaCadastro instanceof ItemPizzaParaCadastro) {
+                $itemPizza = $this->criarItemPizza($itemPedidoParaCadastro, $erros);
+                if ($itemPizza instanceof ItemPizza) {
+                    $itensPedido[] = $itemPizza;
+                }
+
                 continue;
             }
 
-            $saboresEscolhidos = $this->criarSaboresEscolhidos($itemPizzaParaCadastro->saboresEscolhidos);
-
-            try {
-                $itemPizza = new ItemPizza(
-                    id: 0,
-                    quantidade: $itemPizzaParaCadastro->quantidade,
-                    saboresEscolhidos: $saboresEscolhidos,
-                    tamanhoPizza: $tamanhoPizza,
-                );
-            } catch (DominioException $e) {
-                $erros = [...$erros, ...$e->erros()];
+            if ($itemPedidoParaCadastro instanceof ItemSimplesParaCadastro) {
+                $itemSimples = $this->criarItemSimples($itemPedidoParaCadastro, $erros);
+                if ($itemSimples instanceof ItemSimples) {
+                    $itensPedido[] = $itemSimples;
+                }
                 continue;
             }
-
-            $itensPìzza[] = $itemPizza;
         }
 
-        if (!empty($erros)) {
-            throw DominioException::criarException(...$erros);
+        if (empty($erros) && empty($itensPedido)) {
+            $erros[] = 'O pedido deve conter pelo menos um item.';
         }
 
-        return $itensPìzza;
+        return $itensPedido;
+    }
+
+    private function criarItemPizza(ItemPizzaParaCadastro $itemPizzaParaCadastro, array &$erros): ?ItemPizza {
+        $tamanhoPizza = TamanhoPizza::tryFrom($itemPizzaParaCadastro->tamanho);
+        if ($tamanhoPizza === null) {
+            $erros[] = "Tamanho de pizza inválido: {$itemPizzaParaCadastro->tamanho}.";
+
+            return null;
+        }
+
+        $saboresEscolhidos = $this->criarSaboresEscolhidos($itemPizzaParaCadastro->saboresEscolhidos);
+
+        $itemPizza = null;
+
+        try {
+            $itemPizza = new ItemPizza(
+                id: 0,
+                quantidade: $itemPizzaParaCadastro->quantidade,
+                saboresEscolhidos: $saboresEscolhidos,
+                tamanhoPizza: $tamanhoPizza,
+            );
+        } catch (DominioException $e) {
+            $erros = [...$erros, ...$e->erros()];
+        }
+
+        return $itemPizza;
     }
 
     /**
@@ -220,41 +249,62 @@ class GestorPedido {
         return $ingredientesEscolhidos;
     }
 
-    /**
-     * @param ItemSimplesParaCadastro[] $itensSimplesParaCadastro
-     * @return ItemSimples[]
-     */
-    private function criarItensSimples(array $itensSimplesParaCadastro): array {
-        $erros = [];
-        $itensSimples = [];
+    private function criarItemSimples(ItemSimplesParaCadastro $itemSimplesParaCadastro, array &$erros): ?ItemSimples {
+        $produtoSimples = $this->repositorioProdutoSimples->obterProdutoSimplesPorId($itemSimplesParaCadastro->idProduto);
+        if (!$produtoSimples instanceof ProdutoSimples) {
+            $erros[] = "Produto simples (ID {$itemSimplesParaCadastro->idProduto}) não encontrado.";
 
-        foreach ($itensSimplesParaCadastro as $itemSimplesParaCadastro) {
-            $produtoSimples = $this->repositorioProdutoSimples->obterProdutoSimplesPorId($itemSimplesParaCadastro->idProduto);
-            if (!$produtoSimples instanceof ProdutoSimples) {
-                $erros[] = "Produto simples (ID {$itemSimplesParaCadastro->idProduto}) não encontrado.";
-                continue;
-            }
+            return null;
+        }
 
-            $itensSimples[] = new ItemSimples(
+        $itemSimples = null;
+
+        try {
+            $itemSimples = new ItemSimples(
                 id: 0,
                 quantidade: $itemSimplesParaCadastro->quantidade,
                 produtoSimples: $produtoSimples,
             );
+        } catch (DominioException $e) {
+            $erros = [...$erros, ...$e->erros()];
         }
 
-        if (!empty($erros)) {
-            throw DominioException::criarException(...$erros);
+        $itemSimples = $this->atualizarEstoqueItemSimples(itemSimples: $itemSimples, erros: $erros);
+
+        return $itemSimples;
+    }
+
+    private function atualizarEstoqueItemSimples(ItemSimples $itemSimples, array &$erros): ?ItemSimples {
+        $produtoSimples = $itemSimples->produtoSimples;
+        $idProdutoSimples = $produtoSimples->id;
+
+        $quantidadeSolicitada = $itemSimples->obterQuantidadeSolicitada();
+        if (!$produtoSimples->temEstoqueSuficiente($quantidadeSolicitada)) {
+            $estoqueAtual = $produtoSimples->estoque;
+            if ($estoqueAtual->ehMaiorQueZero()) {
+                $erros[] = "Produto simples (ID {$idProdutoSimples}) não possui estoque suficiente. Quantidade ajustada para {$estoqueAtual->valor}.";
+                $itemSimples = $itemSimples->copiarComQuantidade($estoqueAtual->valor);
+
+                return $itemSimples;
+            }
+
+            $erros[] = "Produto simples (ID {$idProdutoSimples}) está sem estoque.";
+
+            return null;
         }
 
-        return $itensSimples;
+        return $itemSimples;
     }
 
     /**
-     * @param ItemPizza[] $itensPizza
+     * @param ItemPedido[] $itensPedido
      * @return DescontoPromocao[]
      */
-    private function criarDescontosPromocao(array $itensPizza): array {
+    private function criarDescontosPromocao(array $itensPedido): array {
         $promocoesVigentes = $this->repositorioPromocao->obterPromocoes(new FiltroPromocao(apenasVigentes: true));
+        $itensPizza = array_filter($itensPedido, function (ItemPedido $itemPedido) {
+            return $itemPedido instanceof ItemPizza;
+        });
 
         return new CalculadoraDescontoPromocao()->calcularDescontos(itensPizza: $itensPizza, promocoes: $promocoesVigentes);
     }

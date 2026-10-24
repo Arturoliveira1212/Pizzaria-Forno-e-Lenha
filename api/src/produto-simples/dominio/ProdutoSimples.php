@@ -9,4 +9,8 @@ class ProdutoSimples {
         public readonly Dinheiro $preco,
         public readonly QuantidadeMedida $estoque,
     ) {}
+
+    public function temEstoqueSuficiente(QuantidadeMedida $quantidadeSolicitada): bool {
+        return $quantidadeSolicitada->ehMenorOuIgualA($this->estoque);
+    }
 }

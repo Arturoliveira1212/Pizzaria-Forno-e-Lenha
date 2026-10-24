@@ -15,4 +15,18 @@ class ItemSimples extends ItemPedido {
     protected function calcularPrecoUnitario(): Dinheiro {
         return $this->produtoSimples->preco;
     }
+
+    public function obterQuantidadeSolicitada(): QuantidadeMedida {
+        $unidadeMedida = $this->produtoSimples->estoque->unidadeMedida;
+
+        return new QuantidadeMedida($this->quantidade, $unidadeMedida);
+    }
+
+    public function copiarComQuantidade(int $quantidade): ItemSimples {
+        return new self(
+            id: $this->id,
+            quantidade: $quantidade,
+            produtoSimples: $this->produtoSimples,
+        );
+    }
 }
