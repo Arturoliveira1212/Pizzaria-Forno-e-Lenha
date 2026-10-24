@@ -9,17 +9,17 @@ class IngredienteSubstitutoFactory {
                 new QuantidadePorTamanho(
                     id: 1,
                     tamanhoPizza: TamanhoPizza::PEQUENA,
-                    quantidade: new Quantidade(150, UnidadeMedidaFactory::gramas()),
+                    quantidadeMedida: new QuantidadeMedida(150, UnidadeMedidaFactory::gramas()),
                 ),
                 new QuantidadePorTamanho(
                     id: 2,
                     tamanhoPizza: TamanhoPizza::MEDIA,
-                    quantidade: new Quantidade(220, UnidadeMedidaFactory::gramas()),
+                    quantidadeMedida: new QuantidadeMedida(220, UnidadeMedidaFactory::gramas()),
                 ),
                 new QuantidadePorTamanho(
                     id: 3,
                     tamanhoPizza: TamanhoPizza::GRANDE,
-                    quantidade: new Quantidade(300, UnidadeMedidaFactory::gramas()),
+                    quantidadeMedida: new QuantidadeMedida(300, UnidadeMedidaFactory::gramas()),
                 ),
             ],
         );
@@ -33,17 +33,17 @@ class IngredienteSubstitutoFactory {
                 new QuantidadePorTamanho(
                     id: 1,
                     tamanhoPizza: TamanhoPizza::PEQUENA,
-                    quantidade: new Quantidade(150, UnidadeMedidaFactory::gramas()),
+                    quantidadeMedida: new QuantidadeMedida(150, UnidadeMedidaFactory::gramas()),
                 ),
                 new QuantidadePorTamanho(
                     id: 2,
                     tamanhoPizza: TamanhoPizza::MEDIA,
-                    quantidade: new Quantidade(200, UnidadeMedidaFactory::gramas()),
+                    quantidadeMedida: new QuantidadeMedida(200, UnidadeMedidaFactory::gramas()),
                 ),
                 new QuantidadePorTamanho(
                     id: 3,
                     tamanhoPizza: TamanhoPizza::GRANDE,
-                    quantidade: new Quantidade(300, UnidadeMedidaFactory::gramas()),
+                    quantidadeMedida: new QuantidadeMedida(300, UnidadeMedidaFactory::gramas()),
                 ),
             ],
         );

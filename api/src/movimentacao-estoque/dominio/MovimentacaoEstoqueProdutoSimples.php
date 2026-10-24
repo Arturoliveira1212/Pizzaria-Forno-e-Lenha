@@ -5,7 +5,7 @@ class MovimentacaoEstoqueProdutoSimples extends MovimentacaoEstoque {
         int $id,
         DateTime $data,
         TipoMovimentacaoEstoque $tipoMovimentacaoEstoque,
-        Quantidade $quantidade,
+        QuantidadeMedida $quantidade,
         public readonly ProdutoSimples $produtoSimples,
     ) {
         parent::__construct($id, $data, $tipoMovimentacaoEstoque, $quantidade);

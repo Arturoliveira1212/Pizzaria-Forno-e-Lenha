@@ -69,7 +69,7 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
             descricao: $linha['descricao'],
             tipo: TipoProdutoSimples::from($linha['tipo']),
             preco: new Dinheiro((int) $linha['preco']),
-            estoque: new Quantidade(
+            estoque: new QuantidadeMedida(
                 valor: (int) $linha['estoque'],
                 unidadeMedida: new UnidadeMedida(
                     id: (int) $linha['idUnidadeMedida'],

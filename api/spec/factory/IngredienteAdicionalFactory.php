@@ -6,7 +6,7 @@ class IngredienteAdicionalFactory {
             id: 1,
             ingrediente: IngredienteFactory::bacon(),
             preco: new Dinheiro(899),
-            quantidade: new Quantidade(350, UnidadeMedidaFactory::gramas()),
+            quantidadeMedida: new QuantidadeMedida(350, UnidadeMedidaFactory::gramas()),
         );
     }
 
@@ -15,7 +15,7 @@ class IngredienteAdicionalFactory {
             id: 2,
             ingrediente: IngredienteFactory::calabresa(),
             preco: new Dinheiro(799),
-            quantidade: new Quantidade(250, UnidadeMedidaFactory::gramas()),
+            quantidadeMedida: new QuantidadeMedida(250, UnidadeMedidaFactory::gramas()),
         );
     }
 
@@ -24,7 +24,7 @@ class IngredienteAdicionalFactory {
             id: 3,
             ingrediente: IngredienteFactory::catupiry(),
             preco: new Dinheiro(799),
-            quantidade: new Quantidade(250, UnidadeMedidaFactory::gramas()),
+            quantidadeMedida: new QuantidadeMedida(250, UnidadeMedidaFactory::gramas()),
         );
     }
 }

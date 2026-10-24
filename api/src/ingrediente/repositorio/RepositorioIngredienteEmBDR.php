@@ -30,7 +30,7 @@ class RepositorioIngredienteEmBDR implements RepositorioIngrediente {
             return new Ingrediente(
                 id: (int) $linha['id'],
                 nome: $linha['nome'],
-                estoque: new Quantidade(
+                estoque: new QuantidadeMedida(
                     valor: (int) $linha['estoque'],
                     unidadeMedida: new UnidadeMedida(
                         id: (int) $linha['idUnidadeMedida'],

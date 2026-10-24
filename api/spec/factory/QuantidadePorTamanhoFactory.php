@@ -5,7 +5,7 @@ class QuantidadePorTamanhoFactory {
         return new QuantidadePorTamanho(
             id: 1,
             tamanhoPizza: TamanhoPizza::PEQUENA,
-            quantidade: new Quantidade($quantidade, $unidadeMedida),
+            quantidadeMedida: new QuantidadeMedida($quantidade, $unidadeMedida),
         );
     }
 
@@ -13,7 +13,7 @@ class QuantidadePorTamanhoFactory {
         return new QuantidadePorTamanho(
             id: 2,
             tamanhoPizza: TamanhoPizza::MEDIA,
-            quantidade: new Quantidade($quantidade, $unidadeMedida),
+            quantidadeMedida: new QuantidadeMedida($quantidade, $unidadeMedida),
         );
     }
 
@@ -21,7 +21,7 @@ class QuantidadePorTamanhoFactory {
         return new QuantidadePorTamanho(
             id: 3,
             tamanhoPizza: TamanhoPizza::GRANDE,
-            quantidade: new Quantidade($quantidade, $unidadeMedida),
+            quantidadeMedida: new QuantidadeMedida($quantidade, $unidadeMedida),
         );
     }
 }

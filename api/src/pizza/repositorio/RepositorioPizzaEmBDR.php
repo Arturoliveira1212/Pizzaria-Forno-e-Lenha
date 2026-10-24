@@ -226,7 +226,7 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
             ingrediente: new Ingrediente(
                 id: (int) $linha['idIngrediente'],
                 nome: $linha['nomeIngrediente'],
-                estoque: new Quantidade(
+                estoque: new QuantidadeMedida(
                     valor: (int) $linha['estoque'],
                     unidadeMedida: new UnidadeMedida(
                         id: (int) $linha['idUnidadeMedida'],
@@ -284,7 +284,7 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
             ingrediente: new Ingrediente(
                 id: (int) $linha['idIngrediente'],
                 nome: $linha['nomeIngrediente'],
-                estoque: new Quantidade(
+                estoque: new QuantidadeMedida(
                     valor: (int) $linha['estoque'],
                     unidadeMedida: new UnidadeMedida(
                         id: (int) $linha['idUnidadeMedida'],
@@ -331,7 +331,7 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
         return new QuantidadePorTamanho(
             id: (int) $linha['id'],
             tamanhoPizza: TamanhoPizza::from($linha['tamanho']),
-            quantidade: new Quantidade(
+            quantidadeMedida: new QuantidadeMedida(
                 valor: (int) $linha['quantidade'],
                 unidadeMedida: new UnidadeMedida(
                     id: (int) $linha['idUnidadeMedida'],
@@ -395,7 +395,7 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
             ingrediente: new Ingrediente(
                 id: (int) $linha['idIngrediente'],
                 nome: $linha['nomeIngrediente'],
-                estoque: new Quantidade(
+                estoque: new QuantidadeMedida(
                     valor: (int) $linha['estoque'],
                     unidadeMedida: new UnidadeMedida(
                         id: (int) $linha['idUnidadeMedida'],
@@ -405,7 +405,7 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
                 ),
             ),
             preco: new Dinheiro((int) $linha['preco']),
-            quantidade: new Quantidade(
+            quantidadeMedida: new QuantidadeMedida(
                 valor: (int) $linha['quantidade'],
                 unidadeMedida: new UnidadeMedida(
                     id: (int) $linha['idUnidadeMedida'],

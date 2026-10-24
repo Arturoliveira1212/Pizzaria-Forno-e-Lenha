@@ -5,6 +5,6 @@ abstract class MovimentacaoEstoque {
         public readonly int $id,
         public readonly DateTime $data,
         public readonly TipoMovimentacaoEstoque $tipoMovimentacaoEstoque,
-        public readonly Quantidade $quantidade,
+        public readonly QuantidadeMedida $quantidadeMedida,
     ) {}
 }

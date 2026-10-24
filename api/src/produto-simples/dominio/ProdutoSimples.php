@@ -7,6 +7,6 @@ class ProdutoSimples {
         public readonly string $descricao,
         public readonly TipoProdutoSimples $tipo,
         public readonly Dinheiro $preco,
-        public readonly Quantidade $estoque,
+        public readonly QuantidadeMedida $estoque,
     ) {}
 }

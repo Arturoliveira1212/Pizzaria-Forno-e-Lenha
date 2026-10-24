@@ -5,6 +5,6 @@ class IngredienteAdicional {
         public readonly int $id,
         public readonly Ingrediente $ingrediente,
         public readonly Dinheiro $preco,
-        public readonly Quantidade $quantidade,
+        public readonly QuantidadeMedida $quantidadeMedida,
     ) {}
 }

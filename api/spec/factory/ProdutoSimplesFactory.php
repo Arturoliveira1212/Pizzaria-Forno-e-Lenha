@@ -8,7 +8,7 @@ class ProdutoSimplesFactory {
             descricao: 'Refrigerante de cola',
             tipo: TipoProdutoSimples::BEBIDA,
             preco: new Dinheiro(590),
-            estoque: new Quantidade($estoque, UnidadeMedidaFactory::litros()),
+            estoque: new QuantidadeMedida($estoque, UnidadeMedidaFactory::unidade()),
         );
     }
 
@@ -19,7 +19,7 @@ class ProdutoSimplesFactory {
             descricao: 'Sorvete de chocolate',
             tipo: TipoProdutoSimples::SOBREMESA,
             preco: new Dinheiro(799),
-            estoque: new Quantidade(350, UnidadeMedidaFactory::gramas()),
+            estoque: new QuantidadeMedida(350, UnidadeMedidaFactory::gramas()),
         );
     }
 
@@ -30,7 +30,7 @@ class ProdutoSimplesFactory {
             descricao: 'Suco natural de laranja',
             tipo: TipoProdutoSimples::BEBIDA,
             preco: new Dinheiro(998),
-            estoque: new Quantidade(1, UnidadeMedidaFactory::litros()),
+            estoque: new QuantidadeMedida(1, UnidadeMedidaFactory::litros()),
         );
     }
 
@@ -41,7 +41,7 @@ class ProdutoSimplesFactory {
             descricao: 'Produto que não existe no banco de dados',
             tipo: TipoProdutoSimples::BEBIDA,
             preco: new Dinheiro(1000),
-            estoque: new Quantidade(10, UnidadeMedidaFactory::litros()),
+            estoque: new QuantidadeMedida(10, UnidadeMedidaFactory::litros()),
         );
     }
 }
