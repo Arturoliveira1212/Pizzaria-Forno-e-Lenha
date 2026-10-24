@@ -62,21 +62,6 @@ class Pizza {
         return $idsIngredientesNaoPersonalizaveis;
     }
 
-    /**
-     * @return IngredientePadrao[]
-     */
-    public function obterIngredientesPadraoNaoPersonalizaveis(): array {
-        $ingredientesNaoPersonalizaveis = [];
-
-        foreach ($this->ingredientesPadrao as $ingredientePadrao) {
-            if ($ingredientePadrao->ehFixo()) {
-                $ingredientesNaoPersonalizaveis[] = $ingredientePadrao->ingrediente;
-            }
-        }
-
-        return $ingredientesNaoPersonalizaveis;
-    }
-
     public function obterPrecoPorTamanho(TamanhoPizza $tamanho): ?Dinheiro {
         foreach ($this->precosPorTamanho as $precoPorTamanho) {
             if ($precoPorTamanho->tamanhoPizza === $tamanho) {

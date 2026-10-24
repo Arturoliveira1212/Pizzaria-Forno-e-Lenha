@@ -15,14 +15,7 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
 
             $produtosSimples = [];
             foreach ($resultado as $linha) {
-                $produtosSimples[] = new ProdutoSimples(
-                    id: (int) $linha['id'],
-                    nome: $linha['nome'],
-                    descricao: $linha['descricao'],
-                    tipo: TipoProdutoSimples::from($linha['tipo']),
-                    preco: new Dinheiro((int) $linha['preco']),
-                    estoque: Quantidade::criar($linha),
-                );
+                $produtosSimples[] = $this->criarProdutoSimples($linha);
             }
 
             return $produtosSimples;
@@ -43,7 +36,7 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
                 produto_simples.descricao,
                 produto_simples.tipo,
                 produto_simples.preco,
-                produto_simples.estoque AS valor,
+                produto_simples.estoque,
                 produto_simples.idUnidadeMedida AS idUnidadeMedida,
                 unidade_medida.descricao,
                 unidade_medida.sigla
@@ -60,17 +53,31 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
 
             $linha = $resultado[0];
 
-            return new ProdutoSimples(
-                id: (int) $linha['id'],
-                nome: $linha['nome'],
-                descricao: $linha['descricao'],
-                tipo: TipoProdutoSimples::from($linha['tipo']),
-                preco: new Dinheiro((int) $linha['preco']),
-                estoque: Quantidade::criar($linha),
-            );
+            return $this->criarProdutoSimples($linha);
         } catch (Throwable $e) {
             throw new RepositorioException('Erro ao obter produto por ID.');
         }
+    }
+
+    /**
+     * @param array<string, mixed> $linha
+     */
+    private function criarProdutoSimples(array $linha): ProdutoSimples {
+        return new ProdutoSimples(
+            id: (int) $linha['id'],
+            nome: $linha['nome'],
+            descricao: $linha['descricao'],
+            tipo: TipoProdutoSimples::from($linha['tipo']),
+            preco: new Dinheiro((int) $linha['preco']),
+            estoque: new Quantidade(
+                valor: (int) $linha['estoque'],
+                unidadeMedida: new UnidadeMedida(
+                    id: (int) $linha['idUnidadeMedida'],
+                    descricao: $linha['descricao'],
+                    sigla: $linha['sigla'],
+                ),
+            ),
+        );
     }
 
     /**
@@ -83,7 +90,7 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
             produto_simples.descricao,
             produto_simples.tipo,
             produto_simples.preco,
-            produto_simples.estoque AS valor,
+            produto_simples.estoque,
             produto_simples.idUnidadeMedida AS idUnidadeMedida,
             unidade_medida.descricao,
             unidade_medida.sigla

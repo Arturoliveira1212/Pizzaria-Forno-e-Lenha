@@ -10,7 +10,7 @@ class RepositorioIngredienteEmBDR implements RepositorioIngrediente {
             $sql = 'SELECT
                 ingrediente.id,
                 ingrediente.nome,
-                ingrediente.estoque AS valor,
+                ingrediente.estoque,
                 unidade_medida.id AS idUnidadeMedida,
                 unidade_medida.descricao,
                 unidade_medida.sigla
@@ -30,7 +30,14 @@ class RepositorioIngredienteEmBDR implements RepositorioIngrediente {
             return new Ingrediente(
                 id: (int) $linha['id'],
                 nome: $linha['nome'],
-                estoque: Quantidade::criar($linha),
+                estoque: new Quantidade(
+                    valor: (int) $linha['estoque'],
+                    unidadeMedida: new UnidadeMedida(
+                        id: (int) $linha['idUnidadeMedida'],
+                        descricao: $linha['descricao'],
+                        sigla: $linha['sigla'],
+                    ),
+                ),
             );
         } catch (Throwable $e) {
             throw new RepositorioException('Erro ao obter ingrediente por ID.');
