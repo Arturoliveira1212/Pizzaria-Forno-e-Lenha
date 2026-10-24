@@ -96,6 +96,7 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
 
     private function salvarPedido(Pedido $pedido): int {
         $sql = 'INSERT INTO pedido (
+                idUsuario,
                 data,
                 valorTotal,
                 taxaEntrega,
@@ -103,6 +104,7 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
                 tipoAtendimento,
                 idCliente
             ) VALUES (
+                :idUsuario,
                 :data,
                 :valorTotal,
                 :taxaEntrega,
@@ -112,6 +114,7 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
             )';
 
         $this->bancoDados->executar($sql, [
+            'idUsuario' => $pedido->usuario->id,
             'data' => $pedido->data->format('Y-m-d H:i:s'),
             'valorTotal' => $pedido->calcularValorTotal()->centavos,
             'taxaEntrega' => $pedido->calcularValorEntrega()->centavos,

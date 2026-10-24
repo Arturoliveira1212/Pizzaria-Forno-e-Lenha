@@ -7,14 +7,16 @@ class SemeadorIngredienteAdicional extends AbstractSeed {
         return [
             'SemeadorPizza',
             'SemeadorIngrediente',
+            'SemeadorUnidadeMedida',
         ];
     }
 
     public function run(): void {
         $sql = <<<SQL
-            INSERT INTO ingrediente_adicional (idIngrediente, preco) VALUES
-                (4, 500), (6, 600), (7, 500), (11, 450),
-                (12, 550), (15, 650), (16, 400), (17, 350), (18, 600);
+            INSERT INTO ingrediente_adicional (idIngrediente, preco, quantidade, idUnidadeMedida) VALUES
+                (4, 500, 100, 1), (6, 600, 100, 1), (7, 500, 100, 1),
+                (11, 450, 50, 1), (12, 550, 100, 1), (15, 650, 100, 1),
+                (16, 400, 100, 1), (17, 350, 100, 1), (18, 600, 100, 1);
         SQL;
         $this->execute($sql);
     }
