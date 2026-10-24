@@ -94,6 +94,7 @@ class GestorPedido {
 
     /**
      * @param ItemPizzaParaCadastro[]|ItemSimplesParaCadastro[] $itensPedidoParaCadastro
+     * @param string[] $erros
      * @return ItemPedido[]
      */
     private function criarItensPedido(array $itensPedidoParaCadastro, array &$erros): array {
@@ -101,7 +102,7 @@ class GestorPedido {
 
         foreach ($itensPedidoParaCadastro as $itemPedidoParaCadastro) {
             if ($itemPedidoParaCadastro instanceof ItemPizzaParaCadastro) {
-                $itemPizza = $this->criarItemPizza($itemPedidoParaCadastro, $erros);
+                $itemPizza = $this->criarItemPizza(itemPizzaParaCadastro: $itemPedidoParaCadastro, erros: $erros);
                 if ($itemPizza instanceof ItemPizza) {
                     $itensPedido[] = $itemPizza;
                 }
@@ -109,12 +110,9 @@ class GestorPedido {
                 continue;
             }
 
-            if ($itemPedidoParaCadastro instanceof ItemSimplesParaCadastro) {
-                $itemSimples = $this->criarItemSimples($itemPedidoParaCadastro, $erros);
-                if ($itemSimples instanceof ItemSimples) {
-                    $itensPedido[] = $itemSimples;
-                }
-                continue;
+            $itemSimples = $this->criarItemSimples(itemSimplesParaCadastro: $itemPedidoParaCadastro, erros: $erros);
+            if ($itemSimples instanceof ItemSimples) {
+                $itensPedido[] = $itemSimples;
             }
         }
 
@@ -125,6 +123,9 @@ class GestorPedido {
         return $itensPedido;
     }
 
+    /**
+     * @param string[] $erros
+     */
     private function criarItemPizza(ItemPizzaParaCadastro $itemPizzaParaCadastro, array &$erros): ?ItemPizza {
         $tamanhoPizza = TamanhoPizza::tryFrom($itemPizzaParaCadastro->tamanho);
         if ($tamanhoPizza === null) {
@@ -133,7 +134,10 @@ class GestorPedido {
             return null;
         }
 
-        $saboresEscolhidos = $this->criarSaboresEscolhidos($itemPizzaParaCadastro->saboresEscolhidos);
+        $saboresEscolhidos = $this->criarSaboresEscolhidos(
+            saboresEscolhidosParaCadastro: $itemPizzaParaCadastro->saboresEscolhidos,
+            erros: $erros,
+        );
 
         $itemPizza = null;
 
@@ -153,9 +157,10 @@ class GestorPedido {
 
     /**
      * @param SaborEscolhidoParaCadastro[] $saboresEscolhidosParaCadastro
+     * @param string[] $erros
      * @return SaborEscolhido[]
      */
-    private function criarSaboresEscolhidos(array $saboresEscolhidosParaCadastro): array {
+    private function criarSaboresEscolhidos(array $saboresEscolhidosParaCadastro, array &$erros): array {
         $erros = [];
         $saboresEscolhidos = [];
 
@@ -172,6 +177,7 @@ class GestorPedido {
                 pizza: $pizza,
                 quantidadeSabores: $quantidadeSabores,
                 ingredientesEscolhidosParaCadastro: $saborEscolhidoParaCadastro->ingredientesEscolhidos,
+                erros: $erros,
             );
 
             try {
@@ -188,18 +194,15 @@ class GestorPedido {
             $saboresEscolhidos[] = $saborEscolhido;
         }
 
-        if (!empty($erros)) {
-            throw DominioException::criarException(...$erros);
-        }
-
         return $saboresEscolhidos;
     }
 
     /**
      * @param IngredienteEscolhidoParaCadastro[] $ingredientesEscolhidosParaCadastro
+     * @param string[] $erros
      * @return IngredienteEscolhido[]
      */
-    private function criarIngredientesEscolhidos(Pizza $pizza, int $quantidadeSabores, array $ingredientesEscolhidosParaCadastro): array {
+    private function criarIngredientesEscolhidos(Pizza $pizza, int $quantidadeSabores, array $ingredientesEscolhidosParaCadastro, array &$erros): array {
         $erros = [];
         $ingredientesEscolhidos = [];
 
@@ -242,13 +245,12 @@ class GestorPedido {
             $ingredientesEscolhidos[] = $ingredienteEscolhido;
         }
 
-        if (!empty($erros)) {
-            throw DominioException::criarException(...$erros);
-        }
-
         return $ingredientesEscolhidos;
     }
 
+    /**
+     * @param string[] $erros
+     */
     private function criarItemSimples(ItemSimplesParaCadastro $itemSimplesParaCadastro, array &$erros): ?ItemSimples {
         $produtoSimples = $this->repositorioProdutoSimples->obterProdutoSimplesPorId($itemSimplesParaCadastro->idProduto);
         if (!$produtoSimples instanceof ProdutoSimples) {
@@ -274,6 +276,9 @@ class GestorPedido {
         return $itemSimples;
     }
 
+    /**
+     * @param string[] $erros
+     */
     private function atualizarEstoqueItemSimples(ItemSimples $itemSimples, array &$erros): ?ItemSimples {
         $produtoSimples = $itemSimples->produtoSimples;
         $idProdutoSimples = $produtoSimples->id;
