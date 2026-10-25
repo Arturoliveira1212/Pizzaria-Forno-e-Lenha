@@ -9,7 +9,7 @@ final class CriaTabelaIngredientePadraoQuantidade extends AbstractMigration {
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 idIngredientePadrao INT NOT NULL,
                 tamanho ENUM('PEQUENA', 'MEDIA', 'GRANDE') NOT NULL,
-                quantidade INT NOT NULL,
+                quantidade INT UNSIGNED NOT NULL,
                 idUnidadeMedida INT NOT NULL,
                 UNIQUE KEY uq_ingrediente_padrao_quantidade_tamanho (idIngredientePadrao, tamanho),
                 CONSTRAINT fk_ingrediente_padrao_quantidade_ingrediente_padrao

@@ -7,11 +7,15 @@ final class CriaTabelaMovimentacaoEstoqueIngrediente extends AbstractMigration {
         $sql = <<<'SQL'
             CREATE TABLE movimentacao_estoque_ingrediente (
                 id INT PRIMARY KEY AUTO_INCREMENT,
+                idPedido INT NULL,
                 idIngrediente INT NOT NULL,
                 data DATETIME NOT NULL,
-                tipo ENUM('ENTRADA', 'SAIDA') NOT NULL,
-                quantidade INT NOT NULL,
+                tipoOperacaoEstoque ENUM('ENTRADA', 'SAIDA') NOT NULL,
+                quantidade INT UNSIGNED NOT NULL,
                 idUnidadeMedida INT NOT NULL,
+                CONSTRAINT fk_movimentacao_estoque_ingrediente_pedido
+                    FOREIGN KEY (idPedido) REFERENCES pedido(id)
+                    ON DELETE RESTRICT ON UPDATE CASCADE,
                 CONSTRAINT fk_movimentacao_estoque_ingrediente
                     FOREIGN KEY (idIngrediente) REFERENCES ingrediente(id)
                     ON DELETE RESTRICT ON UPDATE CASCADE,
