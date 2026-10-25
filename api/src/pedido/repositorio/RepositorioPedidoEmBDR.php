@@ -84,17 +84,17 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
         }
     }
 
-    public function registrarPedido(Pedido $pedido): void {
+    public function registrarPedido(Pedido &$pedido): void {
         try {
-            $idPedido = $this->salvarPedido($pedido);
-            $this->salvarItensPedido($idPedido, $pedido);
-            $this->salvarDescontos($idPedido, $pedido);
+            $this->salvarPedido($pedido);
+            $this->salvarItensPedido($pedido);
+            $this->salvarDescontos($pedido);
         } catch (Throwable $e) {
             throw new RepositorioException('Erro ao registrar pedido.');
         }
     }
 
-    private function salvarPedido(Pedido $pedido): int {
+    private function salvarPedido(Pedido &$pedido): void {
         $sql = 'INSERT INTO pedido (
                 idUsuario,
                 data,
@@ -123,10 +123,11 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
             'idCliente' => $pedido->cliente?->id,
         ]);
 
-        return (int) $this->bancoDados->ultimoIdInserido();
+        $ultimoIdInserido = (int) $this->bancoDados->ultimoIdInserido();
+        $pedido = $pedido->copiarComId($ultimoIdInserido);
     }
 
-    private function salvarDescontos(int $idPedido, Pedido $pedido): void {
+    private function salvarDescontos(Pedido $pedido): void {
         foreach ($pedido->descontosPromocao as $desconto) {
             $sql = 'INSERT INTO desconto_promocao (
                     idPedido,
@@ -139,7 +140,7 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
                 )';
 
             $this->bancoDados->executar($sql, [
-                'pedidoId' => $idPedido,
+                'pedidoId' => $pedido->id,
                 'valorDesconto' => $desconto->valorDesconto->centavos,
                 'promocaoId' => $desconto->promocao->id,
             ]);
@@ -157,22 +158,22 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
                 )';
 
             $this->bancoDados->executar($sql, [
-                'pedidoId' => $idPedido,
+                'pedidoId' => $pedido->id,
                 'valorDesconto' => $pedido->descontoFidelidade->valorDesconto->centavos,
                 'beneficioFidelidadeId' => $pedido->descontoFidelidade->beneficioFidelidade->id,
             ]);
         }
     }
 
-    private function salvarItensPedido(int $idPedido, Pedido $pedido): void {
+    private function salvarItensPedido(Pedido $pedido): void {
         foreach ($pedido->itensPedido as $itemPedido) {
             if ($itemPedido instanceof ItemPizza) {
-                $this->salvarItemPizza($idPedido, $itemPedido);
+                $this->salvarItemPizza($pedido->id, $itemPedido);
                 continue;
             }
 
             if ($itemPedido instanceof ItemSimples) {
-                $this->salvarItemSimples($idPedido, $itemPedido);
+                $this->salvarItemSimples($pedido->id, $itemPedido);
             }
         }
     }

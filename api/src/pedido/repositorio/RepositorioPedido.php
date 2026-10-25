@@ -8,5 +8,5 @@ interface RepositorioPedido {
 
     public function alterarStatus(int $idPedido, StatusPedido $novoStatus): void;
 
-    public function registrarPedido(Pedido $pedido): void;
+    public function registrarPedido(Pedido &$pedido): void;
 }

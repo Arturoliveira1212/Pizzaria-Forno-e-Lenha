@@ -102,4 +102,22 @@ class Pedido {
 
         return $valorTotal;
     }
+
+    public function copiarComId(int $novoId): Pedido {
+        return new Pedido(
+            id: $novoId,
+            usuario: $this->usuario,
+            data: $this->data,
+            tipoAtendimento: $this->tipoAtendimento,
+            cliente: $this->cliente,
+            itensPedido: $this->itensPedido,
+            status: $this->status,
+            descontosPromocao: $this->descontosPromocao,
+            descontoFidelidade: $this->descontoFidelidade,
+            entrega: $this->entrega,
+            cancelamento: $this->cancelamento,
+            taxaEntrega: $this->taxaEntrega,
+            movimentacoesEstoque: $this->movimentacoesEstoque,
+        );
+    }
 }
