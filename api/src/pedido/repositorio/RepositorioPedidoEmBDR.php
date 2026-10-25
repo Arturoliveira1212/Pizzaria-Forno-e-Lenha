@@ -5,7 +5,7 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
         private readonly BancoDados $bancoDados,
     ) {}
 
-    public function obterPedidos(?int $idPedido = null): array {
+    public function obterPedidosParaListagem(?int $idPedido = null): array {
         try {
             $parametros = [];
             $sql = 'SELECT

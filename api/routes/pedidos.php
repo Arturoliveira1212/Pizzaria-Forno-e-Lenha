@@ -24,7 +24,7 @@ $app->get('/pedidos', function (HttpRequest $request, HttpResponse $response) us
             throw new DominioException('O identificador do pedido deve ser um número.');
         }
 
-        $pedidos = $gestorPedido->obterPedidos($idPedido);
+        $pedidos = $gestorPedido->obterPedidosParaListagem($idPedido);
 
         $response->status(200)->json(['message' => 'Pedidos obtidos com sucesso.', 'data' => [
             'pedidos' => $pedidos,

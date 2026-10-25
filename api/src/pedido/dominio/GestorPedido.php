@@ -16,8 +16,8 @@ class GestorPedido {
     /**
      * @return PedidoParaListagem[]
      */
-    public function obterPedidos(?int $idPedido = null): array {
-        return $this->repositorioPedido->obterPedidos($idPedido);
+    public function obterPedidosParaListagem(?int $idPedido = null): array {
+        return $this->repositorioPedido->obterPedidosParaListagem($idPedido);
     }
 
     public function alterarStatus(int $idPedido, string $novoStatus): void {

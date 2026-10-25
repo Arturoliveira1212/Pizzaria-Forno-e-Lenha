@@ -4,7 +4,7 @@ interface RepositorioPedido {
     /**
      * @return PedidoParaListagem[]
      */
-    public function obterPedidos(?int $idPedido = null): array;
+    public function obterPedidosParaListagem(?int $idPedido = null): array;
 
     public function alterarStatus(int $idPedido, StatusPedido $novoStatus): void;
 
