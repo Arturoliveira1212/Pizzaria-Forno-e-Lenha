@@ -5,7 +5,7 @@ use Phinx\Migration\AbstractMigration;
 final class AlteraTabelaProdutoSimplesAddEstoque extends AbstractMigration {
     public function up(): void {
         $sql = <<<'SQL'
-            ALTER TABLE produto_simples ADD estoque INT NOT NULL AFTER tipo;
+            ALTER TABLE produto_simples ADD estoque INT UNSIGNED NOT NULL DEFAULT 0 AFTER tipo;
         SQL;
         $this->execute($sql);
     }

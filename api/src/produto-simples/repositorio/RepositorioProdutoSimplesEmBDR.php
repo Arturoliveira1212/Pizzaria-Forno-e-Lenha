@@ -1,6 +1,8 @@
 <?php
 
 class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
+    public const MAXIMO_TENTATIVAS_ATUALIZACAO_ESTOQUE = 3;
+
     public function __construct(
         private readonly BancoDados $bancoDados,
     ) {}
@@ -118,5 +120,57 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
         }
 
         return $query;
+    }
+
+    private function obterVersaoProdutoSimples(int $idProduto): int {
+        try {
+            $sql = 'SELECT versao FROM produto_simples WHERE id = :id';
+            $resultado = $this->bancoDados->consultar($sql, [
+                'id' => $idProduto,
+            ]);
+
+            if (empty($resultado)) {
+                throw new RepositorioException('Produto não encontrado.');
+            }
+
+            return (int) $resultado[0]['versao'];
+        } catch (Throwable $e) {
+            throw new RepositorioException('Erro ao obter a versão do produto.');
+        }
+    }
+
+    public function atualizarEstoqueProdutoSimples(int $idProduto, QuantidadeMedida $quantidade, TipoOperacaoEstoque $tipoOperacaoEstoque): void {
+        try {
+            $versao = $this->obterVersaoProdutoSimples($idProduto);
+            $sinal = $tipoOperacaoEstoque->sinal();
+
+            $linhasAfetadas = 0;
+            $tentativas = 0;
+
+            do {
+                $tentativas++;
+
+                $sql = "UPDATE produto_simples SET
+                    estoque = estoque {$sinal} :quantidade,
+                    versao = :novaVersao
+                        WHERE id = :id
+                        AND versao = :versao";
+
+                $linhasAfetadas = $this->bancoDados->executar($sql, [
+                    'quantidade' => $quantidade->valor,
+                    'id' => $idProduto,
+                    'versao' => $versao,
+                    'novaVersao' => $versao + 1,
+                ]);
+
+                $versao++;
+            } while ($linhasAfetadas < 1 && $tentativas <= self::MAXIMO_TENTATIVAS_ATUALIZACAO_ESTOQUE);
+
+            if ($linhasAfetadas === 0) {
+                throw new RepositorioException('Não foi possível atualizar o estoque do produto. O produto pode ter sido atualizado por outro processo. Tente novamente.');
+            }
+        } catch (Throwable $e) {
+            throw new RepositorioException('Erro ao atualizar o estoque do produto.');
+        }
     }
 }
