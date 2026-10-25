@@ -55,7 +55,7 @@ class RepositorioMovimentacaoEstoqueEmBDR implements RepositorioMovimentacaoEsto
                 'idIngrediente' => $movimentacao->ingrediente->id,
             ]);
         } catch (Throwable $e) {
-            throw new RepositorioException('Erro ao registrar a movimentação de estoque do ingrediente.' . $e->getMessage());
+            throw new RepositorioException('Erro ao registrar a movimentação de estoque do ingrediente.');
         }
     }
 
@@ -82,7 +82,7 @@ class RepositorioMovimentacaoEstoqueEmBDR implements RepositorioMovimentacaoEsto
                 'idProdutoSimples' => $movimentacao->produtoSimples->id,
             ]);
         } catch (Throwable $e) {
-            throw new RepositorioException('Erro ao registrar a movimentação de estoque do produto simples.' . $e->getMessage());
+            throw new RepositorioException('Erro ao registrar a movimentação de estoque do produto simples.');
         }
     }
 }

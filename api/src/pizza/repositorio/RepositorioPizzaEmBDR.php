@@ -99,7 +99,7 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
                 precos: $precos,
             );
         } catch (Throwable $e) {
-            throw new RepositorioException('Erro ao obter pizza por ID.' . $e->getMessage());
+            throw new RepositorioException('Erro ao obter pizza por ID.');
         }
     }
 
