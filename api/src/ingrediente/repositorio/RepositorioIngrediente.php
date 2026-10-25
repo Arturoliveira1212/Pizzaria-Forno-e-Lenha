@@ -3,5 +3,5 @@
 interface RepositorioIngrediente {
     public function obterIngredientePorId(int $idIngrediente): ?Ingrediente;
 
-    public function atualizarEstoqueIngrediente(int $idProduto, QuantidadeMedida $quantidade, TipoOperacaoEstoque $tipoOperacaoEstoque): void;
+    public function atualizarEstoqueIngrediente(int $idIngrediente, QuantidadeMedida $quantidade, TipoOperacaoEstoque $tipoOperacaoEstoque): void;
 }

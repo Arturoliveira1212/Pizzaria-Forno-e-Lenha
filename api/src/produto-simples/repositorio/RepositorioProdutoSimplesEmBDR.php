@@ -122,23 +122,6 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
         return $query;
     }
 
-    private function obterVersaoProdutoSimples(int $idProduto): int {
-        try {
-            $sql = 'SELECT versao FROM produto_simples WHERE id = :id';
-            $resultado = $this->bancoDados->consultar($sql, [
-                'id' => $idProduto,
-            ]);
-
-            if (empty($resultado)) {
-                throw new RepositorioException('Produto não encontrado.');
-            }
-
-            return (int) $resultado[0]['versao'];
-        } catch (Throwable $e) {
-            throw new RepositorioException('Erro ao obter a versão do produto.');
-        }
-    }
-
     public function atualizarEstoqueProdutoSimples(int $idProduto, QuantidadeMedida $quantidade, TipoOperacaoEstoque $tipoOperacaoEstoque): void {
         try {
             $versao = $this->obterVersaoProdutoSimples($idProduto);
@@ -171,6 +154,23 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
             }
         } catch (Throwable $e) {
             throw new RepositorioException('Erro ao atualizar o estoque do produto.');
+        }
+    }
+
+    private function obterVersaoProdutoSimples(int $idProduto): int {
+        try {
+            $sql = 'SELECT versao FROM produto_simples WHERE id = :id';
+            $resultado = $this->bancoDados->consultar($sql, [
+                'id' => $idProduto,
+            ]);
+
+            if (empty($resultado)) {
+                throw new RepositorioException('Produto não encontrado.');
+            }
+
+            return (int) $resultado[0]['versao'];
+        } catch (Throwable $e) {
+            throw new RepositorioException('Erro ao obter a versão do produto.');
         }
     }
 }

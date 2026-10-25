@@ -11,8 +11,8 @@ class Ingrediente {
         return $consumo->ehMenorOuIgualA($this->estoque);
     }
 
-    public function copiarComEstoque(QuantidadeMedida $novoEstoque): self {
-        return new self(
+    public function copiarComEstoque(QuantidadeMedida $novoEstoque): Ingrediente {
+        return new Ingrediente(
             id: $this->id,
             nome: $this->nome,
             estoque: $novoEstoque,

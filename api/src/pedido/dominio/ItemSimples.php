@@ -23,7 +23,7 @@ class ItemSimples extends ItemPedido {
     }
 
     public function copiarComQuantidade(int $quantidade): ItemSimples {
-        return new self(
+        return new ItemSimples(
             id: $this->id,
             quantidade: $quantidade,
             produtoSimples: $this->produtoSimples,

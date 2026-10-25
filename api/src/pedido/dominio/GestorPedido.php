@@ -10,6 +10,7 @@ class GestorPedido {
         private readonly RepositorioIngrediente $repositorioIngrediente,
         private readonly RepositorioPromocao $repositorioPromocao,
         private readonly RepositorioConfiguracaoFidelidade $repositorioConfiguracaoFidelidade,
+        private readonly RepositorioMovimentacaoEstoque $repositorioMovimentacaoEstoque,
     ) {}
 
     /**
@@ -33,6 +34,7 @@ class GestorPedido {
 
         $this->unidadeTrabalho->executar(function () use ($pedido) {
             $this->repositorioPedido->registrarPedido($pedido);
+            $this->atualizarEstoqueItensPedido($pedido);
             $this->marcarBeneficioFidelidadeComoUtilizado($pedido);
             $this->gerarNovoBeneficioFidelidade($pedido);
         });
@@ -314,6 +316,75 @@ class GestorPedido {
             itensPedido: $itensPedido,
             beneficioFidelidade: $beneficioFidelidade,
             valorTotalDescontoPromocao: $valorTotalDescontoPromocao,
+        );
+    }
+
+    private function atualizarEstoqueItensPedido(Pedido $pedido): void {
+        foreach ($pedido->itensPedido as $itemPedido) {
+            if ($itemPedido instanceof ItemPizza) {
+                $this->atualizarEstoqueItemPizza(pedido: $pedido, itemPizza: $itemPedido);
+                continue;
+            }
+
+            if ($itemPedido instanceof ItemSimples) {
+                $this->atualizarEstoqueItemSimples(pedido: $pedido, itemSimples: $itemPedido);
+                continue;
+            }
+        }
+    }
+
+    private function atualizarEstoqueItemPizza(Pedido $pedido, ItemPizza $itemPizza): void {
+        $saboresEscolhidos = $itemPizza->saboresEscolhidos;
+        $quantidadeSabores = count($saboresEscolhidos);
+
+        foreach ($saboresEscolhidos as $saborEscolhido) {
+            $ingredientesEscolhidos = $saborEscolhido->ingredientesEscolhidos;
+
+            foreach ($ingredientesEscolhidos as $ingredienteEscolhido) {
+                $consumo = $saborEscolhido->obterConsumo(
+                    ingredienteEscolhido: $ingredienteEscolhido,
+                    tamanhoPizza: $itemPizza->tamanhoPizza,
+                    quantidadeSabores: $quantidadeSabores,
+                );
+
+                $this->repositorioIngrediente->atualizarEstoqueIngrediente(
+                    idIngrediente: $ingredienteEscolhido->ingrediente->id,
+                    quantidade: $consumo,
+                    tipoOperacaoEstoque: TipoOperacaoEstoque::SAIDA,
+                );
+
+                $this->repositorioMovimentacaoEstoque->registrarMovimentacaoEstoque(
+                    pedido: $pedido,
+                    movimentacao: new MovimentacaoEstoqueIngrediente(
+                        id: 0,
+                        data: new DateTime(),
+                        tipoOperacaoEstoque: TipoOperacaoEstoque::SAIDA,
+                        quantidade: $consumo,
+                        ingrediente: $ingredienteEscolhido->ingrediente,
+                    ),
+                );
+            }
+        }
+    }
+
+    private function atualizarEstoqueItemSimples(Pedido $pedido, ItemSimples $itemSimples): void {
+        $consumo = $itemSimples->obterConsumo();
+
+        $this->repositorioProdutoSimples->atualizarEstoqueProdutoSimples(
+            idProduto: $itemSimples->produtoSimples->id,
+            quantidade: $consumo,
+            tipoOperacaoEstoque: TipoOperacaoEstoque::SAIDA,
+        );
+
+        $this->repositorioMovimentacaoEstoque->registrarMovimentacaoEstoque(
+            pedido: $pedido,
+            movimentacao: new MovimentacaoEstoqueProdutoSimples(
+                id: 0,
+                data: new DateTime(),
+                tipoOperacaoEstoque: TipoOperacaoEstoque::SAIDA,
+                quantidade: $consumo,
+                produtoSimples: $itemSimples->produtoSimples,
+            ),
         );
     }
 

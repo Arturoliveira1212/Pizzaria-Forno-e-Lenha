@@ -23,6 +23,7 @@ describe('GestorPedido', function () {
         $this->repositorioIngrediente = Double::instance(['implements' => RepositorioIngrediente::class]);
         $this->repositorioPromocao = Double::instance(['implements' => RepositorioPromocao::class]);
         $this->repositorioConfiguracaoFidelidade = Double::instance(['implements' => RepositorioConfiguracaoFidelidade::class]);
+        $this->repositorioMovimentacaoEstoque = Double::instance(['implements' => RepositorioMovimentacaoEstoque::class]);
 
         $this->gestorPedido = new GestorPedido(
             unidadeTrabalho: $this->unidadeTrabalho,
@@ -33,6 +34,7 @@ describe('GestorPedido', function () {
             repositorioIngrediente: $this->repositorioIngrediente,
             repositorioPromocao: $this->repositorioPromocao,
             repositorioConfiguracaoFidelidade: $this->repositorioConfiguracaoFidelidade,
+            repositorioMovimentacaoEstoque: $this->repositorioMovimentacaoEstoque,
         );
     });
 
@@ -653,6 +655,7 @@ describe('GestorPedido - integração com banco de dados', function () {
             repositorioIngrediente: new RepositorioIngredienteEmBDR($this->bancoDados),
             repositorioPromocao: new RepositorioPromocaoEmBDR($this->bancoDados),
             repositorioConfiguracaoFidelidade: new RepositorioConfiguracaoFidelidadeEmBDR($this->bancoDados),
+            repositorioMovimentacaoEstoque: new RepositorioMovimentacaoEstoqueEmBDR($this->bancoDados),
         );
     });
 
