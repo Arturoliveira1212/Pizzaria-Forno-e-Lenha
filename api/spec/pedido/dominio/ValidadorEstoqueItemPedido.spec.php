@@ -142,7 +142,7 @@ describe('ValidadorEstoqueItemPedido', function () {
             $itensAtualizados = [];
 
             // Possui estoque insuficiente
-            $molho = IngredienteFactory::molho(1);
+            $molho = IngredienteFactory::molho(3);
             $mussarela = IngredienteFactory::mussarela(199);
             $bacon = IngredienteFactory::bacon(349);
 
@@ -182,7 +182,7 @@ describe('ValidadorEstoqueItemPedido', function () {
             $itensAtualizados = [];
 
             // Possui estoque insuficiente
-            $molho = IngredienteFactory::molho(1);
+            $molho = IngredienteFactory::molho(3);
             $mussarela = IngredienteFactory::mussarela(199);
             $bacon = IngredienteFactory::bacon(349);
             $catupiry = IngredienteFactory::catupiry(199);
@@ -242,11 +242,11 @@ describe('ValidadorEstoqueItemPedido', function () {
             $itensAtualizados = [];
 
             // Possui estoque insuficiente
-            $molho = IngredienteFactory::molho(5);
+            $molho = IngredienteFactory::molho(9);
             $mussarela = IngredienteFactory::mussarela(200);
             $catupiry = IngredienteFactory::catupiry(199);
             // Possui estoque suficiente
-            $manjericao = IngredienteFactory::manjericao(4);
+            $manjericao = IngredienteFactory::manjericao(6);
 
             $validador = new ValidadorEstoqueItemPedido();
             $itensAtualizados = $validador->validarEstoqueItensPizza(
@@ -301,10 +301,10 @@ describe('ValidadorEstoqueItemPedido', function () {
             $itensAtualizados = [];
 
             // Possui estoque suficiente
-            $molho = IngredienteFactory::molho(6);
+            $molho = IngredienteFactory::molho(10);
             $mussarela = IngredienteFactory::mussarela(500);
             $catupiry = IngredienteFactory::catupiry(300);
-            $manjericao = IngredienteFactory::manjericao(4);
+            $manjericao = IngredienteFactory::manjericao(10);
 
             $validador = new ValidadorEstoqueItemPedido();
             $itensAtualizados = $validador->validarEstoqueItensPizza(
@@ -356,7 +356,7 @@ describe('ValidadorEstoqueItemPedido', function () {
             $itensAtualizados = [];
 
             // Possui estoque insuficiente
-            $molho = IngredienteFactory::molho(1);
+            $molho = IngredienteFactory::molho(2);
             $mussarela = IngredienteFactory::mussarela(199);
             // Possui estoque suficiente
             $catupiry = IngredienteFactory::catupiry(300);
@@ -406,10 +406,10 @@ describe('ValidadorEstoqueItemPedido', function () {
             $itensAtualizados = [];
 
             // Possui estoque suficiente
-            $molho = IngredienteFactory::molho(4);
+            $molho = IngredienteFactory::molho(6);
             $mussarela = IngredienteFactory::mussarela(300);
             $catupiry = IngredienteFactory::catupiry(150);
-            $manjericao = IngredienteFactory::manjericao(2);
+            $manjericao = IngredienteFactory::manjericao(3);
 
             $validador = new ValidadorEstoqueItemPedido();
             $itensAtualizados = $validador->validarEstoqueItensPizza(

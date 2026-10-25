@@ -8,9 +8,9 @@ class IngredientePadraoFactory {
             removivel: $removivel,
             substituivel: $substituivel,
             quantidadesPorTamanho: [
-                QuantidadePorTamanhoFactory::pequena(1, UnidadeMedidaFactory::litros()),
-                QuantidadePorTamanhoFactory::media(2, UnidadeMedidaFactory::litros()),
-                QuantidadePorTamanhoFactory::grande(4, UnidadeMedidaFactory::litros()),
+                QuantidadePorTamanhoFactory::pequena(2, UnidadeMedidaFactory::litros()),
+                QuantidadePorTamanhoFactory::media(4, UnidadeMedidaFactory::litros()),
+                QuantidadePorTamanhoFactory::grande(6, UnidadeMedidaFactory::litros()),
             ],
         );
     }
@@ -64,9 +64,9 @@ class IngredientePadraoFactory {
             removivel: $removivel,
             substituivel: $substituivel,
             quantidadesPorTamanho: [
-                QuantidadePorTamanhoFactory::pequena(1, UnidadeMedidaFactory::folhas()),
-                QuantidadePorTamanhoFactory::media(2, UnidadeMedidaFactory::folhas()),
-                QuantidadePorTamanhoFactory::grande(4, UnidadeMedidaFactory::folhas()),
+                QuantidadePorTamanhoFactory::pequena(2, UnidadeMedidaFactory::folhas()),
+                QuantidadePorTamanhoFactory::media(4, UnidadeMedidaFactory::folhas()),
+                QuantidadePorTamanhoFactory::grande(6, UnidadeMedidaFactory::folhas()),
             ],
         );
     }
