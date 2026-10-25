@@ -158,19 +158,15 @@ class RepositorioProdutoSimplesEmBDR implements RepositorioProdutoSimples {
     }
 
     private function obterVersaoProdutoSimples(int $idProduto): int {
-        try {
-            $sql = 'SELECT versao FROM produto_simples WHERE id = :id';
-            $resultado = $this->bancoDados->consultar($sql, [
-                'id' => $idProduto,
-            ]);
+        $sql = 'SELECT versao FROM produto_simples WHERE id = :id';
+        $resultado = $this->bancoDados->consultar($sql, [
+            'id' => $idProduto,
+        ]);
 
-            if (empty($resultado)) {
-                throw new RepositorioException('Produto não encontrado.');
-            }
-
-            return (int) $resultado[0]['versao'];
-        } catch (Throwable $e) {
-            throw new RepositorioException('Erro ao obter a versão do produto.');
+        if (empty($resultado)) {
+            throw new RepositorioException('Produto não encontrado.');
         }
+
+        return (int) $resultado[0]['versao'];
     }
 }

@@ -82,18 +82,14 @@ class RepositorioIngredienteEmBDR implements RepositorioIngrediente {
     }
 
     private function obterVersaoIngrediente(int $idIngrediente): int {
-        try {
-            $sql = 'SELECT versao FROM ingrediente WHERE id = :id';
-            $resultado = $this->bancoDados->consultar($sql, [
-                'id' => $idIngrediente,
-            ]);
-            if (empty($resultado)) {
-                throw new RepositorioException('Ingrediente não encontrado.');
-            }
-
-            return (int) $resultado[0]['versao'];
-        } catch (Throwable $e) {
-            throw new RepositorioException('Erro ao obter a versão do ingrediente.');
+        $sql = 'SELECT versao FROM ingrediente WHERE id = :id';
+        $resultado = $this->bancoDados->consultar($sql, [
+            'id' => $idIngrediente,
+        ]);
+        if (empty($resultado)) {
+            throw new RepositorioException('Ingrediente não encontrado.');
         }
+
+        return (int) $resultado[0]['versao'];
     }
 }
