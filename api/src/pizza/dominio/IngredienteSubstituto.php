@@ -9,4 +9,14 @@ class IngredienteSubstituto {
         public readonly Ingrediente $ingrediente,
         public readonly array $quantidadesPorTamanho,
     ) {}
+
+    public function obterQuantidadePorTamanho(TamanhoPizza $tamanhoPizza): ?QuantidadePorTamanho {
+        foreach ($this->quantidadesPorTamanho as $quantidadePorTamanho) {
+            if ($quantidadePorTamanho->tamanhoPizza === $tamanhoPizza) {
+                return $quantidadePorTamanho;
+            }
+        }
+
+        return null;
+    }
 }

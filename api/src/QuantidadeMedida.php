@@ -37,4 +37,22 @@ class QuantidadeMedida {
     public function ehMaiorQueZero(): bool {
         return $this->valor > 0;
     }
+
+    public function subtrair(QuantidadeMedida $outra): QuantidadeMedida {
+        $this->validarOperacao($outra);
+
+        $novoValor = max(0, $this->valor - $outra->valor);
+
+        return new QuantidadeMedida($novoValor, $this->unidadeMedida);
+    }
+
+    public function dividir(int $divisor): QuantidadeMedida {
+        if ($divisor <= 0) {
+            throw new DominioException('Não é possível dividir por número não positivo.');
+        }
+
+        $novoValor = (int) floor($this->valor / $divisor);
+
+        return new QuantidadeMedida($novoValor, $this->unidadeMedida);
+    }
 }

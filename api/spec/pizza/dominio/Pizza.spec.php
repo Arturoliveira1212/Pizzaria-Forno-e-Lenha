@@ -10,19 +10,19 @@ describe('Pizza', function () {
         $this->pizzaPortuguesa = PizzaFactory::portuguesa();
     });
 
-    describe('obterAdicional()', function () {
+    describe('obterIngredientePadrao()', function () {
 
-        it('retorna o adicional quando ele existe', function () {
-            $adicional = $this->pizzaPortuguesa->obterAdicional($this->bacon);
+        it('retorna o ingrediente padrão quando ele existe', function () {
+            $ingredientePadrao = $this->pizzaPortuguesa->obterIngredientePadrao($this->molho);
 
-            expect($adicional)->toBeAnInstanceOf(IngredienteAdicional::class);
-            expect($adicional->ingrediente->id)->toBe($this->bacon->id);
+            expect($ingredientePadrao)->toBeAnInstanceOf(IngredientePadrao::class);
+            expect($ingredientePadrao->ingrediente->id)->toBe($this->molho->id);
         });
 
-        it('retorna null quando o adicional não existe', function () {
-            $adicional = $this->pizzaPortuguesa->obterAdicional($this->cebola);
+        it('retorna null quando o ingrediente não é padrão', function () {
+            $ingredientePadrao = $this->pizzaPortuguesa->obterIngredientePadrao($this->cebola);
 
-            expect($adicional)->toBeNull();
+            expect($ingredientePadrao)->toBeNull();
         });
 
     });
@@ -39,6 +39,35 @@ describe('Pizza', function () {
 
     });
 
+    describe('obterIdsIngredientesPadraoNaoPersonalizaveis()', function () {
+
+        it('retorna os ids dos ingredientes padrão que não são personalizáveis', function () {
+            $idsIngredientesNaoPersonalizaveis = $this->pizzaPortuguesa->obterIdsIngredientesPadraoNaoPersonalizaveis();
+
+            expect($idsIngredientesNaoPersonalizaveis)->toHaveLength(2);
+            expect($idsIngredientesNaoPersonalizaveis)->toContain($this->molho->id);
+            expect($idsIngredientesNaoPersonalizaveis)->toContain($this->mussarela->id);
+        });
+
+    });
+
+    describe('obterIngredienteSubstituto()', function () {
+
+        it('retorna o ingrediente substituto quando ele existe', function () {
+            $ingredienteSubstituto = $this->pizzaPortuguesa->obterIngredienteSubstituto($this->cebola);
+
+            expect($ingredienteSubstituto)->toBeAnInstanceOf(IngredienteSubstituto::class);
+            expect($ingredienteSubstituto->ingrediente->id)->toBe($this->cebola->id);
+        });
+
+        it('retorna null quando o ingrediente não é substituto', function () {
+            $ingredienteSubstituto = $this->pizzaPortuguesa->obterIngredienteSubstituto($this->molho);
+
+            expect($ingredienteSubstituto)->toBeNull();
+        });
+
+    });
+
     describe('temComoIngredienteSubstituto()', function () {
 
         it('retorna true quando o ingrediente é substituto', function () {
@@ -51,14 +80,19 @@ describe('Pizza', function () {
 
     });
 
-    describe('obterIdsIngredientesPadraoNaoPersonalizaveis()', function () {
+    describe('obterAdicional()', function () {
 
-        it('retorna os ids dos ingredientes padrão que não são personalizáveis', function () {
-            $idsIngredientesNaoPersonalizaveis = $this->pizzaPortuguesa->obterIdsIngredientesPadraoNaoPersonalizaveis();
+        it('retorna o adicional quando ele existe', function () {
+            $adicional = $this->pizzaPortuguesa->obterAdicional($this->bacon);
 
-            expect($idsIngredientesNaoPersonalizaveis)->toHaveLength(2);
-            expect($idsIngredientesNaoPersonalizaveis)->toContain($this->molho->id);
-            expect($idsIngredientesNaoPersonalizaveis)->toContain($this->mussarela->id);
+            expect($adicional)->toBeAnInstanceOf(IngredienteAdicional::class);
+            expect($adicional->ingrediente->id)->toBe($this->bacon->id);
+        });
+
+        it('retorna null quando o adicional não existe', function () {
+            $adicional = $this->pizzaPortuguesa->obterAdicional($this->cebola);
+
+            expect($adicional)->toBeNull();
         });
 
     });

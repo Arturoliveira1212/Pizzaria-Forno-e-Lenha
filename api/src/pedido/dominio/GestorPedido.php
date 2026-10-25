@@ -98,13 +98,14 @@ class GestorPedido {
      * @return ItemPedido[]
      */
     private function criarItensPedido(array $itensPedidoParaCadastro, array &$erros): array {
-        $itensPedido = [];
+        $itensPizza = [];
+        $itensSimples = [];
 
         foreach ($itensPedidoParaCadastro as $itemPedidoParaCadastro) {
             if ($itemPedidoParaCadastro instanceof ItemPizzaParaCadastro) {
                 $itemPizza = $this->criarItemPizza(itemPizzaParaCadastro: $itemPedidoParaCadastro, erros: $erros);
                 if ($itemPizza instanceof ItemPizza) {
-                    $itensPedido[] = $itemPizza;
+                    $itensPizza[] = $itemPizza;
                 }
 
                 continue;
@@ -112,10 +113,21 @@ class GestorPedido {
 
             $itemSimples = $this->criarItemSimples(itemSimplesParaCadastro: $itemPedidoParaCadastro, erros: $erros);
             if ($itemSimples instanceof ItemSimples) {
-                $itensPedido[] = $itemSimples;
+                $itensSimples[] = $itemSimples;
             }
         }
 
+        $validador = new ValidadorEstoqueItemPedido();
+
+        if (!empty($itensSimples)) {
+            $itensSimples = $validador->validarEstoqueItensSimples(itensSimples: $itensSimples, erros: $erros);
+        }
+
+        if (!empty($itensPizza)) {
+            $itensPizza = $validador->validarEstoqueItensPizza(itensPizza: $itensPizza, erros: $erros);
+        }
+
+        $itensPedido = [...$itensPizza, ...$itensSimples];
         if (empty($erros) && empty($itensPedido)) {
             $erros[] = 'O pedido deve conter pelo menos um item.';
         }
@@ -269,33 +281,6 @@ class GestorPedido {
             );
         } catch (DominioException $e) {
             $erros = [...$erros, ...$e->erros()];
-        }
-
-        $itemSimples = $this->atualizarEstoqueItemSimples(itemSimples: $itemSimples, erros: $erros);
-
-        return $itemSimples;
-    }
-
-    /**
-     * @param string[] $erros
-     */
-    private function atualizarEstoqueItemSimples(ItemSimples $itemSimples, array &$erros): ?ItemSimples {
-        $produtoSimples = $itemSimples->produtoSimples;
-        $idProdutoSimples = $produtoSimples->id;
-
-        $quantidadeSolicitada = $itemSimples->obterQuantidadeSolicitada();
-        if (!$produtoSimples->temEstoqueSuficiente($quantidadeSolicitada)) {
-            $estoqueAtual = $produtoSimples->estoque;
-            if ($estoqueAtual->ehMaiorQueZero()) {
-                $erros[] = "Produto simples (ID {$idProdutoSimples}) não possui estoque suficiente. Quantidade ajustada para {$estoqueAtual->valor}.";
-                $itemSimples = $itemSimples->copiarComQuantidade($estoqueAtual->valor);
-
-                return $itemSimples;
-            }
-
-            $erros[] = "Produto simples (ID {$idProdutoSimples}) está sem estoque.";
-
-            return null;
         }
 
         return $itemSimples;

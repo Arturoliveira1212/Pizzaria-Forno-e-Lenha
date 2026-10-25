@@ -17,10 +17,10 @@ class Pizza {
         public readonly array $precosPorTamanho,
     ) {}
 
-    public function obterAdicional(Ingrediente $ingrediente): ?IngredienteAdicional {
-        foreach ($this->adicionais as $adicional) {
-            if ($adicional->ingrediente->id === $ingrediente->id) {
-                return $adicional;
+    public function obterIngredientePadrao(Ingrediente $ingrediente): ?IngredientePadrao {
+        foreach ($this->ingredientesPadrao as $ingredientePadrao) {
+            if ($ingredientePadrao->ingrediente->id === $ingrediente->id) {
+                return $ingredientePadrao;
             }
         }
 
@@ -30,16 +30,6 @@ class Pizza {
     public function temComoIngredientePadrao(Ingrediente $ingrediente): bool {
         foreach ($this->ingredientesPadrao as $ingredientePadrao) {
             if ($ingredientePadrao->ingrediente->id === $ingrediente->id) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function temComoIngredienteSubstituto(Ingrediente $ingrediente): bool {
-        foreach ($this->ingredientesSubstitutos as $ingredienteSubstituto) {
-            if ($ingredienteSubstituto->ingrediente->id === $ingrediente->id) {
                 return true;
             }
         }
@@ -60,6 +50,36 @@ class Pizza {
         }
 
         return $idsIngredientesNaoPersonalizaveis;
+    }
+
+    public function obterIngredienteSubstituto(Ingrediente $ingrediente): ?IngredienteSubstituto {
+        foreach ($this->ingredientesSubstitutos as $ingredienteSubstituto) {
+            if ($ingredienteSubstituto->ingrediente->id === $ingrediente->id) {
+                return $ingredienteSubstituto;
+            }
+        }
+
+        return null;
+    }
+
+    public function temComoIngredienteSubstituto(Ingrediente $ingrediente): bool {
+        foreach ($this->ingredientesSubstitutos as $ingredienteSubstituto) {
+            if ($ingredienteSubstituto->ingrediente->id === $ingrediente->id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function obterAdicional(Ingrediente $ingrediente): ?IngredienteAdicional {
+        foreach ($this->adicionais as $adicional) {
+            if ($adicional->ingrediente->id === $ingrediente->id) {
+                return $adicional;
+            }
+        }
+
+        return null;
     }
 
     public function obterPrecoPorTamanho(TamanhoPizza $tamanho): ?Dinheiro {

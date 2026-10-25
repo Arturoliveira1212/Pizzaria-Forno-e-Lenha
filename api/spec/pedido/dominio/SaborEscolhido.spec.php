@@ -3,7 +3,7 @@
 describe('SaborEscolhido', function () {
 
     beforeAll(function () {
-        $this->pizza = PizzaFactory::portuguesa();
+        $this->pizzaPortuguesa = PizzaFactory::portuguesa();
 
         $this->ingredientesEscolhidosNaoPersonalizaveis = [
             IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
@@ -19,7 +19,7 @@ describe('SaborEscolhido', function () {
 
                 return new SaborEscolhido(
                     id: $id,
-                    pizza: $this->pizza,
+                    pizza: $this->pizzaPortuguesa,
                     ingredientesEscolhidos: $this->ingredientesEscolhidosNaoPersonalizaveis,
                 );
             })->toThrow(new DominioException('O identificador do ingrediente escolhido deve ser maior que ' . IngredienteEscolhido::MENOR_ID_PERMITIDO . '.'));
@@ -29,7 +29,7 @@ describe('SaborEscolhido', function () {
             expect(function () {
                 return new SaborEscolhido(
                     id: SaborEscolhido::MENOR_ID_PERMITIDO,
-                    pizza: $this->pizza,
+                    pizza: $this->pizzaPortuguesa,
                     ingredientesEscolhidos: [],
                 );
             })->toThrow(new DominioException('É necessário escolher todos os ingredientes padrão da pizza.'));
@@ -39,7 +39,7 @@ describe('SaborEscolhido', function () {
             expect(function () {
                 return new SaborEscolhido(
                     id: 1,
-                    pizza: $this->pizza,
+                    pizza: $this->pizzaPortuguesa,
                     ingredientesEscolhidos: [
                         ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                         IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
@@ -52,7 +52,7 @@ describe('SaborEscolhido', function () {
             expect(function () {
                 return new SaborEscolhido(
                     id: 1,
-                    pizza: $this->pizza,
+                    pizza: $this->pizzaPortuguesa,
                     ingredientesEscolhidos: [
                         ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                         IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::catupiry()),
@@ -65,7 +65,7 @@ describe('SaborEscolhido', function () {
             expect(function () {
                 return new SaborEscolhido(
                     id: 1,
-                    pizza: $this->pizza,
+                    pizza: $this->pizzaPortuguesa,
                     ingredientesEscolhidos: [
                         ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                         IngredienteEscolhidoFactory::substituto(1, IngredienteFactory::bacon()),
@@ -78,7 +78,7 @@ describe('SaborEscolhido', function () {
             expect(function () {
                 return new SaborEscolhido(
                     id: 1,
-                    pizza: $this->pizza,
+                    pizza: $this->pizzaPortuguesa,
                     ingredientesEscolhidos: [
                         ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                         IngredienteEscolhidoFactory::adicional(1, IngredienteFactory::cebola(), 500),
@@ -91,7 +91,7 @@ describe('SaborEscolhido', function () {
             expect(function () {
                 return new SaborEscolhido(
                     id: 1,
-                    pizza: $this->pizza,
+                    pizza: $this->pizzaPortuguesa,
                     ingredientesEscolhidos: [
                         ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                         IngredienteEscolhidoFactory::adicional(1, IngredienteFactory::bacon(), 500),
@@ -104,7 +104,7 @@ describe('SaborEscolhido', function () {
             expect(function () {
                 return new SaborEscolhido(
                     id: 1,
-                    pizza: $this->pizza,
+                    pizza: $this->pizzaPortuguesa,
                     ingredientesEscolhidos: [
                         IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
 
@@ -117,7 +117,7 @@ describe('SaborEscolhido', function () {
             expect(function () {
                 return new SaborEscolhido(
                     id: 1,
-                    pizza: $this->pizza,
+                    pizza: $this->pizzaPortuguesa,
                     ingredientesEscolhidos: [
                         ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                         IngredienteEscolhidoFactory::substituto(1, IngredienteFactory::cebola()),
@@ -132,7 +132,7 @@ describe('SaborEscolhido', function () {
             expect(function () {
                 return new SaborEscolhido(
                     id: 1,
-                    pizza: $this->pizza,
+                    pizza: $this->pizzaPortuguesa,
                     ingredientesEscolhidos: [
                         ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                         IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::presunto()),
@@ -148,7 +148,7 @@ describe('SaborEscolhido', function () {
 
             $saborEscolhido = new SaborEscolhido(
                 id: $id,
-                pizza: $this->pizza,
+                pizza: $this->pizzaPortuguesa,
                 ingredientesEscolhidos: [
                     ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                     IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::presunto()),
@@ -158,7 +158,7 @@ describe('SaborEscolhido', function () {
             );
 
             expect($saborEscolhido->id)->toBe($id);
-            expect($saborEscolhido->pizza)->toBe($this->pizza);
+            expect($saborEscolhido->pizza)->toBe($this->pizzaPortuguesa);
             expect($saborEscolhido->ingredientesEscolhidos)->toHaveLength(5);
         });
 
@@ -167,7 +167,7 @@ describe('SaborEscolhido', function () {
 
             $saborEscolhido = new SaborEscolhido(
                 id: $id,
-                pizza: $this->pizza,
+                pizza: $this->pizzaPortuguesa,
                 ingredientesEscolhidos: [
                     ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                     IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::presunto()),
@@ -177,7 +177,7 @@ describe('SaborEscolhido', function () {
             );
 
             expect($saborEscolhido->id)->toBe($id);
-            expect($saborEscolhido->pizza)->toBe($this->pizza);
+            expect($saborEscolhido->pizza)->toBe($this->pizzaPortuguesa);
             expect($saborEscolhido->ingredientesEscolhidos)->toHaveLength(5);
         });
 
@@ -186,7 +186,7 @@ describe('SaborEscolhido', function () {
 
             $saborEscolhido = new SaborEscolhido(
                 id: $id,
-                pizza: $this->pizza,
+                pizza: $this->pizzaPortuguesa,
                 ingredientesEscolhidos: [
                     ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                     IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::presunto()),
@@ -196,7 +196,7 @@ describe('SaborEscolhido', function () {
             );
 
             expect($saborEscolhido->id)->toBe($id);
-            expect($saborEscolhido->pizza)->toBe($this->pizza);
+            expect($saborEscolhido->pizza)->toBe($this->pizzaPortuguesa);
             expect($saborEscolhido->ingredientesEscolhidos)->toHaveLength(5);
         });
 
@@ -207,7 +207,7 @@ describe('SaborEscolhido', function () {
         it('calcula o preço dos adicionais corretamente (0 adicionais)', function () {
             $saborEscolhido = new SaborEscolhido(
                 id: SaborEscolhido::MENOR_ID_PERMITIDO,
-                pizza: $this->pizza,
+                pizza: $this->pizzaPortuguesa,
                 ingredientesEscolhidos: [
                     ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                 ],
@@ -219,7 +219,7 @@ describe('SaborEscolhido', function () {
         it('calcula o preço dos adicionais corretamente (1 adicional)', function () {
             $saborEscolhido = new SaborEscolhido(
                 id: SaborEscolhido::MENOR_ID_PERMITIDO,
-                pizza: $this->pizza,
+                pizza: $this->pizzaPortuguesa,
                 ingredientesEscolhidos: [
                     ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                     IngredienteEscolhidoFactory::adicional(3, IngredienteFactory::bacon(), 899),
@@ -232,7 +232,7 @@ describe('SaborEscolhido', function () {
         it('calcula o preço dos adicionais corretamente (2 adicionais)', function () {
             $saborEscolhido = new SaborEscolhido(
                 id: SaborEscolhido::MENOR_ID_PERMITIDO,
-                pizza: $this->pizza,
+                pizza: $this->pizzaPortuguesa,
                 ingredientesEscolhidos: [
                     ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                     IngredienteEscolhidoFactory::adicional(3, IngredienteFactory::bacon(), 899),
@@ -246,7 +246,7 @@ describe('SaborEscolhido', function () {
         it('calcula o preço dos adicionais corretamente (2 adicionais repetidos)', function () {
             $saborEscolhido = new SaborEscolhido(
                 id: SaborEscolhido::MENOR_ID_PERMITIDO,
-                pizza: $this->pizza,
+                pizza: $this->pizzaPortuguesa,
                 ingredientesEscolhidos: [
                     ...$this->ingredientesEscolhidosNaoPersonalizaveis,
                     IngredienteEscolhidoFactory::adicional(3, IngredienteFactory::bacon(), 899),
@@ -255,6 +255,110 @@ describe('SaborEscolhido', function () {
             );
 
             expect($saborEscolhido->calcularPrecoDosAdicionais()->centavos)->toBe(1798);
+        });
+
+    });
+
+    describe('obterConsumo()', function () {
+
+        beforeAll(function () {
+            $this->saborEscolhido = new SaborEscolhido(
+                id: SaborEscolhido::MENOR_ID_PERMITIDO,
+                pizza: $this->pizzaPortuguesa,
+                ingredientesEscolhidos: [
+                    ...$this->ingredientesEscolhidosNaoPersonalizaveis,
+                ],
+            );
+        });
+
+        it('retorna o consumo corretamente para um ingrediente padrão (pizza inteira)', function () {
+            $ingredienteEscolhido = IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::mussarela());
+
+            $consumo = $this->saborEscolhido->obterConsumo(
+                ingredienteEscolhido: $ingredienteEscolhido,
+                tamanhoPizza: TamanhoPizza::MEDIA,
+                quantidadeSabores: 1,
+            );
+
+            expect($consumo->valor)->toBe(200);
+            expect($consumo->unidadeMedida->id)->toBe(2);
+            expect($consumo->unidadeMedida->descricao)->toBe('gramas');
+            expect($consumo->unidadeMedida->sigla)->toBe('g');
+        });
+
+        it('retorna o consumo corretamente para um ingrediente padrão (pizza com 2 sabores)', function () {
+            $ingredienteEscolhido = IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::mussarela());
+
+            $consumo = $this->saborEscolhido->obterConsumo(
+                ingredienteEscolhido: $ingredienteEscolhido,
+                tamanhoPizza: TamanhoPizza::MEDIA,
+                quantidadeSabores: 2,
+            );
+
+            expect($consumo->valor)->toBe(100);
+            expect($consumo->unidadeMedida->id)->toBe(2);
+            expect($consumo->unidadeMedida->descricao)->toBe('gramas');
+            expect($consumo->unidadeMedida->sigla)->toBe('g');
+        });
+
+        it('retorna o consumo corretamente para um ingrediente substituto (pizza inteira)', function () {
+            $ingredienteEscolhido = IngredienteEscolhidoFactory::substituto(1, IngredienteFactory::cebola());
+
+            $consumo = $this->saborEscolhido->obterConsumo(
+                ingredienteEscolhido: $ingredienteEscolhido,
+                tamanhoPizza: TamanhoPizza::GRANDE,
+                quantidadeSabores: 1,
+            );
+
+            expect($consumo->valor)->toBe(300);
+            expect($consumo->unidadeMedida->id)->toBe(2);
+            expect($consumo->unidadeMedida->descricao)->toBe('gramas');
+            expect($consumo->unidadeMedida->sigla)->toBe('g');
+        });
+
+        it('retorna o consumo corretamente para um ingrediente substituto (pizza com 2 sabores)', function () {
+            $ingredienteEscolhido = IngredienteEscolhidoFactory::substituto(1, IngredienteFactory::cebola());
+
+            $consumo = $this->saborEscolhido->obterConsumo(
+                ingredienteEscolhido: $ingredienteEscolhido,
+                tamanhoPizza: TamanhoPizza::GRANDE,
+                quantidadeSabores: 2,
+            );
+
+            expect($consumo->valor)->toBe(150);
+            expect($consumo->unidadeMedida->id)->toBe(2);
+            expect($consumo->unidadeMedida->descricao)->toBe('gramas');
+            expect($consumo->unidadeMedida->sigla)->toBe('g');
+        });
+
+        it('retorna o consumo corretamente para um ingrediente adicional (pizza inteira)', function () {
+            $ingredienteEscolhido = IngredienteEscolhidoFactory::adicional(1, IngredienteFactory::bacon(), 899);
+
+            $consumo = $this->saborEscolhido->obterConsumo(
+                ingredienteEscolhido: $ingredienteEscolhido,
+                tamanhoPizza: TamanhoPizza::PEQUENA,
+                quantidadeSabores: 1,
+            );
+
+            expect($consumo->valor)->toBe(350);
+            expect($consumo->unidadeMedida->id)->toBe(2);
+            expect($consumo->unidadeMedida->descricao)->toBe('gramas');
+            expect($consumo->unidadeMedida->sigla)->toBe('g');
+        });
+
+        it('retorna o consumo corretamente para um ingrediente adicional (pizza com 2 sabores)', function () {
+            $ingredienteEscolhido = IngredienteEscolhidoFactory::adicional(1, IngredienteFactory::bacon(), 899);
+
+            $consumo = $this->saborEscolhido->obterConsumo(
+                ingredienteEscolhido: $ingredienteEscolhido,
+                tamanhoPizza: TamanhoPizza::PEQUENA,
+                quantidadeSabores: 2,
+            );
+
+            expect($consumo->valor)->toBe(175);
+            expect($consumo->unidadeMedida->id)->toBe(2);
+            expect($consumo->unidadeMedida->descricao)->toBe('gramas');
+            expect($consumo->unidadeMedida->sigla)->toBe('g');
         });
 
     });

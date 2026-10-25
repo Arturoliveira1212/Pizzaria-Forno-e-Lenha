@@ -125,4 +125,17 @@ class SaborEscolhido {
 
         return $preco;
     }
+
+    public function obterConsumo(IngredienteEscolhido $ingredienteEscolhido, TamanhoPizza $tamanhoPizza, int $quantidadeSabores): QuantidadeMedida {
+        $ingrediente = $ingredienteEscolhido->ingrediente;
+        $pizza = $this->pizza;
+
+        $quantidade = match ($ingredienteEscolhido->papel) {
+            PapelIngrediente::PADRAO => $pizza->obterIngredientePadrao($ingrediente)->obterQuantidadePorTamanho($tamanhoPizza)->quantidadeMedida,
+            PapelIngrediente::SUBSTITUTO => $pizza->obterIngredienteSubstituto($ingrediente)->obterQuantidadePorTamanho($tamanhoPizza)->quantidadeMedida,
+            PapelIngrediente::ADICIONAL => $pizza->obterAdicional($ingrediente)->quantidadeMedida,
+        };
+
+        return $quantidade->dividir($quantidadeSabores);
+    }
 }

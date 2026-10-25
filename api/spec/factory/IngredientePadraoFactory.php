@@ -10,7 +10,7 @@ class IngredientePadraoFactory {
             quantidadesPorTamanho: [
                 QuantidadePorTamanhoFactory::pequena(1, UnidadeMedidaFactory::litros()),
                 QuantidadePorTamanhoFactory::media(2, UnidadeMedidaFactory::litros()),
-                QuantidadePorTamanhoFactory::grande(3, UnidadeMedidaFactory::litros()),
+                QuantidadePorTamanhoFactory::grande(4, UnidadeMedidaFactory::litros()),
             ],
         );
     }
@@ -66,7 +66,7 @@ class IngredientePadraoFactory {
             quantidadesPorTamanho: [
                 QuantidadePorTamanhoFactory::pequena(1, UnidadeMedidaFactory::folhas()),
                 QuantidadePorTamanhoFactory::media(2, UnidadeMedidaFactory::folhas()),
-                QuantidadePorTamanhoFactory::grande(3, UnidadeMedidaFactory::folhas()),
+                QuantidadePorTamanhoFactory::grande(4, UnidadeMedidaFactory::folhas()),
             ],
         );
     }
@@ -95,6 +95,19 @@ class IngredientePadraoFactory {
                 QuantidadePorTamanhoFactory::pequena(50, UnidadeMedidaFactory::gramas()),
                 QuantidadePorTamanhoFactory::media(100, UnidadeMedidaFactory::gramas()),
                 QuantidadePorTamanhoFactory::grande(150, UnidadeMedidaFactory::gramas()),
+            ],
+        );
+    }
+
+    public static function bacon(bool $removivel = false, bool $substituivel = false): IngredientePadrao {
+        return new IngredientePadrao(
+            id: 8,
+            ingrediente: IngredienteFactory::bacon(),
+            removivel: $removivel,
+            substituivel: $substituivel,
+            quantidadesPorTamanho: [
+                QuantidadePorTamanhoFactory::pequena(100, UnidadeMedidaFactory::gramas()),
+                QuantidadePorTamanhoFactory::media(200, UnidadeMedidaFactory::gramas()),
             ],
         );
     }

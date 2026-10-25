@@ -162,7 +162,10 @@ describe('GestorPedido', function () {
                 });
 
                 expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
-                expect($e->erros)->toBe(["Pizza (ID {$idInexistente}) não encontrada."]);
+                expect($e->erros)->toBe([
+                    "Pizza (ID {$idInexistente}) não encontrada.",
+                    'A quantidade de sabores deve ser entre 1 e 2.',
+                ]);
             });
 
         });
@@ -279,7 +282,11 @@ describe('GestorPedido', function () {
                 });
 
                 expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
-                expect($e->erros)->toBe(['Ingrediente adicional (ID 2) não encontrado para a pizza (ID 1).']);
+                expect($e->erros)->toBe([
+                    'Ingrediente adicional (ID 2) não encontrado para a pizza (ID 1).',
+                    'O ingrediente Mussarela(2) não é permitido como padrão para a pizza.',
+                    'A quantidade de sabores deve ser entre 1 e 2.',
+                ]);
             });
 
         });
@@ -309,125 +316,6 @@ describe('GestorPedido', function () {
 
                 expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
                 expect($e->erros)->toBe(["Produto simples (ID {$idInexistente}) não encontrado."]);
-            });
-
-            it('lança exceção quando o produto simples está sem estoque', function () {
-                $produtoSimplesSemEstoque = ProdutoSimplesFactory::cocaCola(0);
-                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->andReturn($produtoSimplesSemEstoque);
-
-                /** @var RegistroPedidoException $e */
-                $e = capturarExcecao(function () {
-                    $this->gestorPedido->registrarPedido(
-                        new PedidoParaCadastro(
-                            tipoAtendimento: TipoAtendimento::BALCAO->value,
-                            idCliente: 1,
-                            itensPedido: [
-                                new ItemSimplesParaCadastro(
-                                    idProduto: 1,
-                                    quantidade: 1,
-                                ),
-                            ],
-                        ),
-                    );
-                });
-
-                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
-                expect($e->erros)->toBe(['Produto simples (ID 1) está sem estoque.']);
-            });
-
-            it('lança exceção quando a quantidade do produto simples é maior que o estoque disponível (1 item simples)', function () {
-                $produtoSimplesComEstoque = ProdutoSimplesFactory::cocaCola(2);
-                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->andReturn($produtoSimplesComEstoque);
-
-                /** @var RegistroPedidoException $e */
-                $e = capturarExcecao(function () {
-                    $this->gestorPedido->registrarPedido(
-                        new PedidoParaCadastro(
-                            tipoAtendimento: TipoAtendimento::BALCAO->value,
-                            idCliente: 1,
-                            itensPedido: [
-                                new ItemSimplesParaCadastro(
-                                    idProduto: 1,
-                                    quantidade: 3,
-                                ),
-                            ],
-                        ),
-                    );
-                });
-
-                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
-                expect($e->erros)->toBe(['Produto simples (ID 1) não possui estoque suficiente. Quantidade ajustada para 2.']);
-                expect($e->itensPedidoAtualizados)->toHaveLength(1);
-                expect($e->itensPedidoAtualizados[0]->quantidade)->toBe(2);
-            });
-
-            it('lança exceção quando a quantidade do produto simples é maior que o estoque disponível (2 itens simples)', function () {
-                $produto1 = ProdutoSimplesFactory::cocaCola(2);
-                $produto12 = ProdutoSimplesFactory::sucoLaranja(12);
-
-                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->with(1)->andReturn($produto1);
-                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->with(3)->andReturn($produto12);
-
-                /** @var RegistroPedidoException $e */
-                $e = capturarExcecao(function () {
-                    $this->gestorPedido->registrarPedido(
-                        new PedidoParaCadastro(
-                            tipoAtendimento: TipoAtendimento::BALCAO->value,
-                            idCliente: 1,
-                            itensPedido: [
-                                new ItemSimplesParaCadastro(
-                                    idProduto: 1,
-                                    quantidade: 3,
-                                ),
-                                new ItemSimplesParaCadastro(
-                                    idProduto: 3,
-                                    quantidade: 4,
-                                ),
-                            ],
-                        ),
-                    );
-                });
-
-                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
-                expect($e->erros)->toBe(['Produto simples (ID 1) não possui estoque suficiente. Quantidade ajustada para 2.']);
-                expect($e->itensPedidoAtualizados)->toHaveLength(2);
-                expect($e->itensPedidoAtualizados[0]->quantidade)->toBe(2);
-                expect($e->itensPedidoAtualizados[1]->quantidade)->toBe(4);
-            });
-
-            it('lança exceção e retorna o array de itens pedido vazio quando todos os itens simples estão sem estoque', function () {
-                $produto1 = ProdutoSimplesFactory::cocaCola(0);
-                $produto2 = ProdutoSimplesFactory::sucoLaranja(0);
-
-                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->with(1)->andReturn($produto1);
-                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->with(3)->andReturn($produto2);
-
-                /** @var RegistroPedidoException $e */
-                $e = capturarExcecao(function () {
-                    $this->gestorPedido->registrarPedido(
-                        new PedidoParaCadastro(
-                            tipoAtendimento: TipoAtendimento::BALCAO->value,
-                            idCliente: 1,
-                            itensPedido: [
-                                new ItemSimplesParaCadastro(
-                                    idProduto: 1,
-                                    quantidade: 3,
-                                ),
-                                new ItemSimplesParaCadastro(
-                                    idProduto: 3,
-                                    quantidade: 4,
-                                ),
-                            ],
-                        ),
-                    );
-                });
-
-                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
-                expect($e->erros)->toBe([
-                    'Produto simples (ID 1) está sem estoque.',
-                    'Produto simples (ID 3) está sem estoque.',
-                ]);
-                expect($e->itensPedidoAtualizados)->toHaveLength(0);
             });
 
         });

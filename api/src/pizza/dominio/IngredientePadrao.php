@@ -15,4 +15,14 @@ class IngredientePadrao {
     public function ehFixo(): bool {
         return !$this->removivel && !$this->substituivel;
     }
+
+    public function obterQuantidadePorTamanho(TamanhoPizza $tamanhoPizza): ?QuantidadePorTamanho {
+        foreach ($this->quantidadesPorTamanho as $quantidadePorTamanho) {
+            if ($quantidadePorTamanho->tamanhoPizza === $tamanhoPizza) {
+                return $quantidadePorTamanho;
+            }
+        }
+
+        return null;
+    }
 }

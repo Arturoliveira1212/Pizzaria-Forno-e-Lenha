@@ -16,7 +16,7 @@ class ItemSimples extends ItemPedido {
         return $this->produtoSimples->preco;
     }
 
-    public function obterQuantidadeSolicitada(): QuantidadeMedida {
+    public function obterConsumo(): QuantidadeMedida {
         $unidadeMedida = $this->produtoSimples->estoque->unidadeMedida;
 
         return new QuantidadeMedida($this->quantidade, $unidadeMedida);

@@ -10,7 +10,7 @@ class ProdutoSimples {
         public readonly QuantidadeMedida $estoque,
     ) {}
 
-    public function temEstoqueSuficiente(QuantidadeMedida $quantidadeSolicitada): bool {
-        return $quantidadeSolicitada->ehMenorOuIgualA($this->estoque);
+    public function temEstoqueSuficiente(QuantidadeMedida $consumo): bool {
+        return $consumo->ehMenorOuIgualA($this->estoque);
     }
 }

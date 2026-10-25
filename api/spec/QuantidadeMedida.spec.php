@@ -4,7 +4,7 @@ describe('QuantidadeMedida', function () {
 
     describe('validar()', function () {
 
-        it('lança exceção quando o valor menor que o valor mínimo permitido', function () {
+        it('lança exceção quando o valor é menor que o valor mínimo permitido', function () {
             expect(function () {
                 $valor = QuantidadeMedida::MENOR_VALOR_PERMITIDO - 1;
                 new QuantidadeMedida($valor, UnidadeMedidaFactory::gramas());
@@ -79,6 +79,51 @@ describe('QuantidadeMedida', function () {
             $quantidadeMedida = new QuantidadeMedida(0, UnidadeMedidaFactory::gramas());
 
             expect($quantidadeMedida->ehMaiorQueZero())->toBe(false);
+        });
+
+    });
+
+    describe('subtrair()', function () {
+
+        it('subtrai uma quantidade de medida de outra', function () {
+            $quantidadeMedida1 = new QuantidadeMedida(10, UnidadeMedidaFactory::gramas());
+            $quantidadeMedida2 = new QuantidadeMedida(5, UnidadeMedidaFactory::gramas());
+
+            $resultado = $quantidadeMedida1->subtrair($quantidadeMedida2);
+
+            expect($resultado->valor)->toBe(5);
+            expect($resultado->unidadeMedida->id)->toBe($quantidadeMedida1->unidadeMedida->id);
+        });
+
+        it('não permite que a subtração seja negativo', function () {
+            $quantidadeMedida1 = new QuantidadeMedida(5, UnidadeMedidaFactory::gramas());
+            $quantidadeMedida2 = new QuantidadeMedida(10, UnidadeMedidaFactory::gramas());
+
+            $resultado = $quantidadeMedida1->subtrair($quantidadeMedida2);
+
+            expect($resultado->valor)->toBe(0);
+            expect($resultado->unidadeMedida->id)->toBe($quantidadeMedida1->unidadeMedida->id);
+        });
+
+    });
+
+    describe('dividir()', function () {
+
+        it('divide uma quantidade de medida por um número', function () {
+            $quantidadeMedida = new QuantidadeMedida(10, UnidadeMedidaFactory::gramas());
+
+            $resultado = $quantidadeMedida->dividir(3);
+
+            expect($resultado->valor)->toBe(3);
+            expect($resultado->unidadeMedida->id)->toBe($quantidadeMedida->unidadeMedida->id);
+        });
+
+        it('lança exceção quando o divisor é menor ou igual a zero', function () {
+            $quantidadeMedida = new QuantidadeMedida(10, UnidadeMedidaFactory::gramas());
+
+            expect(function () use ($quantidadeMedida) {
+                $quantidadeMedida->dividir(0);
+            })->toThrow(new DominioException('Não é possível dividir por número não positivo.'));
         });
 
     });

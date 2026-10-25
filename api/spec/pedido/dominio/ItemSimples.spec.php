@@ -74,9 +74,9 @@ describe('ItemSimples', function () {
         });
     });
 
-    describe('obterQuantidadeSolicitada()', function () {
+    describe('obterConsumo()', function () {
 
-        it('retorna a quantidade solicitada corretamente', function () {
+        it('retorna a o consumo corretamente', function () {
             $produtoSimples = ProdutoSimplesFactory::cocaCola();
             $quantidade = 5;
 
@@ -86,10 +86,10 @@ describe('ItemSimples', function () {
                 produtoSimples: ProdutoSimplesFactory::cocaCola(),
             );
 
-            $quantidadeSolicitada = $itemSimples->obterQuantidadeSolicitada();
+            $consumo = $itemSimples->obterConsumo();
 
-            expect($quantidadeSolicitada->valor)->toBe($quantidade);
-            expect($quantidadeSolicitada->unidadeMedida->id)->toBe($produtoSimples->estoque->unidadeMedida->id);
+            expect($consumo->valor)->toBe($quantidade);
+            expect($consumo->unidadeMedida->id)->toBe($produtoSimples->estoque->unidadeMedida->id);
         });
     });
 

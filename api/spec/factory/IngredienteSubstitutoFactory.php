@@ -48,4 +48,23 @@ class IngredienteSubstitutoFactory {
             ],
         );
     }
+
+    public static function presunto(): IngredienteSubstituto {
+        return new IngredienteSubstituto(
+            id: 3,
+            ingrediente: IngredienteFactory::presunto(),
+            quantidadesPorTamanho: [
+                new QuantidadePorTamanho(
+                    id: 1,
+                    tamanhoPizza: TamanhoPizza::PEQUENA,
+                    quantidadeMedida: new QuantidadeMedida(150, UnidadeMedidaFactory::gramas()),
+                ),
+                new QuantidadePorTamanho(
+                    id: 2,
+                    tamanhoPizza: TamanhoPizza::MEDIA,
+                    quantidadeMedida: new QuantidadeMedida(200, UnidadeMedidaFactory::gramas()),
+                ),
+            ],
+        );
+    }
 }
