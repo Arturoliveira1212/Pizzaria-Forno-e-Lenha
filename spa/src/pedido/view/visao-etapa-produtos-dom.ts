@@ -164,7 +164,7 @@ export class VisaoEtapaProdutosDom implements VisaoEtapaProdutos {
 		const card = template.querySelector<HTMLElement>('.card-item')!;
 		card.dataset.idPizza = String(pizza.id);
 		card.dataset.nome = pizza.nome;
-		card.dataset.idsIngredientes = pizza.ingredientes.map((ingrediente) => ingrediente.id).join(',');
+		card.dataset.idsIngredientes = pizza.ingredientesPadrao.map((ingredientePadrao) => ingredientePadrao.ingrediente.id).join(',');
 
 		const img = card.querySelector<HTMLImageElement>('.card-img-top')!;
 		img.src = pizza.imagem;
@@ -173,14 +173,28 @@ export class VisaoEtapaProdutosDom implements VisaoEtapaProdutos {
 		card.querySelector('.card-title')!.textContent = pizza.nome;
 		card.querySelector('.card-text')!.textContent = pizza.descricao;
 
-		const opcoes = pizza.precosPorTamanho.map((precoPorTamanho: PrecoPorTamanho, indice: number) => {
-			return this.criarOpcaoTamanho(pizza.id, precoPorTamanho, indice === 0);
-		});
-
+		const opcoesTamanho = this.criarOpcoesTamanho(pizza);
 		const grupoTamanhos = card.querySelector('.tamanhos-pizza')!;
-		grupoTamanhos.append(...opcoes);
+		grupoTamanhos.append(...opcoesTamanho);
 
 		return template;
+	}
+
+	private criarOpcoesTamanho(pizza: PizzaParaCardapio): DocumentFragment[] {
+		const opcoesTamanho: DocumentFragment[] = [];
+
+		const precosPorTamanho = pizza.precosPorTamanho;
+		precosPorTamanho.forEach((precoPorTamanho) => {
+			const tamanho = precoPorTamanho.tamanhoPizza;
+			const todosOsIngredientesPossuemEstoqueSuficiente = pizza.ingredientesPadrao.every((ingredientePadrao) => ingredientePadrao.temEstoqueSuficiente(tamanho));
+			if (!todosOsIngredientesPossuemEstoqueSuficiente) {
+				return;
+			}
+
+			opcoesTamanho.push(this.criarOpcaoTamanho(pizza.id, precoPorTamanho, opcoesTamanho.length === 0));
+		});
+
+		return opcoesTamanho;
 	}
 
 	private criarOpcaoTamanho(idPizza: number, precoPorTamanho: PrecoPorTamanho, selecionado: boolean): DocumentFragment {

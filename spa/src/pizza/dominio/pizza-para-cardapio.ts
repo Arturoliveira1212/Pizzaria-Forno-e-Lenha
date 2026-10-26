@@ -1,5 +1,5 @@
 import { API } from '../../infra/constantes';
-import { Ingrediente } from '../../ingrediente/dominio/ingrediente';
+import { IngredientePadrao } from './ingrediente-padrao';
 import { PrecoPorTamanho } from './preco-por-tamanho';
 
 export class PizzaParaCardapio {
@@ -10,7 +10,7 @@ export class PizzaParaCardapio {
 		public readonly nome: string,
 		public readonly descricao: string,
 		public readonly precosPorTamanho: PrecoPorTamanho[],
-		public readonly ingredientes: Ingrediente[],
+		public readonly ingredientesPadrao: IngredientePadrao[],
 	) {
 		this.imagem = `${API}/assets/pizza/${id}.jpg`;
 	}

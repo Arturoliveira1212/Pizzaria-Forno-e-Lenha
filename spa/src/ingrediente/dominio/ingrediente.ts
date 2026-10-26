@@ -4,4 +4,8 @@ export class Ingrediente {
 		public readonly nome: string = '',
 		public readonly estoque: number = 0,
 	) {}
+
+	temEstoqueSuficiente(quantidade: number): boolean {
+		return this.estoque >= quantidade;
+	}
 }
