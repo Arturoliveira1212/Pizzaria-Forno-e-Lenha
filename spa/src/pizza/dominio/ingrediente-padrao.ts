@@ -1,4 +1,5 @@
 import { Ingrediente } from '../../ingrediente/dominio/ingrediente';
+import { QuantidadePorTamanho } from './quantidade-por-tamanho';
 
 export class IngredientePadrao {
 	constructor(
@@ -6,6 +7,7 @@ export class IngredientePadrao {
 		public readonly ingrediente: Ingrediente,
 		public readonly removivel: boolean,
 		public readonly substituivel: boolean,
+		public readonly quantidadesPorTamanho: QuantidadePorTamanho[],
 	) {}
 
 	ehFixo(): boolean {

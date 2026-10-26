@@ -40,11 +40,19 @@ export class RepositorioPizzaEmMemoria implements RepositorioPizza {
 	async obterPizzasParaCardapio(identificador: string): Promise<PizzaParaCardapio[]> {
 		return [new PizzaParaCardapio(1, 'Margherita', 'de Mussarela', [], []), new PizzaParaCardapio(2, 'Calabresa', 'de Calabresa', [], [])];
 	}
+
+	async obterPizzas(identificador: string): Promise<Pizza[]> {
+		return [];
+	}
+
+	async obterPizzaPorId(idPizza: number): Promise<Pizza> {
+		return new Pizza(idPizza, 'Margherita', 'de Mussarela', [], [], [], []);
+	}
 }
 
 export class RepositorioProdutoSimplesEmMemoria implements RepositorioProdutoSimples {
 	async obterProdutosSimples(tipo: TipoProdutoSimples, identificador: string): Promise<ProdutoSimples[]> {
-		return [new ProdutoSimples(10, 'Refrigerante', 'Refrigerante gelado', TipoProdutoSimples.BEBIDA, 6)];
+		return [new ProdutoSimples(10, 'Refrigerante', 'Refrigerante gelado', TipoProdutoSimples.BEBIDA, 6, 100)];
 	}
 }
 

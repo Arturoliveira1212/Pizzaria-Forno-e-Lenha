@@ -10,6 +10,7 @@ export class ProdutoSimples {
 		public readonly descricao: string,
 		public readonly tipo: TipoProdutoSimples,
 		public readonly preco: number,
+		public readonly estoque: number,
 	) {
 		this.imagem = `${API}/assets/produto-simples/${id}.jpg`;
 	}

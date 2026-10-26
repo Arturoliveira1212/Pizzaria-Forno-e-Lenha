@@ -19,7 +19,7 @@ export class RepositorioProdutoSimplesNoServidor implements RepositorioProdutoSi
 			const resultado = await this.servicoHttp.get(`${API}/produtos-simples?${parametros.toString()}`);
 
 			resultado.data.produtosSimples.forEach((produto: any) => {
-				produtosSimples.push(new ProdutoSimples(produto.id, produto.nome, produto.tipo, produto.descricao, produto.preco));
+				produtosSimples.push(new ProdutoSimples(produto.id, produto.nome, produto.tipo, produto.descricao, produto.preco, produto.estoque.valor));
 			});
 		} catch (error) {
 			throw new RepositorioError(`Erro ao obter produtos simples: ${error}`);

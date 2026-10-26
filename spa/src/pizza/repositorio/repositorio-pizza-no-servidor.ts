@@ -10,6 +10,7 @@ import { Ingrediente } from '../../ingrediente/dominio/ingrediente';
 import { IngredientePadrao } from '../dominio/ingrediente-padrao';
 import { IngredienteAdicional } from '../dominio/ingrediente-adicional';
 import { IngredienteSubstituto } from '../dominio/ingrediente-substituto';
+import { QuantidadePorTamanho } from '../dominio/quantidade-por-tamanho';
 
 export class RepositorioPizzaNoServidor implements RepositorioPizza {
 	constructor(private readonly servicoHttp: ServicoHttp) {}
@@ -38,7 +39,7 @@ export class RepositorioPizzaNoServidor implements RepositorioPizza {
 			pizza.nome,
 			pizza.descricao,
 			pizza.precosPorTamanho.map((preco: any) => new PrecoPorTamanho(preco.id, preco.tamanhoPizza, preco.preco)),
-			pizza.ingredientes.map((ingrediente: any) => new Ingrediente(ingrediente.id, ingrediente.nome)),
+			pizza.ingredientes.map((ingrediente: any) => new Ingrediente(ingrediente.id, ingrediente.nome, ingrediente.estoque.valor)),
 		);
 	}
 
@@ -73,23 +74,43 @@ export class RepositorioPizzaNoServidor implements RepositorioPizza {
 
 	private criarPizza(pizza: any): Pizza {
 		const ingredientesPadrao = pizza.ingredientesPadrao.map((ingredientePadrao: any) => {
+			const ingrediente = ingredientePadrao.ingrediente;
+
 			return new IngredientePadrao(
 				ingredientePadrao.id,
-				new Ingrediente(ingredientePadrao.ingrediente.id, ingredientePadrao.ingrediente.nome),
+				this.criarIngrediente(ingrediente),
 				ingredientePadrao.removivel,
 				ingredientePadrao.substituivel,
+				this.criarQuantidadesPorTamanho(ingredientePadrao.quantidadesPorTamanho),
 			);
 		});
+
 		const ingredientesSubstitutos = pizza.ingredientesSubstitutos.map((ingredienteSubstituto: any) => {
-			return new IngredienteSubstituto(ingredienteSubstituto.id, new Ingrediente(ingredienteSubstituto.ingrediente.id, ingredienteSubstituto.ingrediente.nome));
+			const ingrediente = ingredienteSubstituto.ingrediente;
+
+			return new IngredienteSubstituto(ingredienteSubstituto.id, this.criarIngrediente(ingrediente), this.criarQuantidadesPorTamanho(ingredienteSubstituto.quantidadesPorTamanho));
 		});
+
 		const adicionais = pizza.adicionais.map((adicional: any) => {
-			return new IngredienteAdicional(adicional.id, new Ingrediente(adicional.ingrediente.id, adicional.ingrediente.nome), adicional.preco);
+			const ingrediente = adicional.ingrediente;
+
+			return new IngredienteAdicional(adicional.id, this.criarIngrediente(ingrediente), adicional.preco, adicional.quantidadeMedida.valor);
 		});
+
 		const precosPorTamanho = pizza.precosPorTamanho.map((precoPorTamanho: any) => {
 			return new PrecoPorTamanho(precoPorTamanho.id, precoPorTamanho.tamanhoPizza, precoPorTamanho.preco);
 		});
 
 		return new Pizza(pizza.id, pizza.nome, pizza.descricao, ingredientesPadrao, ingredientesSubstitutos, adicionais, precosPorTamanho);
+	}
+
+	private criarIngrediente(ingrediente: any): Ingrediente {
+		return new Ingrediente(ingrediente.id, ingrediente.nome, ingrediente.estoque.valor);
+	}
+
+	private criarQuantidadesPorTamanho(quantidades: any[]): QuantidadePorTamanho[] {
+		return quantidades.map((quantidade: any) => {
+			return new QuantidadePorTamanho(quantidade.id, quantidade.tamanhoPizza, quantidade.quantidadeMedida.valor);
+		});
 	}
 }
