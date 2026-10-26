@@ -1,6 +1,7 @@
 import { Ingrediente } from '../../ingrediente/dominio/ingrediente';
 import { IngredienteAdicional } from './ingrediente-adicional';
 import { IngredientePadrao } from './ingrediente-padrao';
+import { IngredienteSubstituto } from './ingrediente-substituto';
 import { PrecoPorTamanho } from './preco-por-tamanho';
 import { TamanhoPizza } from './tamanho-pizza';
 
@@ -10,7 +11,7 @@ export class Pizza {
 		public readonly nome: string,
 		public readonly descricao: string = '',
 		public readonly ingredientesPadrao: IngredientePadrao[] = [],
-		public readonly ingredientesSubstitutos: Ingrediente[] = [],
+		public readonly ingredientesSubstitutos: IngredienteSubstituto[] = [],
 		public readonly adicionais: IngredienteAdicional[] = [],
 		public readonly precosPorTamanho: PrecoPorTamanho[] = [],
 	) {}

@@ -10,6 +10,7 @@ import { formatarDinheiro } from '../../util/dinheiro';
 import { rotuloTamanho, TamanhoPizza } from '../../pizza/dominio/tamanho-pizza';
 import { PapelIngrediente } from '../dominio/papel-ingrediente';
 import { DadosIngredienteEscolhido, DadosItemPizza, DadosSaborEscolhido, SaborPizza, TipoPizza } from './visao-registro-pedido';
+import { IngredienteSubstituto } from '../../pizza/dominio/ingrediente-substituto';
 
 export class VisaoPersonalizacaoPizzaDom implements VisaoPersonalizacaoPizza {
 	private controladoraRegistroPedido!: ControladoraRegistroPedido;
@@ -254,7 +255,7 @@ export class VisaoPersonalizacaoPizzaDom implements VisaoPersonalizacaoPizza {
 		return template;
 	}
 
-	private criarItemListaIngredientePersonalizavel(ingredientePadrao: IngredientePadrao, ingredientesSubstitutos: Ingrediente[]): DocumentFragment {
+	private criarItemListaIngredientePersonalizavel(ingredientePadrao: IngredientePadrao, ingredientesSubstitutos: IngredienteSubstituto[]): DocumentFragment {
 		const template = clonarTemplate('template-ingrediente-personalizavel');
 
 		const li = template.querySelector<HTMLLIElement>('.ingrediente-personalizavel')!;
@@ -269,7 +270,7 @@ export class VisaoPersonalizacaoPizzaDom implements VisaoPersonalizacaoPizza {
 
 		let options = [] as HTMLOptionElement[];
 		if (ingredientePadrao.substituivel) {
-			options = ingredientesSubstitutos.map((substituto) => this.criarOptionIngrediente(substituto));
+			options = ingredientesSubstitutos.map((ingredienteSubstituto) => this.criarOptionIngrediente(ingredienteSubstituto.ingrediente));
 		}
 
 		selectOpcoesTroca.append(optionPadrao, ...options);

@@ -9,6 +9,7 @@ import { Pizza } from '../dominio/pizza';
 import { Ingrediente } from '../../ingrediente/dominio/ingrediente';
 import { IngredientePadrao } from '../dominio/ingrediente-padrao';
 import { IngredienteAdicional } from '../dominio/ingrediente-adicional';
+import { IngredienteSubstituto } from '../dominio/ingrediente-substituto';
 
 export class RepositorioPizzaNoServidor implements RepositorioPizza {
 	constructor(private readonly servicoHttp: ServicoHttp) {}
@@ -71,12 +72,23 @@ export class RepositorioPizzaNoServidor implements RepositorioPizza {
 	}
 
 	private criarPizza(pizza: any): Pizza {
-		const ingredientesPadrao = pizza.ingredientesPadrao.map(
-			(ingrediente: any) => new IngredientePadrao(ingrediente.id, new Ingrediente(ingrediente.ingrediente.id, ingrediente.ingrediente.nome), ingrediente.removivel, ingrediente.substituivel),
-		);
-		const ingredientesSubstitutos = pizza.ingredientesSubstitutos.map((ingrediente: any) => new Ingrediente(ingrediente.id, ingrediente.nome));
-		const adicionais = pizza.adicionais.map((adicional: any) => new IngredienteAdicional(adicional.id, new Ingrediente(adicional.ingrediente.id, adicional.ingrediente.nome), adicional.preco));
-		const precosPorTamanho = pizza.precosPorTamanho.map((preco: any) => new PrecoPorTamanho(preco.id, preco.tamanhoPizza, preco.preco));
+		const ingredientesPadrao = pizza.ingredientesPadrao.map((ingredientePadrao: any) => {
+			return new IngredientePadrao(
+				ingredientePadrao.id,
+				new Ingrediente(ingredientePadrao.ingrediente.id, ingredientePadrao.ingrediente.nome),
+				ingredientePadrao.removivel,
+				ingredientePadrao.substituivel,
+			);
+		});
+		const ingredientesSubstitutos = pizza.ingredientesSubstitutos.map((ingredienteSubstituto: any) => {
+			return new IngredienteSubstituto(ingredienteSubstituto.id, new Ingrediente(ingredienteSubstituto.ingrediente.id, ingredienteSubstituto.ingrediente.nome));
+		});
+		const adicionais = pizza.adicionais.map((adicional: any) => {
+			return new IngredienteAdicional(adicional.id, new Ingrediente(adicional.ingrediente.id, adicional.ingrediente.nome), adicional.preco);
+		});
+		const precosPorTamanho = pizza.precosPorTamanho.map((precoPorTamanho: any) => {
+			return new PrecoPorTamanho(precoPorTamanho.id, precoPorTamanho.tamanhoPizza, precoPorTamanho.preco);
+		});
 
 		return new Pizza(pizza.id, pizza.nome, pizza.descricao, ingredientesPadrao, ingredientesSubstitutos, adicionais, precosPorTamanho);
 	}
