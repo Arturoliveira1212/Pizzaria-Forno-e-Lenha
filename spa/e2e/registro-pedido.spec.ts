@@ -266,6 +266,7 @@ test.describe('Registro de pedido', () => {
 				Cenário: Carregamento dos ingredientes da pizza no modal
 					Dado que o modal de personalização da pizza "Napolitana" no tamanho "Grande" está aberto
 					Então devem ser exibidos os ingredientes padrão da pizza "Napolitana"
+					E devem ser ser exibidos os ingredientes substitutos disponíveis para a pizza "Napolitana"
 					E devem ser exibidos os adicionais disponíveis para a pizza "Napolitana"
 					E deve ser exibido o valor total da personalização da pizza "Napolitana"
 			*/
@@ -274,6 +275,7 @@ test.describe('Registro de pedido', () => {
 				await tela.selecionarTamanhoPizza('Napolitana', 'G');
 				await tela.abrirModalPersonalizacaoPizza('Napolitana');
 				await tela.deveTerQuantidadeDeIngredientes(5, 1);
+				await tela.deveTerQuantidadeDeOpcoesDeIngredientesSubstitutos(8, 1);
 				await tela.deveTerQuantidadeDeAdicionais(2, 1);
 				await tela.deveExibirValorTotalDaPersonalizacaoPizza('R$ 56,00');
 			});

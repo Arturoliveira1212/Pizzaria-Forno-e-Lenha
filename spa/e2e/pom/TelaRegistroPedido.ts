@@ -278,6 +278,10 @@ export class TelaRegistroPedido {
 		await expect(this.obterListaAdicionais(sabor).locator('li')).toHaveCount(quantidade);
 	}
 
+	async deveTerQuantidadeDeOpcoesDeIngredientesSubstitutos(quantidade: number, sabor: Sabor = 1): Promise<void> {
+		await expect(this.obterOpcoesIngredientesSubstitutos(sabor).locator('option')).toHaveCount(quantidade);
+	}
+
 	async deveExibirValorTotalDaPersonalizacaoPizza(valor: string): Promise<void> {
 		await expect(this.valorTotalPersonalizacaoPizza).toHaveText(valor);
 	}
@@ -379,11 +383,11 @@ export class TelaRegistroPedido {
 		await this.card(categoria, nome).locator('.adicionar-item').click();
 	}
 
-	private itemResumo(nome: string) {
+	private itemResumo(nome: string): Locator {
 		return this.listaItensPedido.filter({ hasText: nome });
 	}
 
-	private cliente(identificador: string) {
+	private cliente(identificador: string): Locator {
 		return this.listaClientes.filter({ hasText: identificador });
 	}
 
@@ -401,6 +405,14 @@ export class TelaRegistroPedido {
 		}
 
 		return this.listaAdicionaisSegundoSabor;
+	}
+
+	private obterOpcoesIngredientesSubstitutos(sabor: Sabor): Locator {
+		if (sabor === 1) {
+			return this.listaIngredientesPrimeiroSabor.locator('.opcoes-troca');
+		}
+
+		return this.listaIngredientesSegundoSabor.locator('.opcoes-troca');
 	}
 
 	private ingredientePersonalizavel(nomeIngrediente: string, sabor: Sabor = 1): Locator {
