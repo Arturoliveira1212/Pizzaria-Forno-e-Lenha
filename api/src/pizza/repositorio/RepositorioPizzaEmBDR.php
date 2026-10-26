@@ -20,18 +20,13 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
             $pizzas = [];
             foreach ($resultado as $linha) {
                 $idPizza = (int) $linha['id'];
-                $ingredientes = $ingredientesPadrao[$idPizza]
-                    ? array_map(function (IngredientePadrao $ingredientePadrao) {
-                        return $ingredientePadrao->ingrediente;
-                    }, $ingredientesPadrao[$idPizza])
-                    : [];
 
                 $pizzas[] = new PizzaParaCardapio(
                     id: $idPizza,
                     nome: $linha['nome'],
                     descricao: $linha['descricao'],
                     precosPorTamanho: $precos[$idPizza] ?? [],
-                    ingredientes: $ingredientes,
+                    ingredientesPadrao: $ingredientesPadrao[$idPizza] ?? [],
                 );
             }
 
