@@ -27,6 +27,7 @@ export class ServicoHttpComFetch implements ServicoHttp {
 
 	private async realizarRequisicao(metodo: string, url: string, body?: unknown, headers?: Record<string, string>): Promise<RespostaHttp> {
 		const resposta = await fetch(url, {
+			credentials: 'include',
 			method: metodo,
 			headers: {
 				'Content-Type': 'application/json',
