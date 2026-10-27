@@ -41,7 +41,6 @@ export class VisaoResumoPedidoDom implements VisaoResumoPedido {
 		});
 
 		this.botaoRegistrarPedido.addEventListener('click', () => {
-			this.desabilitarRegistroPedido();
 			this.controladoraRegistroPedido.registrarPedido();
 		});
 	}

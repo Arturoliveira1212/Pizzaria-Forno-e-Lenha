@@ -13,6 +13,7 @@ import { VisaoEtapaProdutos } from '../view/visao-etapa-produtos';
 import { VisaoPersonalizacaoPizza } from '../view/visao-personalizacao-pizza';
 import { VisaoEtapaAtendimento } from '../view/visao-etapa-atendimento';
 import { VisaoResumoPedido } from '../view/visao-resumo-pedido';
+import { PedidoAtualizadoError } from '../../infra/exceptions/pedido-atualizado-error';
 
 type VisoesRegistroPedido = {
 	principal: VisaoRegistroPedido;
@@ -78,6 +79,11 @@ export class ControladoraRegistroPedido {
 	async personalizarItemPizza(idPizza: number, tamanho: TamanhoPizza): Promise<void> {
 		try {
 			const pizza = await this.gestor.obterPizzaPorId(idPizza);
+			const todosOsIngredientesPossuemEstoqueSuficiente = pizza.ingredientesPadrao.every((ingredientePadrao) => ingredientePadrao.temEstoqueSuficiente(tamanho));
+			if (!todosOsIngredientesPossuemEstoqueSuficiente) {
+				throw new Error('Não é possível personalizar a pizza. Alguns ingredientes não possuem estoque suficiente para o tamanho selecionado.');
+			}
+
 			this.visoes.personalizacao.exibirPizzaParaPersonalizacao(pizza, tamanho);
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível personalizar o produto.';
@@ -132,6 +138,7 @@ export class ControladoraRegistroPedido {
 			this.visoes.resumo.exibirResumoPedido(pedido);
 			this.visoes.personalizacao.fecharModal();
 		} catch (erro) {
+			this.tratarErroAtualizacaoPedido(erro);
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar a personalização ao pedido.';
 			this.visoes.resumo.exibirErroNoPedido(mensagem);
 			this.visoes.personalizacao.fecharModal();
@@ -143,6 +150,7 @@ export class ControladoraRegistroPedido {
 			const pedido = await this.gestor.adicionarItemPizza(dados);
 			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
+			this.tratarErroAtualizacaoPedido(erro);
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar o produto ao pedido.';
 			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
@@ -153,6 +161,7 @@ export class ControladoraRegistroPedido {
 			const pedido = await this.gestor.adicionarItemSimples(dados);
 			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
+			this.tratarErroAtualizacaoPedido(erro);
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar o produto ao pedido.';
 			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
@@ -174,6 +183,7 @@ export class ControladoraRegistroPedido {
 			const pedido = await this.gestor.adicionarCliente(idCliente);
 			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
+			this.tratarErroAtualizacaoPedido(erro);
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar o cliente ao pedido.';
 			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
@@ -184,6 +194,7 @@ export class ControladoraRegistroPedido {
 			const pedido = await this.gestor.removerCliente();
 			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
+			this.tratarErroAtualizacaoPedido(erro);
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível remover o cliente do pedido.';
 			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
@@ -194,6 +205,7 @@ export class ControladoraRegistroPedido {
 			const pedido = await this.gestor.alterarQuantidade(indice, delta);
 			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
+			this.tratarErroAtualizacaoPedido(erro);
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível alterar a quantidade do item.';
 			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
@@ -204,6 +216,7 @@ export class ControladoraRegistroPedido {
 			const pedido = await this.gestor.removerItem(indice);
 			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
+			this.tratarErroAtualizacaoPedido(erro);
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível remover o item.';
 			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
@@ -214,6 +227,7 @@ export class ControladoraRegistroPedido {
 			const pedido = await this.gestor.atualizarTipoAtendimento(tipoAtendimento);
 			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
+			this.tratarErroAtualizacaoPedido(erro);
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível atualizar o tipo de atendimento.';
 			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
@@ -221,13 +235,21 @@ export class ControladoraRegistroPedido {
 
 	async registrarPedido(): Promise<void> {
 		try {
+			this.visoes.resumo.desabilitarRegistroPedido();
 			await this.gestor.registrarPedido();
 			this.visoes.resumo.exibirMensagemPedidoRegistrado();
 			this.visoes.principal.redirecionarParaHome();
 		} catch (erro) {
+			this.tratarErroAtualizacaoPedido(erro);
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível registrar o pedido.';
 			this.visoes.resumo.exibirErroNoPedido(mensagem);
 			this.visoes.resumo.habilitarRegistroPedido();
+		}
+	}
+
+	private tratarErroAtualizacaoPedido(erro: any): void {
+		if (erro instanceof PedidoAtualizadoError) {
+			this.visoes.resumo.exibirResumoPedido(erro.pedidoAtualizado);
 		}
 	}
 }

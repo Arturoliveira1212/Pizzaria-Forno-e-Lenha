@@ -26,8 +26,7 @@ export class RepositorioPedidoNoServidor implements RepositorioPedido {
 					new PedidoListagem(pedido.id, pedido.data, pedido.nomeCliente, pedido.tipoAtendimento, pedido.status, pedido.proximosStatus, pedido.valorTotal),
 			);
 		} catch (error) {
-			const mensagemErro = error instanceof HttpError ? error.data?.erros?.join(', ') : 'Ocorreu um erro ao obter os pedidos.';
-			throw new RepositorioError(mensagemErro);
+			this.tratarErro(error, 'Ocorreu um erro ao obter a lista de pedidos.');
 		}
 	}
 
@@ -35,8 +34,7 @@ export class RepositorioPedidoNoServidor implements RepositorioPedido {
 		try {
 			await this.servicoHttp.patch(`${API}/pedidos/status`, { idPedido, status });
 		} catch (error) {
-			const mensagemErro = error instanceof HttpError ? error.data?.erros?.join(', ') : 'Ocorreu um erro ao alterar o status do pedido.';
-			throw new RepositorioError(mensagemErro);
+			this.tratarErro(error, 'Ocorreu um erro ao alterar o status do pedido.');
 		}
 	}
 
@@ -50,8 +48,7 @@ export class RepositorioPedidoNoServidor implements RepositorioPedido {
 
 			return new ResumoValoresPedido(valorTotalPromocao, valorTotalFidelidade, resumo.valorTotalDescontos, resumo.taxaEntrega, resumo.valorTotal);
 		} catch (error) {
-			const mensagemErro = error instanceof HttpError ? error.data?.erros?.join(', ') : 'Ocorreu um erro ao obter o resumo de descontos do pedido.';
-			throw new RepositorioError(mensagemErro);
+			this.tratarErro(error, 'Ocorreu um erro ao obter o resumo de valores do pedido.');
 		}
 	}
 
@@ -59,8 +56,7 @@ export class RepositorioPedidoNoServidor implements RepositorioPedido {
 		try {
 			await this.servicoHttp.post(`${API}/pedidos`, this.obterCorpoRequisicaoParaPedido(pedido));
 		} catch (error) {
-			const mensagemErro = error instanceof HttpError ? error.data?.erros?.join(', ') : 'Ocorreu um erro ao registrar o pedido.';
-			throw new RepositorioError(mensagemErro);
+			this.tratarErro(error, 'Ocorreu um erro ao registrar o pedido.');
 		}
 	}
 
@@ -91,5 +87,13 @@ export class RepositorioPedidoNoServidor implements RepositorioPedido {
 			idCliente: pedido.cliente?.id,
 			itensPedido: itensPedido,
 		};
+	}
+
+	private tratarErro(error: any, mensagemPadrao: string): never {
+		if (error instanceof HttpError) {
+			throw new RepositorioError(error.data?.erros?.join(', ') ?? mensagemPadrao, error.data);
+		}
+
+		throw new RepositorioError(mensagemPadrao);
 	}
 }

@@ -174,17 +174,31 @@ export class VisaoEtapaProdutosDom implements VisaoEtapaProdutos {
 		card.querySelector('.card-text')!.textContent = pizza.descricao;
 
 		const opcoesTamanho = this.criarOpcoesTamanho(pizza);
+		if (opcoesTamanho.length === 0) {
+			const botaoAdicionar = card.querySelector<HTMLButtonElement>('.adicionar-item')!;
+			const botaoPersonalizar = card.querySelector<HTMLButtonElement>('.personalizar-item')!;
+			botaoAdicionar.remove();
+			botaoPersonalizar.remove();
+
+			this.adicionarAvisoProdutoSemEstoque(card);
+		}
+
 		const grupoTamanhos = card.querySelector('.tamanhos-pizza')!;
 		grupoTamanhos.append(...opcoesTamanho);
 
 		return template;
 	}
 
+	private adicionarAvisoProdutoSemEstoque(card: HTMLElement): void {
+		const templateAvisoSemEstoque = clonarTemplate('template-produto-sem-estoque');
+		const cardBody = card.querySelector('.card-body')!;
+		cardBody.appendChild(templateAvisoSemEstoque);
+	}
+
 	private criarOpcoesTamanho(pizza: PizzaParaCardapio): DocumentFragment[] {
 		const opcoesTamanho: DocumentFragment[] = [];
 
-		const precosPorTamanho = pizza.precosPorTamanho;
-		precosPorTamanho.forEach((precoPorTamanho) => {
+		pizza.precosPorTamanho.forEach((precoPorTamanho) => {
 			const tamanho = precoPorTamanho.tamanhoPizza;
 			const todosOsIngredientesPossuemEstoqueSuficiente = pizza.ingredientesPadrao.every((ingredientePadrao) => ingredientePadrao.temEstoqueSuficiente(tamanho));
 			if (!todosOsIngredientesPossuemEstoqueSuficiente) {
@@ -252,6 +266,14 @@ export class VisaoEtapaProdutosDom implements VisaoEtapaProdutos {
 
 		const precoSpan = card.querySelector<HTMLElement>('.preco')!;
 		precoSpan.textContent = formatarDinheiro(produto.preco);
+
+		if (produto.estoque === 0) {
+			const botaoAdicionar = card.querySelector<HTMLButtonElement>('.adicionar-item')!;
+			botaoAdicionar.remove();
+			precoSpan.remove();
+
+			this.adicionarAvisoProdutoSemEstoque(card);
+		}
 
 		return template;
 	}

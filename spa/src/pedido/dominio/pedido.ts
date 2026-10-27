@@ -124,6 +124,10 @@ export class Pedido {
 		return new Pedido(tipoAtendimento, this.cliente, this.itensPedido, this.valorDescontoPromocao, this.valorDescontoFidelidade, this.taxaEntrega, this.valorTotal);
 	}
 
+	criarNovoPedidoComItens(itensPedido: ItemPedido[]): Pedido {
+		return new Pedido(this.tipoAtendimento, this.cliente, itensPedido, this.valorDescontoPromocao, this.valorDescontoFidelidade, this.taxaEntrega, this.valorTotal);
+	}
+
 	estaVazio(): boolean {
 		return this.itensPedido.length === 0;
 	}
