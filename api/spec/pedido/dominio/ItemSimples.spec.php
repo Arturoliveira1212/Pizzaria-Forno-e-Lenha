@@ -78,6 +78,22 @@ describe('ItemSimples', function () {
 
         it('retorna a o consumo corretamente', function () {
             $produtoSimples = ProdutoSimplesFactory::cocaCola();
+            $quantidade = 1;
+
+            $itemSimples = new ItemSimples(
+                id: ItemPedido::MENOR_ID_PERMITIDO,
+                quantidade: $quantidade,
+                produtoSimples: ProdutoSimplesFactory::cocaCola(),
+            );
+
+            $consumo = $itemSimples->obterConsumo();
+
+            expect($consumo->valor)->toBe($quantidade);
+            expect($consumo->unidadeMedida->id)->toBe($produtoSimples->estoque->unidadeMedida->id);
+        });
+
+        it('retorna o consumo corretamente (quantidade 2)', function () {
+            $produtoSimples = ProdutoSimplesFactory::cocaCola();
             $quantidade = 5;
 
             $itemSimples = new ItemSimples(
@@ -91,6 +107,7 @@ describe('ItemSimples', function () {
             expect($consumo->valor)->toBe($quantidade);
             expect($consumo->unidadeMedida->id)->toBe($produtoSimples->estoque->unidadeMedida->id);
         });
+
     });
 
     describe('copiarComQuantidade()', function () {

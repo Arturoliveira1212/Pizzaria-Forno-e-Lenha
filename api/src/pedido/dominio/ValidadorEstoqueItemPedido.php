@@ -85,6 +85,7 @@ class ValidadorEstoqueItemPedido {
                     ingredienteEscolhido: $ingredienteEscolhido,
                     tamanhoPizza: $itemPizza->tamanhoPizza,
                     quantidadeSabores: $quantidadeSabores,
+                    quantidadeItem: $itemPizza->quantidade,
                 );
 
                 $ingrediente = $ingredienteEscolhido->ingrediente;

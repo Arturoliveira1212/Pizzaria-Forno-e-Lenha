@@ -345,6 +345,7 @@ class GestorPedido {
                     ingredienteEscolhido: $ingredienteEscolhido,
                     tamanhoPizza: $itemPizza->tamanhoPizza,
                     quantidadeSabores: $quantidadeSabores,
+                    quantidadeItem: $itemPizza->quantidade,
                 );
 
                 $this->repositorioIngrediente->atualizarEstoqueIngrediente(

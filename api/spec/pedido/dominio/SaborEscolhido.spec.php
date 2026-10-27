@@ -278,9 +278,26 @@ describe('SaborEscolhido', function () {
                 ingredienteEscolhido: $ingredienteEscolhido,
                 tamanhoPizza: TamanhoPizza::MEDIA,
                 quantidadeSabores: 1,
+                quantidadeItem: 1,
             );
 
             expect($consumo->valor)->toBe(200);
+            expect($consumo->unidadeMedida->id)->toBe(2);
+            expect($consumo->unidadeMedida->descricao)->toBe('gramas');
+            expect($consumo->unidadeMedida->sigla)->toBe('g');
+        });
+
+        it('retorna o consumo corretamente para um ingrediente padrão (pizza inteira + quantidade 2)', function () {
+            $ingredienteEscolhido = IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::mussarela());
+
+            $consumo = $this->saborEscolhido->obterConsumo(
+                ingredienteEscolhido: $ingredienteEscolhido,
+                tamanhoPizza: TamanhoPizza::MEDIA,
+                quantidadeSabores: 1,
+                quantidadeItem: 2,
+            );
+
+            expect($consumo->valor)->toBe(400);
             expect($consumo->unidadeMedida->id)->toBe(2);
             expect($consumo->unidadeMedida->descricao)->toBe('gramas');
             expect($consumo->unidadeMedida->sigla)->toBe('g');
@@ -293,9 +310,26 @@ describe('SaborEscolhido', function () {
                 ingredienteEscolhido: $ingredienteEscolhido,
                 tamanhoPizza: TamanhoPizza::MEDIA,
                 quantidadeSabores: 2,
+                quantidadeItem: 1,
             );
 
             expect($consumo->valor)->toBe(100);
+            expect($consumo->unidadeMedida->id)->toBe(2);
+            expect($consumo->unidadeMedida->descricao)->toBe('gramas');
+            expect($consumo->unidadeMedida->sigla)->toBe('g');
+        });
+
+        it('retorna o consumo corretamente para um ingrediente padrão (pizza com 2 sabores + quantidade 2)', function () {
+            $ingredienteEscolhido = IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::mussarela());
+
+            $consumo = $this->saborEscolhido->obterConsumo(
+                ingredienteEscolhido: $ingredienteEscolhido,
+                tamanhoPizza: TamanhoPizza::MEDIA,
+                quantidadeSabores: 2,
+                quantidadeItem: 2,
+            );
+
+            expect($consumo->valor)->toBe(200);
             expect($consumo->unidadeMedida->id)->toBe(2);
             expect($consumo->unidadeMedida->descricao)->toBe('gramas');
             expect($consumo->unidadeMedida->sigla)->toBe('g');
@@ -308,9 +342,26 @@ describe('SaborEscolhido', function () {
                 ingredienteEscolhido: $ingredienteEscolhido,
                 tamanhoPizza: TamanhoPizza::GRANDE,
                 quantidadeSabores: 1,
+                quantidadeItem: 1,
             );
 
             expect($consumo->valor)->toBe(300);
+            expect($consumo->unidadeMedida->id)->toBe(2);
+            expect($consumo->unidadeMedida->descricao)->toBe('gramas');
+            expect($consumo->unidadeMedida->sigla)->toBe('g');
+        });
+
+        it('retorna o consumo corretamente para um ingrediente substituto (pizza inteira + quantidade 2)', function () {
+            $ingredienteEscolhido = IngredienteEscolhidoFactory::substituto(1, IngredienteFactory::cebola());
+
+            $consumo = $this->saborEscolhido->obterConsumo(
+                ingredienteEscolhido: $ingredienteEscolhido,
+                tamanhoPizza: TamanhoPizza::GRANDE,
+                quantidadeSabores: 1,
+                quantidadeItem: 2,
+            );
+
+            expect($consumo->valor)->toBe(600);
             expect($consumo->unidadeMedida->id)->toBe(2);
             expect($consumo->unidadeMedida->descricao)->toBe('gramas');
             expect($consumo->unidadeMedida->sigla)->toBe('g');
@@ -323,9 +374,26 @@ describe('SaborEscolhido', function () {
                 ingredienteEscolhido: $ingredienteEscolhido,
                 tamanhoPizza: TamanhoPizza::GRANDE,
                 quantidadeSabores: 2,
+                quantidadeItem: 1,
             );
 
             expect($consumo->valor)->toBe(150);
+            expect($consumo->unidadeMedida->id)->toBe(2);
+            expect($consumo->unidadeMedida->descricao)->toBe('gramas');
+            expect($consumo->unidadeMedida->sigla)->toBe('g');
+        });
+
+        it('retorna o consumo corretamente para um ingrediente substituto (pizza com 2 sabores + quantidade 2)', function () {
+            $ingredienteEscolhido = IngredienteEscolhidoFactory::substituto(1, IngredienteFactory::cebola());
+
+            $consumo = $this->saborEscolhido->obterConsumo(
+                ingredienteEscolhido: $ingredienteEscolhido,
+                tamanhoPizza: TamanhoPizza::GRANDE,
+                quantidadeSabores: 2,
+                quantidadeItem: 2,
+            );
+
+            expect($consumo->valor)->toBe(300);
             expect($consumo->unidadeMedida->id)->toBe(2);
             expect($consumo->unidadeMedida->descricao)->toBe('gramas');
             expect($consumo->unidadeMedida->sigla)->toBe('g');
@@ -338,9 +406,26 @@ describe('SaborEscolhido', function () {
                 ingredienteEscolhido: $ingredienteEscolhido,
                 tamanhoPizza: TamanhoPizza::PEQUENA,
                 quantidadeSabores: 1,
+                quantidadeItem: 1,
             );
 
             expect($consumo->valor)->toBe(350);
+            expect($consumo->unidadeMedida->id)->toBe(2);
+            expect($consumo->unidadeMedida->descricao)->toBe('gramas');
+            expect($consumo->unidadeMedida->sigla)->toBe('g');
+        });
+
+        it('retorna o consumo corretamente para um ingrediente adicional (pizza inteira + quantidade 2)', function () {
+            $ingredienteEscolhido = IngredienteEscolhidoFactory::adicional(1, IngredienteFactory::bacon(), 899);
+
+            $consumo = $this->saborEscolhido->obterConsumo(
+                ingredienteEscolhido: $ingredienteEscolhido,
+                tamanhoPizza: TamanhoPizza::PEQUENA,
+                quantidadeSabores: 1,
+                quantidadeItem: 2,
+            );
+
+            expect($consumo->valor)->toBe(700);
             expect($consumo->unidadeMedida->id)->toBe(2);
             expect($consumo->unidadeMedida->descricao)->toBe('gramas');
             expect($consumo->unidadeMedida->sigla)->toBe('g');
@@ -353,9 +438,26 @@ describe('SaborEscolhido', function () {
                 ingredienteEscolhido: $ingredienteEscolhido,
                 tamanhoPizza: TamanhoPizza::PEQUENA,
                 quantidadeSabores: 2,
+                quantidadeItem: 1,
             );
 
             expect($consumo->valor)->toBe(175);
+            expect($consumo->unidadeMedida->id)->toBe(2);
+            expect($consumo->unidadeMedida->descricao)->toBe('gramas');
+            expect($consumo->unidadeMedida->sigla)->toBe('g');
+        });
+
+        it('retorna o consumo corretamente para um ingrediente adicional (pizza com 2 sabores + quantidade 2)', function () {
+            $ingredienteEscolhido = IngredienteEscolhidoFactory::adicional(1, IngredienteFactory::bacon(), 899);
+
+            $consumo = $this->saborEscolhido->obterConsumo(
+                ingredienteEscolhido: $ingredienteEscolhido,
+                tamanhoPizza: TamanhoPizza::PEQUENA,
+                quantidadeSabores: 2,
+                quantidadeItem: 2,
+            );
+
+            expect($consumo->valor)->toBe(350);
             expect($consumo->unidadeMedida->id)->toBe(2);
             expect($consumo->unidadeMedida->descricao)->toBe('gramas');
             expect($consumo->unidadeMedida->sigla)->toBe('g');

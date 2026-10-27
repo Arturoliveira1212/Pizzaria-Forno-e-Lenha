@@ -126,7 +126,7 @@ class SaborEscolhido {
         return $preco;
     }
 
-    public function obterConsumo(IngredienteEscolhido $ingredienteEscolhido, TamanhoPizza $tamanhoPizza, int $quantidadeSabores): QuantidadeMedida {
+    public function obterConsumo(IngredienteEscolhido $ingredienteEscolhido, TamanhoPizza $tamanhoPizza, int $quantidadeSabores, int $quantidadeItem): QuantidadeMedida {
         $ingrediente = $ingredienteEscolhido->ingrediente;
         $pizza = $this->pizza;
 
@@ -136,6 +136,6 @@ class SaborEscolhido {
             PapelIngrediente::ADICIONAL => $pizza->obterAdicional($ingrediente)->quantidadeMedida,
         };
 
-        return $quantidade->dividir($quantidadeSabores);
+        return $quantidade->dividir($quantidadeSabores)->multiplicar($quantidadeItem);
     }
 }

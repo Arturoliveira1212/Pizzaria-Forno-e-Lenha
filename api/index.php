@@ -29,7 +29,7 @@ try {
     $app = new Router();
 
     $app->use(cors([
-        'origin' => ['http://localhost:5174', 'http://localhost:5173', 'http://localhost:8080'],
+        'origin' => ['http://localhost:5174', 'http://localhost:5173'],
         'credentials' => true,
         'allowedHeaders' => ['Accept', 'Authorization', 'Cookie', 'Content-Length', 'Content-Type', 'Host', 'Origin', 'Referer'],
         'exposeHeaders' => ['Content-Length', 'Content-Type', 'Set-Cookie'],

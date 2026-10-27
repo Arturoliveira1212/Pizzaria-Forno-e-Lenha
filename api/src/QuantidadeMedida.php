@@ -55,4 +55,14 @@ class QuantidadeMedida {
 
         return new QuantidadeMedida($novoValor, $this->unidadeMedida);
     }
+
+    public function multiplicar(int $multiplicador): QuantidadeMedida {
+        if ($multiplicador < 0) {
+            throw new DominioException('Não é possível multiplicar por número negativo.');
+        }
+
+        $novoValor = $this->valor * $multiplicador;
+
+        return new QuantidadeMedida($novoValor, $this->unidadeMedida);
+    }
 }
