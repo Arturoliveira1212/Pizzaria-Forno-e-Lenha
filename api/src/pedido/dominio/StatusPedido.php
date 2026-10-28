@@ -23,7 +23,7 @@ enum StatusPedido: string {
                 TipoAtendimento::RETIRADA => [self::PRONTO_PARA_RETIRADA, self::CANCELADO],
                 TipoAtendimento::BALCAO => [self::FINALIZADO, self::CANCELADO],
             },
-            self::SAIU_PARA_ENTREGA, self::PRONTO_PARA_RETIRADA => [self::FINALIZADO, self::CANCELADO],
+            self::SAIU_PARA_ENTREGA, self::PRONTO_PARA_RETIRADA => [self::FINALIZADO],
             self::FINALIZADO, self::CANCELADO => [],
         };
     }
