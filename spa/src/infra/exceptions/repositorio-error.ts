@@ -1,10 +1,6 @@
 export class RepositorioError extends Error {
-	constructor(
-		mensagem: string,
-		public readonly data?: any,
-	) {
+	constructor(mensagem: string) {
 		super(mensagem);
 		this.name = 'RepositorioError';
-		this.data = data;
 	}
 }

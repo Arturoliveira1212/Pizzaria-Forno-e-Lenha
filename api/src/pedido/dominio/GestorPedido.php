@@ -31,6 +31,7 @@ class GestorPedido {
 
     public function registrarPedido(PedidoParaCadastro $pedidoParaCadastro): Pedido {
         $pedido = $this->criarPedido($pedidoParaCadastro);
+        $this->validarEstoqueItensPedido($pedido->itensPedido);
 
         $this->unidadeTrabalho->executar(function () use ($pedido) {
             $this->repositorioPedido->registrarPedido($pedido);
@@ -49,49 +50,40 @@ class GestorPedido {
     }
 
     private function criarPedido(PedidoParaCadastro $pedidoParaCadastro): Pedido {
-        $itensPedido = [];
+        $tipoAtendimento = TipoAtendimento::tryFrom($pedidoParaCadastro->tipoAtendimento);
+        if ($tipoAtendimento === null) {
+            throw DominioException::criarException("Tipo de atendimento inválido: {$pedidoParaCadastro->tipoAtendimento}.");
+        }
 
-        try {
-            $tipoAtendimento = TipoAtendimento::tryFrom($pedidoParaCadastro->tipoAtendimento);
-            if ($tipoAtendimento === null) {
-                throw DominioException::criarException("Tipo de atendimento inválido: {$pedidoParaCadastro->tipoAtendimento}.");
-            }
+        $erros = [];
+        $itensPedido = $this->criarItensPedido(itensPedidoParaCadastro: $pedidoParaCadastro->itensPedido, erros: $erros);
+        if (!empty($erros)) {
+            throw DominioException::criarException(...$erros);
+        }
 
-            $erros = [];
-            $itensPedido = $this->criarItensPedido(itensPedidoParaCadastro: $pedidoParaCadastro->itensPedido, erros: $erros);
-            if (!empty($erros)) {
-                throw DominioException::criarException(...$erros);
-            }
+        $descontosPromocao = $this->criarDescontosPromocao($itensPedido);
 
-            $descontosPromocao = $this->criarDescontosPromocao($itensPedido);
-
-            $descontoFidelidade = null;
-            $cliente = $this->repositorioCliente->obterClientePorId($pedidoParaCadastro->idCliente);
-            if ($cliente instanceof Cliente && $cliente->temBeneficioFidelidadeValidoParaUso()) {
-                $descontoFidelidade = $this->criarDescontoFidelidade(
-                    beneficioFidelidade: $cliente->beneficioFidelidade,
-                    itensPedido: $itensPedido,
-                    descontosPromocao: $descontosPromocao,
-                );
-            }
-
-            return new Pedido(
-                id: 0,
-                usuario: UsuarioFactory::atendente(), // TODO: Temporário para passar os testes
-                data: new DateTime(),
-                tipoAtendimento: $tipoAtendimento,
-                cliente: $cliente,
+        $descontoFidelidade = null;
+        $cliente = $this->repositorioCliente->obterClientePorId($pedidoParaCadastro->idCliente);
+        if ($cliente instanceof Cliente && $cliente->temBeneficioFidelidadeValidoParaUso()) {
+            $descontoFidelidade = $this->criarDescontoFidelidade(
+                beneficioFidelidade: $cliente->beneficioFidelidade,
                 itensPedido: $itensPedido,
-                status: StatusPedido::inicial(),
                 descontosPromocao: $descontosPromocao,
-                descontoFidelidade: $descontoFidelidade,
-            );
-        } catch (DominioException $e) {
-            throw new RegistroPedidoException(
-                erros: $e->erros(),
-                itensPedidoAtualizados: $itensPedido,
             );
         }
+
+        return new Pedido(
+            id: 0,
+            usuario: UsuarioFactory::atendente(), // TODO: Temporário para passar os testes
+            data: new DateTime(),
+            tipoAtendimento: $tipoAtendimento,
+            cliente: $cliente,
+            itensPedido: $itensPedido,
+            status: StatusPedido::inicial(),
+            descontosPromocao: $descontosPromocao,
+            descontoFidelidade: $descontoFidelidade,
+        );
     }
 
     /**
@@ -117,16 +109,6 @@ class GestorPedido {
             if ($itemSimples instanceof ItemSimples) {
                 $itensSimples[] = $itemSimples;
             }
-        }
-
-        $validador = new ValidadorEstoqueItemPedido();
-
-        if (!empty($itensSimples)) {
-            $itensSimples = $validador->validarEstoqueItensSimples(itensSimples: $itensSimples, erros: $erros);
-        }
-
-        if (!empty($itensPizza)) {
-            $itensPizza = $validador->validarEstoqueItensPizza(itensPizza: $itensPizza, erros: $erros);
         }
 
         $itensPedido = [...$itensPizza, ...$itensSimples];
@@ -317,6 +299,20 @@ class GestorPedido {
             beneficioFidelidade: $beneficioFidelidade,
             valorTotalDescontoPromocao: $valorTotalDescontoPromocao,
         );
+    }
+
+    /**
+     * @param ItemPedido[] $itensPedido
+     */
+    private function validarEstoqueItensPedido(array $itensPedido): void {
+        $erros = [];
+
+        $validador = new ValidadorEstoqueItemPedido();
+        $validador->validarEstoqueItensPedido(itensPedido: $itensPedido, erros: $erros);
+
+        if (!empty($erros)) {
+            throw DominioException::criarException(...$erros);
+        }
     }
 
     private function atualizarEstoqueItensPedido(Pedido $pedido): void {

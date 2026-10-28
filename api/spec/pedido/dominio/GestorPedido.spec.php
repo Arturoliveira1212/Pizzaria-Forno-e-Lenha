@@ -85,7 +85,7 @@ describe('GestorPedido', function () {
             it('lança exceção quando o tipo atendimento é inválido', function () {
                 $tipoQueNaoExiste = 'tipo_que_nao_existe';
 
-                /** @var RegistroPedidoException $e */
+                /** @var DominioException $e */
                 $e = capturarExcecao(function () use ($tipoQueNaoExiste) {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
@@ -96,8 +96,8 @@ describe('GestorPedido', function () {
                     );
                 });
 
-                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
-                expect($e->erros)->toBe(["Tipo de atendimento inválido: {$tipoQueNaoExiste}."]);
+                expect($e)->toBeAnInstanceOf(DominioException::class);
+                expect($e->erros())->toBe(["Tipo de atendimento inválido: {$tipoQueNaoExiste}."]);
             });
         });
 
@@ -106,7 +106,7 @@ describe('GestorPedido', function () {
             it('lança exceção quando o tamanho da pizza é inválido', function () {
                 $tamanhoQueNaoExiste = 'tamanho_que_nao_existe';
 
-                /** @var RegistroPedidoException $e */
+                /** @var DominioException $e */
                 $e = capturarExcecao(function () use ($tamanhoQueNaoExiste) {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
@@ -128,8 +128,8 @@ describe('GestorPedido', function () {
                     );
                 });
 
-                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
-                expect($e->erros)->toBe(["Tamanho de pizza inválido: {$tamanhoQueNaoExiste}."]);
+                expect($e)->toBeAnInstanceOf(DominioException::class);
+                expect($e->erros())->toBe(["Tamanho de pizza inválido: {$tamanhoQueNaoExiste}."]);
             });
 
         });
@@ -141,7 +141,7 @@ describe('GestorPedido', function () {
 
                 $idInexistente = 999;
 
-                /** @var RegistroPedidoException $e */
+                /** @var DominioException $e */
                 $e = capturarExcecao(function () use ($idInexistente) {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
@@ -163,8 +163,8 @@ describe('GestorPedido', function () {
                     );
                 });
 
-                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
-                expect($e->erros)->toBe([
+                expect($e)->toBeAnInstanceOf(DominioException::class);
+                expect($e->erros())->toBe([
                     "Pizza (ID {$idInexistente}) não encontrada.",
                     'A quantidade de sabores deve ser entre 1 e 2.',
                 ]);
@@ -180,7 +180,7 @@ describe('GestorPedido', function () {
 
                 $idInexistente = 999;
 
-                /** @var RegistroPedidoException $e */
+                /** @var DominioException $e */
                 $e = capturarExcecao(function () use ($idInexistente) {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
@@ -207,8 +207,8 @@ describe('GestorPedido', function () {
                     );
                 });
 
-                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
-                expect($e->erros)->toBe(["Ingrediente (ID {$idInexistente}) não encontrado."]);
+                expect($e)->toBeAnInstanceOf(DominioException::class);
+                expect($e->erros())->toBe(["Ingrediente (ID {$idInexistente}) não encontrado."]);
             });
 
             it('lança exceção quando o papel do ingrediente é inválido', function () {
@@ -217,7 +217,7 @@ describe('GestorPedido', function () {
 
                 $papelQueNaoExiste = 'papel_que_nao_existe';
 
-                /** @var RegistroPedidoException $e */
+                /** @var DominioException $e */
                 $e = capturarExcecao(function () use ($papelQueNaoExiste) {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
@@ -244,15 +244,15 @@ describe('GestorPedido', function () {
                     );
                 });
 
-                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
-                expect($e->erros)->toBe(["Papel do ingrediente inválido: {$papelQueNaoExiste}."]);
+                expect($e)->toBeAnInstanceOf(DominioException::class);
+                expect($e->erros())->toBe(["Papel do ingrediente inválido: {$papelQueNaoExiste}."]);
             });
 
             it('lança exceção quando o adicional não é encontrado', function () {
                 allow($this->repositorioPizza)->toReceive('obterPizzaPorId')->andReturn($this->pizza);
                 allow($this->repositorioIngrediente)->toReceive('obterIngredientePorId')->andReturn($this->queijo);
 
-                /** @var RegistroPedidoException $e */
+                /** @var DominioException $e */
                 $e = capturarExcecao(function () {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
@@ -283,8 +283,8 @@ describe('GestorPedido', function () {
                     );
                 });
 
-                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
-                expect($e->erros)->toBe([
+                expect($e)->toBeAnInstanceOf(DominioException::class);
+                expect($e->erros())->toBe([
                     'Ingrediente adicional (ID 2) não encontrado para a pizza (ID 1).',
                     'O ingrediente Mussarela(2) não é permitido como padrão para a pizza.',
                     'A quantidade de sabores deve ser entre 1 e 2.',
@@ -300,7 +300,7 @@ describe('GestorPedido', function () {
 
                 $idInexistente = 999;
 
-                /** @var RegistroPedidoException $e */
+                /** @var DominioException $e */
                 $e = capturarExcecao(function () use ($idInexistente) {
                     $this->gestorPedido->registrarPedido(
                         new PedidoParaCadastro(
@@ -316,8 +316,8 @@ describe('GestorPedido', function () {
                     );
                 });
 
-                expect($e)->toBeAnInstanceOf(RegistroPedidoException::class);
-                expect($e->erros)->toBe(["Produto simples (ID {$idInexistente}) não encontrado."]);
+                expect($e)->toBeAnInstanceOf(DominioException::class);
+                expect($e->erros())->toBe(["Produto simples (ID {$idInexistente}) não encontrado."]);
             });
 
         });

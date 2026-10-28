@@ -2,30 +2,35 @@
 
 class ValidadorEstoqueItemPedido {
     /**
-     * @param ItemSimples[] $itensSimples
+     * @param ItemPedido[] $itensPedido
      * @param string[] $erros
-     * @return ItemSimples[]
      */
-    public function validarEstoqueItensSimples(array $itensSimples, array &$erros): array {
-        $itensSimplesAtualizados = [];
+    public function validarEstoqueItensPedido(array $itensPedido, array &$erros): void {
+        $mapaIngredientes = [];
 
-        foreach ($itensSimples as $itemSimples) {
-            $item = $this->validarEstoqueItemSimples(itemSimples: $itemSimples, erros: $erros);
-            if (!$item instanceof ItemSimples) {
+        foreach ($itensPedido as $itemPedido) {
+            if ($itemPedido instanceof ItemPizza) {
+                $this->validarEstoqueItemPizza(
+                    itemPizza: $itemPedido,
+                    mapaIngredientes: $mapaIngredientes,
+                    erros: $erros,
+                );
                 continue;
             }
 
-            $itensSimplesAtualizados[] = $item;
+            if ($itemPedido instanceof ItemSimples) {
+                $this->validarEstoqueItemSimples(itemSimples: $itemPedido, erros: $erros);
+                continue;
+            }
         }
 
-        return $itensSimplesAtualizados;
     }
 
     /**
+     * @param ItemSimples $itemSimples
      * @param string[] $erros
-     * @return ItemSimples|null
      */
-    private function validarEstoqueItemSimples(ItemSimples $itemSimples, array &$erros): ?ItemSimples {
+    private function validarEstoqueItemSimples(ItemSimples $itemSimples, array &$erros): void {
         $produtoSimples = $itemSimples->produtoSimples;
         $idProdutoSimples = $produtoSimples->id;
 
@@ -33,46 +38,21 @@ class ValidadorEstoqueItemPedido {
         if (!$produtoSimples->temEstoqueSuficiente($consumo)) {
             $estoqueAtual = $produtoSimples->estoque;
             if ($estoqueAtual->ehMaiorQueZero()) {
-                $erros[] = "Produto {$produtoSimples->nome} (ID {$idProdutoSimples}) não possui estoque suficiente. Quantidade ajustada para {$estoqueAtual->valor}.";
+                $erros[] = "Produto {$produtoSimples->nome} (ID {$idProdutoSimples}) não possui estoque suficiente. Quantidade em estoque: {$estoqueAtual->valor}.";
 
-                return $itemSimples->copiarComQuantidade($estoqueAtual->valor);
+                return;
             }
 
             $erros[] = "Produto {$produtoSimples->nome} (ID {$idProdutoSimples}) está sem estoque.";
-
-            return null;
         }
-
-        return $itemSimples;
     }
 
     /**
-     * @param ItemPizza[] $itensPizza
-     * @param string[] $erros
-     * @return ItemPizza[]
-     */
-    public function validarEstoqueItensPizza(array $itensPizza, array &$erros): array {
-        $itensPizzaAtualizados = [];
-        $mapaIngredientes = [];
-
-        foreach ($itensPizza as $itemPizza) {
-            $item = $this->validarEstoqueItemPizza(itemPizza: $itemPizza, mapaIngredientes: $mapaIngredientes, erros: $erros);
-            if (!$item instanceof ItemPizza) {
-                continue;
-            }
-
-            $itensPizzaAtualizados[] = $item;
-        }
-
-        return $itensPizzaAtualizados;
-    }
-
-    /**
+     * @param ItemPizza $itemPizza
      * @param array<int, Ingrediente> $mapaIngredientes
      * @param string[] $erros
-     * @return ItemPizza|null
      */
-    private function validarEstoqueItemPizza(ItemPizza $itemPizza, array &$mapaIngredientes, array &$erros): ?ItemPizza {
+    private function validarEstoqueItemPizza(ItemPizza $itemPizza, array &$mapaIngredientes, array &$erros): void {
         $saboresEscolhidos = $itemPizza->saboresEscolhidos;
         $quantidadeSabores = count($saboresEscolhidos);
         $inconsistenciasEncontradas = false;
@@ -106,9 +86,7 @@ class ValidadorEstoqueItemPedido {
         }
 
         if ($inconsistenciasEncontradas) {
-            return null;
+            // $erros[] = "Pizza XPTO não possui estoque suficiente para os ingredientes escolhidos";
         }
-
-        return $itemPizza;
     }
 }

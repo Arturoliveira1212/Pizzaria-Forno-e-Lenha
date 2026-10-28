@@ -4,13 +4,12 @@ describe('ValidadorEstoqueItemPedido', function () {
 
     describe('validarEstoqueItensSimples()', function () {
 
-        it('preenche erros e retorna itens atualizados corretamente quando o produto simples está sem estoque', function () {
+        it('preenche erros corretamente quando o produto simples está sem estoque', function () {
             $erros = [];
-            $itensAtualizados = [];
 
             $validador = new ValidadorEstoqueItemPedido();
-            $itensAtualizados = $validador->validarEstoqueItensSimples(
-                itensSimples: [
+            $validador->validarEstoqueItensPedido(
+                itensPedido: [
                     new ItemSimples(
                         id: 1,
                         quantidade: 1,
@@ -20,17 +19,15 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($itensAtualizados)->toHaveLength(0);
             expect($erros)->toBe(['Produto Coca-Cola (ID 1) está sem estoque.']);
         });
 
-        it('preenche erros e retorna itens atualizados corretamente quando a quantidade do produto simples é maior que o estoque disponível (1 item simples)', function () {
+        it('preenche erros corretamente quando a quantidade do produto simples é maior que o estoque disponível (1 item simples)', function () {
             $erros = [];
-            $itensAtualizados = [];
 
             $validador = new ValidadorEstoqueItemPedido();
-            $itensAtualizados = $validador->validarEstoqueItensSimples(
-                itensSimples: [
+            $validador->validarEstoqueItensPedido(
+                itensPedido: [
                     new ItemSimples(
                         id: 1,
                         quantidade: 3,
@@ -40,18 +37,15 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($itensAtualizados)->toHaveLength(1);
-            expect($itensAtualizados[0]->quantidade)->toBe(2);
-            expect($erros)->toBe(['Produto Coca-Cola (ID 1) não possui estoque suficiente. Quantidade ajustada para 2.']);
+            expect($erros)->toBe(['Produto Coca-Cola (ID 1) não possui estoque suficiente. Quantidade em estoque: 2.']);
         });
 
-        it('preenche erros e retorna itens atualizados corretamente quando a quantidade de um produto simples é maior que o estoque disponível (2 itens simples)', function () {
+        it('preenche erros corretamente quando a quantidade de um produto simples é maior que o estoque disponível (2 itens simples)', function () {
             $erros = [];
-            $itensAtualizados = [];
 
             $validador = new ValidadorEstoqueItemPedido();
-            $itensAtualizados = $validador->validarEstoqueItensSimples(
-                itensSimples: [
+            $validador->validarEstoqueItensPedido(
+                itensPedido: [
                     new ItemSimples(
                         id: 1,
                         quantidade: 3,
@@ -66,19 +60,15 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($itensAtualizados)->toHaveLength(2);
-            expect($itensAtualizados[0]->quantidade)->toBe(2);
-            expect($itensAtualizados[1]->quantidade)->toBe(4);
-            expect($erros)->toBe(['Produto Coca-Cola (ID 1) não possui estoque suficiente. Quantidade ajustada para 2.']);
+            expect($erros)->toBe(['Produto Coca-Cola (ID 1) não possui estoque suficiente. Quantidade em estoque: 2.']);
         });
 
-        it('preenche erros e retorna itens atualizados corretamente quando todos os itens simples estão sem estoque', function () {
+        it('preenche erros corretamente quando todos os itens simples estão sem estoque', function () {
             $erros = [];
-            $itensAtualizados = [];
 
             $validador = new ValidadorEstoqueItemPedido();
-            $itensAtualizados = $validador->validarEstoqueItensSimples(
-                itensSimples: [
+            $validador->validarEstoqueItensPedido(
+                itensPedido: [
                     new ItemSimples(
                         id: 1,
                         quantidade: 3,
@@ -93,20 +83,18 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($itensAtualizados)->toHaveLength(0);
             expect($erros)->toBe([
                 'Produto Coca-Cola (ID 1) está sem estoque.',
                 'Produto Suco de Laranja (ID 3) está sem estoque.',
             ]);
         });
 
-        it('não preenche erros e retorna itens atualizados corretamente quando todos os itens simples possuem estoque suficiente', function () {
+        it('não preenche erros corretamente quando todos os itens simples possuem estoque suficiente', function () {
             $erros = [];
-            $itensAtualizados = [];
 
             $validador = new ValidadorEstoqueItemPedido();
-            $itensAtualizados = $validador->validarEstoqueItensSimples(
-                itensSimples: [
+            $validador->validarEstoqueItensPedido(
+                itensPedido: [
                     new ItemSimples(
                         id: 1,
                         quantidade: 3,
@@ -121,9 +109,6 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($itensAtualizados)->toHaveLength(2);
-            expect($itensAtualizados[0]->quantidade)->toBe(3);
-            expect($itensAtualizados[1]->quantidade)->toBe(4);
             expect($erros)->toBe([]);
         });
 
@@ -137,9 +122,8 @@ describe('ValidadorEstoqueItemPedido', function () {
             $this->pizzaMargherita = PizzaFactory::margherita();
         });
 
-        it('preenche erros e retorna itens atualizados corretamente quando consumo de todos os ingrediente é maior que o estoque disponível', function () {
+        it('preenche erros corretamente quando consumo de todos os ingrediente é maior que o estoque disponível', function () {
             $erros = [];
-            $itensAtualizados = [];
 
             // Possui estoque insuficiente
             $molho = IngredienteFactory::molho(3);
@@ -147,8 +131,8 @@ describe('ValidadorEstoqueItemPedido', function () {
             $bacon = IngredienteFactory::bacon(349);
 
             $validador = new ValidadorEstoqueItemPedido();
-            $itensAtualizados = $validador->validarEstoqueItensPizza(
-                itensPizza: [
+            $validador->validarEstoqueItensPedido(
+                itensPedido: [
                     new ItemPizza(
                         id: ItemPedido::MENOR_ID_PERMITIDO,
                         quantidade: ItemPedido::QUANTIDADE_MINIMA_PERMITIDA,
@@ -169,7 +153,6 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($itensAtualizados)->toHaveLength(0);
             expect($erros)->toBe([
                 'Ingrediente Molho (ID 1) não possui estoque suficiente.',
                 'Ingrediente Mussarela (ID 2) não possui estoque suficiente.',
@@ -177,9 +160,8 @@ describe('ValidadorEstoqueItemPedido', function () {
             ]);
         });
 
-        it('preenche erros e retorna itens atualizados corretamente quando consumo de todos os ingrediente é maior que o estoque disponível (2 itens pizza)', function () {
+        it('preenche erros corretamente quando consumo de todos os ingrediente é maior que o estoque disponível (2 itens pizza)', function () {
             $erros = [];
-            $itensAtualizados = [];
 
             // Possui estoque insuficiente
             $molho = IngredienteFactory::molho(3);
@@ -188,8 +170,8 @@ describe('ValidadorEstoqueItemPedido', function () {
             $catupiry = IngredienteFactory::catupiry(199);
 
             $validador = new ValidadorEstoqueItemPedido();
-            $itensAtualizados = $validador->validarEstoqueItensPizza(
-                itensPizza: [
+            $validador->validarEstoqueItensPedido(
+                itensPedido: [
                     new ItemPizza(
                         id: ItemPedido::MENOR_ID_PERMITIDO,
                         quantidade: ItemPedido::QUANTIDADE_MINIMA_PERMITIDA,
@@ -226,7 +208,6 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($itensAtualizados)->toHaveLength(0);
             expect($erros)->toBe([
                 'Ingrediente Molho (ID 1) não possui estoque suficiente.',
                 'Ingrediente Mussarela (ID 2) não possui estoque suficiente.',
@@ -237,9 +218,8 @@ describe('ValidadorEstoqueItemPedido', function () {
             ]);
         });
 
-        it('preenche erros e retorna itens atualizados corretamente quando consumo de alguns ingredientes é maior que o estoque disponível (2 itens pizza)', function () {
+        it('preenche erros corretamente quando consumo de alguns ingredientes é maior que o estoque disponível (2 itens pizza)', function () {
             $erros = [];
-            $itensAtualizados = [];
 
             // Possui estoque insuficiente
             $molho = IngredienteFactory::molho(9);
@@ -249,8 +229,8 @@ describe('ValidadorEstoqueItemPedido', function () {
             $manjericao = IngredienteFactory::manjericao(6);
 
             $validador = new ValidadorEstoqueItemPedido();
-            $itensAtualizados = $validador->validarEstoqueItensPizza(
-                itensPizza: [
+            $validador->validarEstoqueItensPedido(
+                itensPedido: [
                     new ItemPizza(
                         id: 1,
                         quantidade: ItemPedido::QUANTIDADE_MINIMA_PERMITIDA,
@@ -287,8 +267,6 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($itensAtualizados)->toHaveLength(1);
-            expect($itensAtualizados[0]->id)->toBe(1);
             expect($erros)->toBe([
                 'Ingrediente Molho (ID 1) não possui estoque suficiente.',
                 'Ingrediente Mussarela (ID 2) não possui estoque suficiente.',
@@ -296,9 +274,8 @@ describe('ValidadorEstoqueItemPedido', function () {
             ]);
         });
 
-        it('não preenche erros e retorna itens atualizados corretamente quando todos os ingredientes possuem estoque suficiente', function () {
+        it('não preenche erros corretamente quando todos os ingredientes possuem estoque suficiente', function () {
             $erros = [];
-            $itensAtualizados = [];
 
             // Possui estoque suficiente
             $molho = IngredienteFactory::molho(10);
@@ -307,8 +284,8 @@ describe('ValidadorEstoqueItemPedido', function () {
             $manjericao = IngredienteFactory::manjericao(10);
 
             $validador = new ValidadorEstoqueItemPedido();
-            $itensAtualizados = $validador->validarEstoqueItensPizza(
-                itensPizza: [
+            $validador->validarEstoqueItensPedido(
+                itensPedido: [
                     new ItemPizza(
                         id: 1,
                         quantidade: ItemPedido::QUANTIDADE_MINIMA_PERMITIDA,
@@ -345,15 +322,11 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($itensAtualizados)->toHaveLength(2);
-            expect($itensAtualizados[0]->id)->toBe(1);
-            expect($itensAtualizados[1]->id)->toBe(2);
             expect($erros)->toBe([]);
         });
 
-        it('preenche erros e retorna itens atualizados corretamente quando o consumo de alguns ingredientes é maior que o estoque disponível (meia pizza)', function () {
+        it('preenche erros corretamente quando o consumo de alguns ingredientes é maior que o estoque disponível (meia pizza)', function () {
             $erros = [];
-            $itensAtualizados = [];
 
             // Possui estoque insuficiente
             $molho = IngredienteFactory::molho(2);
@@ -363,8 +336,8 @@ describe('ValidadorEstoqueItemPedido', function () {
             $manjericao = IngredienteFactory::manjericao(3);
 
             $validador = new ValidadorEstoqueItemPedido();
-            $itensAtualizados = $validador->validarEstoqueItensPizza(
-                itensPizza: [
+            $validador->validarEstoqueItensPedido(
+                itensPedido: [
                     new ItemPizza(
                         id: 1,
                         quantidade: ItemPedido::QUANTIDADE_MINIMA_PERMITIDA,
@@ -394,16 +367,14 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($itensAtualizados)->toHaveLength(0);
             expect($erros)->toBe([
                 'Ingrediente Molho (ID 1) não possui estoque suficiente.',
                 'Ingrediente Mussarela (ID 2) não possui estoque suficiente.',
             ]);
         });
 
-        it('não preenche erros e retorna itens atualizados corretamente quando todos os ingredientes possuem estoque suficiente (meia pizza)', function () {
+        it('não preenche erros corretamente quando todos os ingredientes possuem estoque suficiente (meia pizza)', function () {
             $erros = [];
-            $itensAtualizados = [];
 
             // Possui estoque suficiente
             $molho = IngredienteFactory::molho(6);
@@ -412,8 +383,8 @@ describe('ValidadorEstoqueItemPedido', function () {
             $manjericao = IngredienteFactory::manjericao(3);
 
             $validador = new ValidadorEstoqueItemPedido();
-            $itensAtualizados = $validador->validarEstoqueItensPizza(
-                itensPizza: [
+            $validador->validarEstoqueItensPedido(
+                itensPedido: [
                     new ItemPizza(
                         id: 1,
                         quantidade: ItemPedido::QUANTIDADE_MINIMA_PERMITIDA,
@@ -443,8 +414,6 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($itensAtualizados)->toHaveLength(1);
-            expect($itensAtualizados[0]->id)->toBe(1);
             expect($erros)->toBe([]);
         });
 

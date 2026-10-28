@@ -67,13 +67,12 @@ $app->post('/pedidos/valores', function (HttpRequest $request, HttpResponse $res
         $response->status(200)->json(['message' => 'Resumo dos descontos obtido com sucesso.', 'data' => [
             'resumoValores' => $resumoValores,
         ]]);
-    } catch (RegistroPedidoException $e) {
+    } catch (DominioException $e) {
         $response->status(400)->json(['message' => 'Erro ao validar pedido.', 'data' => [
-            'erros' => $e->erros,
-            'itensPedidoAtualizados' => $e->itensPedidoAtualizados,
+            'erros' => $e->erros(),
         ]]);
     } catch (Throwable $e) {
-        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
+        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.' . $e->getMessage()]);
     }
 });
 
@@ -83,10 +82,9 @@ $app->post('/pedidos', function (HttpRequest $request, HttpResponse $response) u
         $gestorPedido->registrarPedido($pedidoParaCadastro);
 
         $response->status(201)->json(['message' => 'Pedido registrado com sucesso.']);
-    } catch (RegistroPedidoException $e) {
+    } catch (DominioException $e) {
         $response->status(400)->json(['message' => 'Erro ao registrar pedido.', 'data' => [
-            'erros' => $e->erros,
-            'itensPedidoAtualizados' => $e->itensPedidoAtualizados,
+            'erros' => $e->erros(),
         ]]);
     } catch (Throwable $e) {
         $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);

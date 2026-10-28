@@ -18,9 +18,6 @@ import { PizzaParaCardapio } from '../../pizza/dominio/pizza-para-cardapio';
 import { IngredienteEscolhido } from './ingrediente-escolhido';
 import { Ingrediente } from '../../ingrediente/dominio/ingrediente';
 import { DadosItemPizza, DadosItemSimples } from '../view/visao-registro-pedido';
-import { RepositorioError } from '../../infra/exceptions/repositorio-error';
-import { ItemPedido } from './item-pedido';
-import { PedidoAtualizadoError } from '../../infra/exceptions/pedido-atualizado-error';
 
 export class GestorRegistroPedido {
 	private pedidoAtual: Pedido = new Pedido();
@@ -120,11 +117,7 @@ export class GestorRegistroPedido {
 			throw new DominioError('Não é possível registrar um pedido sem itens.');
 		}
 
-		try {
-			await this.repositorioPedido.registrarPedido(this.pedidoAtual);
-		} catch (error) {
-			await this.tratarErroAtualizacaoPedido(error as Error);
-		}
+		await this.repositorioPedido.registrarPedido(this.pedidoAtual);
 	}
 
 	private async atualizarPedido(): Promise<void> {
@@ -133,51 +126,11 @@ export class GestorRegistroPedido {
 			return;
 		}
 
-		try {
-			const resumoValores = await this.obterResumoValores(this.pedidoAtual);
-			this.pedidoAtual = this.pedidoAtual.criarNovoPedidoComValores(resumoValores);
-		} catch (error) {
-			await this.tratarErroAtualizacaoPedido(error as Error);
-		}
+		const resumoValores = await this.obterResumoValores(this.pedidoAtual);
+		this.pedidoAtual = this.pedidoAtual.criarNovoPedidoComValores(resumoValores);
 	}
 
 	private obterResumoValores(pedido: Pedido): Promise<ResumoValoresPedido> {
 		return this.repositorioPedido.obterResumoValores(pedido);
-	}
-
-	private async tratarErroAtualizacaoPedido(error: Error): Promise<void> {
-		if (error instanceof RepositorioError) {
-			const itensPedidoAtualizados = error.data?.itensPedidoAtualizados ?? [];
-			this.atualizarPedidoComItensAtualizados(itensPedidoAtualizados);
-
-			if (!this.pedidoAtual.estaVazio()) {
-				const resumoValores = await this.obterResumoValores(this.pedidoAtual);
-				this.pedidoAtual = this.pedidoAtual.criarNovoPedidoComValores(resumoValores);
-			}
-
-			throw new PedidoAtualizadoError(error.message, this.pedidoAtual);
-		}
-
-		throw error;
-	}
-
-	private atualizarPedidoComItensAtualizados(itensPedidoAtualizados: any[]): void {
-		const novosItensPedido = itensPedidoAtualizados.map((itemPedido) => {
-			if (itemPedido.tamanhoPizza) {
-				const saboresEscolhidos = itemPedido.saboresEscolhidos.map((sabor: any) => {
-					const ingredientesEscolhidos = sabor.ingredientesEscolhidos.map((ingredienteEscolhido: any) => {
-						return new IngredienteEscolhido(new Ingrediente(ingredienteEscolhido.ingrediente.id), ingredienteEscolhido.papel);
-					});
-
-					return new SaborEscolhido(new Pizza(sabor.pizza.id, sabor.pizza.nome), ingredientesEscolhidos);
-				});
-
-				return new ItemPizza(itemPedido.quantidade, saboresEscolhidos, itemPedido.tamanhoPizza, itemPedido.precoPraticado);
-			}
-
-			return new ItemSimples(itemPedido.quantidade, itemPedido.produtoSimples.id, itemPedido.produtoSimples.nome, itemPedido.precoPraticado);
-		});
-
-		this.pedidoAtual = this.pedidoAtual.criarNovoPedidoComItens(novosItensPedido as ItemPedido[]);
 	}
 }
