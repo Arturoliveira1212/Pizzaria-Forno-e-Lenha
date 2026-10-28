@@ -29,22 +29,4 @@ class PedidoParaCadastro {
             itensPedido: $itensPedido,
         );
     }
-
-    /**
-     * @return array{0: ItemPizzaParaCadastro[], 1: ItemSimplesParaCadastro[]}
-     */
-    public function obterItensPorTipo(): array {
-        $itensPizza = [];
-        $itensSimples = [];
-
-        foreach ($this->itensPedido as $itemPedido) {
-            if ($itemPedido instanceof ItemPizzaParaCadastro) {
-                $itensPizza[] = $itemPedido;
-            } elseif ($itemPedido instanceof ItemSimplesParaCadastro) {
-                $itensSimples[] = $itemPedido;
-            }
-        }
-
-        return [$itensPizza, $itensSimples];
-    }
 }
