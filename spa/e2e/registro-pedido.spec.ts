@@ -410,28 +410,6 @@ test.describe('Registro de pedido', () => {
 				await tela.selecionarTipoCliente('Cliente');
 				await tela.deveExibirSecaoDeClientes();
 			});
-
-			/*
-				Cenário: Exibição da seção de entregador no atendimento Entrega
-					Quando seleciono o tipo de atendimento "Entrega"
-					Então a seção de entregador deve aparecer
-			*/
-			test('Exibição da seção de entregador no atendimento Entrega', async () => {
-				await tela.selecionarTipoAtendimento('Entrega');
-				await tela.deveExibirSecaoDeEntregador();
-			});
-
-			/*
-				Cenário: Ocultação da seção de entregador fora do atendimento Entrega
-					Dado que selecionei o tipo de atendimento "Entrega"
-					Quando seleciono o tipo de atendimento "Retirada"
-					Então a seção de entregador deve desaparecer
-			*/
-			test('Ocultação da seção de entregador fora do atendimento Entrega', async () => {
-				await tela.selecionarTipoAtendimento('Entrega');
-				await tela.selecionarTipoAtendimento('Retirada');
-				await tela.deveNaoExibirSecaoDeEntregador();
-			});
 		});
 	});
 
@@ -572,51 +550,7 @@ test.describe('Registro de pedido', () => {
 				await tela.selecionarEtapaAtendimento();
 				await tela.buscarCliente('Artur Alves');
 				await tela.selecionarCliente('Artur Alves');
-				await tela.deveExibirValorTotalDoPedido('R$ 34,20');
-				await tela.registrarPedido();
-				await tela.deveRedirecionarParaInicio();
-			});
-
-			/*
-				Cenário: Tentativa de finalizar pedido de entrega sem entregador
-					Dado que a pizza "Bacon" foi adicionada ao pedido
-					E acesso a etapa "Atendimento"
-					E vinculo o cliente "Artur Alves"
-					E seleciono o tipo de atendimento "Entrega"
-					Quando clico em "Registrar pedido"
-					Então deve aparecer a mensagem de erro "O entregador é obrigatório para pedidos de entrega."
-			*/
-			test('Tentativa de finalizar pedido de entrega sem entregador', async () => {
-				await tela.selecionarEtapaProdutos();
-				await tela.buscarPizza('Bacon');
-				await tela.adicionarPizzaAoPedido('Bacon');
-				await tela.selecionarEtapaAtendimento();
-				await tela.buscarCliente('Artur Alves');
-				await tela.selecionarCliente('Artur Alves');
-				await tela.selecionarTipoAtendimento('Entrega');
-				await tela.registrarPedido();
-				await tela.deveExibirErroNoPedido('O entregador é obrigatório para pedidos de entrega.');
-			});
-
-			/*
-				Cenário: Finalização de pedido de entrega com entregador
-					Dado que a pizza "Bacon" foi adicionada ao pedido
-					E acesso a etapa "Atendimento"
-					E vinculo o cliente "Artur Alves"
-					E seleciono o tipo de atendimento "Entrega"
-					E seleciono o entregador "João Pedro Alves"
-					Quando clico em "Registrar pedido"
-					Então devo ser redirecionado para a home
-			*/
-			test('Finalização de pedido de entrega com entregador', async () => {
-				await tela.selecionarEtapaProdutos();
-				await tela.buscarPizza('Bacon');
-				await tela.adicionarPizzaAoPedido('Bacon');
-				await tela.selecionarEtapaAtendimento();
-				await tela.buscarCliente('Artur Alves');
-				await tela.selecionarCliente('Artur Alves');
-				await tela.selecionarTipoAtendimento('Entrega');
-				await tela.selecionarEntregador('João Pedro Alves');
+				await tela.deveExibirValorTotalDoPedido('R$ 38,00');
 				await tela.registrarPedido();
 				await tela.deveRedirecionarParaInicio();
 			});

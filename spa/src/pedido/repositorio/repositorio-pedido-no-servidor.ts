@@ -93,7 +93,6 @@ export class RepositorioPedidoNoServidor implements RepositorioPedido {
 		return {
 			tipoAtendimento: pedido.tipoAtendimento,
 			idCliente: pedido.cliente?.id,
-			idEntregador: pedido.entregador?.id,
 			itensPedido: itensPedido,
 		};
 	}

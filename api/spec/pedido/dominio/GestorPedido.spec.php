@@ -24,7 +24,6 @@ describe('GestorPedido', function () {
         $this->repositorioPromocao = Double::instance(['implements' => RepositorioPromocao::class]);
         $this->repositorioConfiguracaoFidelidade = Double::instance(['implements' => RepositorioConfiguracaoFidelidade::class]);
         $this->repositorioMovimentacaoEstoque = Double::instance(['implements' => RepositorioMovimentacaoEstoque::class]);
-        $this->repositorioEntregador = Double::instance(['implements' => RepositorioEntregador::class]);
 
         $this->gestorPedido = new GestorPedido(
             unidadeTrabalho: $this->unidadeTrabalho,
@@ -36,7 +35,6 @@ describe('GestorPedido', function () {
             repositorioPromocao: $this->repositorioPromocao,
             repositorioConfiguracaoFidelidade: $this->repositorioConfiguracaoFidelidade,
             repositorioMovimentacaoEstoque: $this->repositorioMovimentacaoEstoque,
-            repositorioEntregador: $this->repositorioEntregador,
         );
     });
 
@@ -101,136 +99,6 @@ describe('GestorPedido', function () {
                 expect($e)->toBeAnInstanceOf(DominioException::class);
                 expect($e->erros())->toBe(["Tipo de atendimento inválido: {$tipoQueNaoExiste}."]);
             });
-        });
-
-        describe('Entregador', function () {
-
-            beforeEach(function () {
-                allow($this->repositorioCliente)->toReceive('obterClientePorId')->andReturn(
-                    new Cliente(
-                        id: 1,
-                        nome: 'João da Silva',
-                        telefone: $this->telefone,
-                        cpf: $this->cpf,
-                        endereco: $this->endereco,
-                        beneficioFidelidade: null,
-                    ),
-                );
-                allow($this->repositorioPromocao)->toReceive('obterPromocoes')->andReturn([]);
-                allow($this->repositorioProdutoSimples)->toReceive('obterProdutoSimplesPorId')->andReturn(ProdutoSimplesFactory::cocaCola(20));
-            });
-
-            it('lança exceção quando o pedido é de entrega e o entregador não é informado', function () {
-                /** @var DominioException $e */
-                $e = capturarExcecao(function () {
-                    $this->gestorPedido->registrarPedido(
-                        new PedidoParaCadastro(
-                            tipoAtendimento: TipoAtendimento::ENTREGA->value,
-                            idCliente: 1,
-                            itensPedido: [
-                                new ItemSimplesParaCadastro(
-                                    idProduto: 1,
-                                    quantidade: 1,
-                                ),
-                            ],
-                        ),
-                    );
-                });
-
-                expect($e)->toBeAnInstanceOf(DominioException::class);
-                expect($e->erros())->toBe(['O entregador é obrigatório para pedidos de entrega.']);
-            });
-
-            it('lança exceção quando o entregador não existe', function () {
-                allow($this->repositorioEntregador)->toReceive('obterEntregadorPorId')->andReturn(null);
-
-                $idInexistente = 999;
-
-                /** @var DominioException $e */
-                $e = capturarExcecao(function () use ($idInexistente) {
-                    $this->gestorPedido->registrarPedido(
-                        new PedidoParaCadastro(
-                            tipoAtendimento: TipoAtendimento::ENTREGA->value,
-                            idCliente: 1,
-                            itensPedido: [
-                                new ItemSimplesParaCadastro(
-                                    idProduto: 1,
-                                    quantidade: 1,
-                                ),
-                            ],
-                            idEntregador: (string) $idInexistente,
-                        ),
-                    );
-                });
-
-                expect($e)->toBeAnInstanceOf(DominioException::class);
-                expect($e->erros())->toBe(["Entregador (ID {$idInexistente}) não encontrado."]);
-            });
-
-            it('lança exceção quando o entregador não está disponível', function () {
-                $entregador = EntregadorFactory::entregador(disponivel: false);
-                allow($this->repositorioEntregador)->toReceive('obterEntregadorPorId')->andReturn($entregador);
-
-                /** @var DominioException $e */
-                $e = capturarExcecao(function () use ($entregador) {
-                    $this->gestorPedido->registrarPedido(
-                        new PedidoParaCadastro(
-                            tipoAtendimento: TipoAtendimento::ENTREGA->value,
-                            idCliente: 1,
-                            itensPedido: [
-                                new ItemSimplesParaCadastro(
-                                    idProduto: 1,
-                                    quantidade: 1,
-                                ),
-                            ],
-                            idEntregador: (string) $entregador->id,
-                        ),
-                    );
-                });
-
-                expect($e)->toBeAnInstanceOf(DominioException::class);
-                expect($e->erros())->toBe(["O entregador {$entregador->nome} (ID {$entregador->id}) não está disponível."]);
-            });
-
-            it('cria a entrega com o entregador informado e o endereço do cliente', function () {
-                allow($this->repositorioEntregador)->toReceive('obterEntregadorPorId')->andReturn(EntregadorFactory::entregador());
-
-                $pedido = $this->gestorPedido->registrarPedido(
-                    new PedidoParaCadastro(
-                        tipoAtendimento: TipoAtendimento::ENTREGA->value,
-                        idCliente: 1,
-                        itensPedido: [
-                            new ItemSimplesParaCadastro(
-                                idProduto: 1,
-                                quantidade: 1,
-                            ),
-                        ],
-                        idEntregador: '2',
-                    ),
-                );
-
-                expect($pedido->entrega)->toBeAnInstanceOf(Entrega::class);
-                expect($pedido->entrega->entregador->id)->toBe(2);
-                expect($pedido->entrega->endereco)->toBe($this->endereco);
-            });
-
-            it('não exige entregador quando o pedido não é de entrega', function () {
-                $pedido = $this->gestorPedido->registrarPedido(
-                    new PedidoParaCadastro(
-                        tipoAtendimento: TipoAtendimento::BALCAO->value,
-                        idCliente: 1,
-                        itensPedido: [
-                            new ItemSimplesParaCadastro(
-                                idProduto: 1,
-                                quantidade: 1,
-                            ),
-                        ],
-                    ),
-                );
-
-                expect($pedido->entrega)->toBeNull();
-            });
-
         });
 
         describe('ItemPizza', function () {
@@ -813,7 +681,6 @@ describe('GestorPedido - integração com banco de dados', function () {
             repositorioPromocao: new RepositorioPromocaoEmBDR($this->bancoDados),
             repositorioConfiguracaoFidelidade: new RepositorioConfiguracaoFidelidadeEmBDR($this->bancoDados),
             repositorioMovimentacaoEstoque: new RepositorioMovimentacaoEstoqueEmBDR($this->bancoDados),
-            repositorioEntregador: new RepositorioEntregadorEmBDR($this->bancoDados),
         );
     });
 

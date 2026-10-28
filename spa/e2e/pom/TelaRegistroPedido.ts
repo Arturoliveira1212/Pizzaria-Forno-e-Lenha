@@ -29,8 +29,6 @@ export class TelaRegistroPedido {
 	private readonly tituloCarrinho: Locator;
 	private readonly secaoConsumidorFinal: Locator;
 	private readonly secaoCliente: Locator;
-	private readonly secaoEntregador: Locator;
-	private readonly selectEntregador: Locator;
 	private readonly secaoEntrega: Locator;
 	private readonly valorEntrega: Locator;
 	private readonly secaoFidelidade: Locator;
@@ -70,8 +68,6 @@ export class TelaRegistroPedido {
 		this.tituloCarrinho = this.page.locator('#titulo-carrinho');
 		this.secaoConsumidorFinal = this.page.locator('#secao-consumidor-final');
 		this.secaoCliente = this.page.locator('#secao-cliente');
-		this.secaoEntregador = this.page.locator('#secao-entregador');
-		this.selectEntregador = this.page.getByTestId('select-entregador');
 		this.secaoEntrega = this.page.locator('#secao-entrega');
 		this.valorEntrega = this.page.locator('#valor-entrega');
 		this.secaoFidelidade = this.page.locator('#secao-fidelidade');
@@ -166,19 +162,17 @@ export class TelaRegistroPedido {
 	}
 
 	async selecionarTipoAtendimento(tipoAtendimento: TipoAtendimento): Promise<void> {
-		await this.executarAguardandoAtualizacaoValores(async () => {
-			switch (tipoAtendimento) {
-				case 'Entrega':
-					await this.labelTipoAtendimentoEntrega.click();
-					break;
-				case 'Retirada':
-					await this.labelTipoAtendimentoRetirada.click();
-					break;
-				case 'Balcão':
-					await this.labelTipoAtendimentoBalcao.click();
-					break;
-			}
-		});
+		switch (tipoAtendimento) {
+			case 'Entrega':
+				await this.labelTipoAtendimentoEntrega.click();
+				break;
+			case 'Retirada':
+				await this.labelTipoAtendimentoRetirada.click();
+				break;
+			case 'Balcão':
+				await this.labelTipoAtendimentoBalcao.click();
+				break;
+		}
 	}
 
 	async selecionarTipoCliente(tipoCliente: TipoCliente): Promise<void> {
@@ -198,13 +192,7 @@ export class TelaRegistroPedido {
 	}
 
 	async selecionarCliente(nome: string): Promise<void> {
-		await this.executarAguardandoAtualizacaoValores(() => this.cliente(nome).click());
-	}
-
-	async selecionarEntregador(nome: string): Promise<void> {
-		await this.executarAguardandoAtualizacaoValores(async () => {
-			await this.selectEntregador.selectOption({ label: nome });
-		});
+		await this.cliente(nome).click();
 	}
 
 	async registrarPedido(): Promise<void> {
@@ -327,14 +315,6 @@ export class TelaRegistroPedido {
 		await expect(this.secaoCliente).toBeVisible();
 	}
 
-	async deveExibirSecaoDeEntregador(): Promise<void> {
-		await expect(this.secaoEntregador).toBeVisible();
-	}
-
-	async deveNaoExibirSecaoDeEntregador(): Promise<void> {
-		await expect(this.secaoEntregador).toBeHidden();
-	}
-
 	async deveExibirTaxaDeEntrega(): Promise<void> {
 		await expect(this.secaoEntrega).toBeVisible();
 		await expect(this.valorEntrega).toHaveText('R$ 10,00');
@@ -389,23 +369,6 @@ export class TelaRegistroPedido {
 		const respostaApi = this.aguardarBuscaProduto(categoria);
 		await this.botaoFiltrarCardapio.click();
 		await respostaApi;
-	}
-
-	private async executarAguardandoAtualizacaoValores(acao: () => Promise<void>): Promise<void> {
-		if (await this.avisoCarrinhoVazio.isVisible()) {
-			await acao();
-			return;
-		}
-
-		const respostaApi = this.aguardarAtualizacaoValores();
-		await acao();
-		await respostaApi;
-	}
-
-	private aguardarAtualizacaoValores(): Promise<Response> {
-		return this.page.waitForResponse((resposta) => {
-			return resposta.url().includes('/pedidos/valores') && resposta.request().method() === 'POST';
-		});
 	}
 
 	private aguardarBuscaProduto(categoria: Categoria): Promise<Response> {

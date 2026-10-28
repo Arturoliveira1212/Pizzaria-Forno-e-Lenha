@@ -11,7 +11,6 @@ class GestorPedido {
         private readonly RepositorioPromocao $repositorioPromocao,
         private readonly RepositorioConfiguracaoFidelidade $repositorioConfiguracaoFidelidade,
         private readonly RepositorioMovimentacaoEstoque $repositorioMovimentacaoEstoque,
-        private readonly RepositorioEntregador $repositorioEntregador,
     ) {}
 
     /**
@@ -50,7 +49,6 @@ class GestorPedido {
 
     public function registrarPedido(PedidoParaCadastro $pedidoParaCadastro): Pedido {
         $pedido = $this->criarPedido($pedidoParaCadastro);
-        $this->validarEntregaPedido($pedido);
         $this->validarEstoqueItensPedido($pedido->itensPedido);
 
         $this->unidadeTrabalho->executar(function () use ($pedido) {
@@ -93,16 +91,6 @@ class GestorPedido {
             );
         }
 
-        $entrega = $this->criarEntrega(
-            tipoAtendimento: $tipoAtendimento,
-            cliente: $cliente,
-            idEntregador: $pedidoParaCadastro->idEntregador,
-            erros: $erros,
-        );
-        if (!empty($erros)) {
-            throw DominioException::criarException(...$erros);
-        }
-
         return new Pedido(
             id: 0,
             usuario: UsuarioFactory::atendente(), // TODO: Temporário para passar os testes
@@ -113,7 +101,6 @@ class GestorPedido {
             status: StatusPedido::inicial(),
             descontosPromocao: $descontosPromocao,
             descontoFidelidade: $descontoFidelidade,
-            entrega: $entrega,
         );
     }
 
@@ -332,12 +319,6 @@ class GestorPedido {
         );
     }
 
-    private function validarEntregaPedido(Pedido $pedido): void {
-        if ($pedido->tipoAtendimento === TipoAtendimento::ENTREGA && !$pedido->entrega instanceof Entrega) {
-            throw DominioException::criarException('O entregador é obrigatório para pedidos de entrega.');
-        }
-    }
-
     /**
      * @param ItemPedido[] $itensPedido
      */
@@ -350,41 +331,6 @@ class GestorPedido {
         if (!empty($erros)) {
             throw DominioException::criarException(...$erros);
         }
-    }
-
-    /**
-     * @param string[] $erros
-     */
-    private function criarEntrega(TipoAtendimento $tipoAtendimento, ?Cliente $cliente, string $idEntregador, array &$erros): ?Entrega {
-        if ($tipoAtendimento !== TipoAtendimento::ENTREGA || $idEntregador === '') {
-            return null;
-        }
-
-        $entregador = $this->repositorioEntregador->obterEntregadorPorId((int) $idEntregador);
-        if (!$entregador instanceof Entregador) {
-            $erros[] = "Entregador (ID {$idEntregador}) não encontrado.";
-
-            return null;
-        }
-
-        if (!$entregador->disponivel) {
-            $erros[] = "O entregador {$entregador->nome} (ID {$entregador->id}) não está disponível.";
-
-            return null;
-        }
-
-        if (!$cliente instanceof Cliente) {
-            return null;
-        }
-
-        return new Entrega(
-            id: 0,
-            endereco: $cliente->endereco,
-            entregador: $entregador,
-            dataSaida: null,
-            dataChegada: null,
-            taxa: new Dinheiro(Entrega::TAXA_ENTREGA_FIXA_EM_CENTAVOS),
-        );
     }
 
     private function atualizarEstoqueItensPedido(Pedido $pedido): void {

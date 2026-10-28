@@ -1,5 +1,4 @@
 import { Cliente } from '../../cliente/dominio/cliente';
-import { Entregador } from '../../entregador/dominio/entregador';
 import { ItemPedido } from './item-pedido';
 import { ItemPizza } from './item-pizza';
 import { ItemSimples } from './item-simples';
@@ -11,7 +10,6 @@ import { SaborEscolhido } from './sabor-escolhido';
 export class Pedido {
 	public readonly tipoAtendimento: TipoAtendimento = TipoAtendimento.BALCAO;
 	public readonly cliente?: Cliente = undefined;
-	public readonly entregador?: Entregador = undefined;
 	public readonly itensPedido: ItemPedido[] = [];
 	public readonly valorDescontoPromocao: number = 0;
 	public readonly valorDescontoFidelidade: number = 0;
@@ -21,7 +19,6 @@ export class Pedido {
 	constructor(
 		tipoAtendimento: TipoAtendimento = TipoAtendimento.BALCAO,
 		cliente?: Cliente,
-		entregador?: Entregador,
 		itensPedido: ItemPedido[] = [],
 		valorDescontoPromocao: number = 0,
 		valorDescontoFidelidade: number = 0,
@@ -30,7 +27,6 @@ export class Pedido {
 	) {
 		this.tipoAtendimento = tipoAtendimento;
 		this.cliente = cliente;
-		this.entregador = entregador;
 		this.itensPedido = itensPedido;
 		this.valorDescontoPromocao = valorDescontoPromocao;
 		this.valorDescontoFidelidade = valorDescontoFidelidade;
@@ -109,14 +105,13 @@ export class Pedido {
 	}
 
 	criarNovoPedidoComCliente(cliente?: Cliente): Pedido {
-		return new Pedido(this.tipoAtendimento, cliente, this.entregador, this.itensPedido, this.valorDescontoPromocao, this.valorDescontoFidelidade, this.taxaEntrega, this.valorTotal);
+		return new Pedido(this.tipoAtendimento, cliente, this.itensPedido, this.valorDescontoPromocao, this.valorDescontoFidelidade, this.taxaEntrega, this.valorTotal);
 	}
 
 	criarNovoPedidoComValores(resumoValoresPedido: ResumoValoresPedido): Pedido {
 		return new Pedido(
 			this.tipoAtendimento,
 			this.cliente,
-			this.entregador,
 			this.itensPedido,
 			resumoValoresPedido.valorDescontoPromocao,
 			resumoValoresPedido.valorDescontoFidelidade,
@@ -126,17 +121,11 @@ export class Pedido {
 	}
 
 	criarNovoPedidoComTipoAtendimento(tipoAtendimento: TipoAtendimento): Pedido {
-		const entregador = tipoAtendimento === TipoAtendimento.ENTREGA ? this.entregador : undefined;
-
-		return new Pedido(tipoAtendimento, this.cliente, entregador, this.itensPedido, this.valorDescontoPromocao, this.valorDescontoFidelidade, this.taxaEntrega, this.valorTotal);
-	}
-
-	criarNovoPedidoComEntregador(entregador?: Entregador): Pedido {
-		return new Pedido(this.tipoAtendimento, this.cliente, entregador, this.itensPedido, this.valorDescontoPromocao, this.valorDescontoFidelidade, this.taxaEntrega, this.valorTotal);
+		return new Pedido(tipoAtendimento, this.cliente, this.itensPedido, this.valorDescontoPromocao, this.valorDescontoFidelidade, this.taxaEntrega, this.valorTotal);
 	}
 
 	criarNovoPedidoComItens(itensPedido: ItemPedido[]): Pedido {
-		return new Pedido(this.tipoAtendimento, this.cliente, this.entregador, itensPedido, this.valorDescontoPromocao, this.valorDescontoFidelidade, this.taxaEntrega, this.valorTotal);
+		return new Pedido(this.tipoAtendimento, this.cliente, itensPedido, this.valorDescontoPromocao, this.valorDescontoFidelidade, this.taxaEntrega, this.valorTotal);
 	}
 
 	estaVazio(): boolean {

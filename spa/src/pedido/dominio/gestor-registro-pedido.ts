@@ -14,8 +14,6 @@ import { RepositorioProdutoSimples } from '../../produto-simples/repositorio/rep
 import { TipoProdutoSimples } from '../../produto-simples/dominio/tipo-produto-simples';
 import { ProdutoSimples } from '../../produto-simples/dominio/produto-simples';
 import { RepositorioCliente } from '../../cliente/repositorio/repositorio-cliente';
-import { Entregador } from '../../entregador/dominio/entregador';
-import { RepositorioEntregador } from '../../entregador/repositorio/repositorio-entregador';
 import { PizzaParaCardapio } from '../../pizza/dominio/pizza-para-cardapio';
 import { IngredienteEscolhido } from './ingrediente-escolhido';
 import { Ingrediente } from '../../ingrediente/dominio/ingrediente';
@@ -29,7 +27,6 @@ export class GestorRegistroPedido {
 		private readonly repositorioPizza: RepositorioPizza,
 		private readonly repositorioProdutoSimples: RepositorioProdutoSimples,
 		private readonly repositorioCliente: RepositorioCliente,
-		private readonly repositorioEntregador: RepositorioEntregador,
 	) {}
 
 	async obterPizzasParaCardapio(busca: string): Promise<PizzaParaCardapio[]> {
@@ -94,24 +91,6 @@ export class GestorRegistroPedido {
 		return this.pedidoAtual;
 	}
 
-	async obterEntregadores(): Promise<Entregador[]> {
-		return this.repositorioEntregador.obterEntregadores();
-	}
-
-	async adicionarEntregador(idEntregador: number): Promise<Pedido> {
-		this.pedidoAtual = this.pedidoAtual.criarNovoPedidoComEntregador(new Entregador(idEntregador));
-		await this.atualizarPedido();
-
-		return this.pedidoAtual;
-	}
-
-	async removerEntregador(): Promise<Pedido> {
-		this.pedidoAtual = this.pedidoAtual.criarNovoPedidoComEntregador(undefined);
-		await this.atualizarPedido();
-
-		return this.pedidoAtual;
-	}
-
 	async alterarQuantidade(indice: number, delta: number): Promise<Pedido> {
 		this.pedidoAtual.alterarQuantidade(indice, delta);
 		await this.atualizarPedido();
@@ -136,10 +115,6 @@ export class GestorRegistroPedido {
 	async registrarPedido(): Promise<void> {
 		if (this.pedidoAtual.estaVazio()) {
 			throw new DominioError('Não é possível registrar um pedido sem itens.');
-		}
-
-		if (this.pedidoAtual.tipoAtendimento === TipoAtendimento.ENTREGA && !this.pedidoAtual.entregador) {
-			throw new DominioError('O entregador é obrigatório para pedidos de entrega.');
 		}
 
 		await this.repositorioPedido.registrarPedido(this.pedidoAtual);

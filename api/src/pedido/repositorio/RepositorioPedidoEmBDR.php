@@ -111,7 +111,6 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
             $this->salvarPedido($pedido);
             $this->salvarItensPedido($pedido);
             $this->salvarDescontos($pedido);
-            $this->salvarEntrega($pedido);
         } catch (Throwable $e) {
             throw new RepositorioException('Erro ao registrar pedido.');
         }
@@ -186,37 +185,6 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
                 'beneficioFidelidadeId' => $pedido->descontoFidelidade->beneficioFidelidade->id,
             ]);
         }
-    }
-
-    private function salvarEntrega(Pedido $pedido): void {
-        if (!$pedido->entrega instanceof Entrega) {
-            return;
-        }
-
-        $sql = 'INSERT INTO entrega (
-                idPedido,
-                dataSaida,
-                dataChegada,
-                taxa,
-                idEndereco,
-                idEntregador
-            ) VALUES (
-                :pedidoId,
-                :dataSaida,
-                :dataChegada,
-                :taxa,
-                :enderecoId,
-                :entregadorId
-            )';
-
-        $this->bancoDados->executar($sql, [
-            'pedidoId' => $pedido->id,
-            'dataSaida' => $pedido->entrega->dataSaida?->format('Y-m-d H:i:s'),
-            'dataChegada' => $pedido->entrega->dataChegada?->format('Y-m-d H:i:s'),
-            'taxa' => $pedido->entrega->taxa->centavos,
-            'enderecoId' => $pedido->entrega->endereco->id,
-            'entregadorId' => $pedido->entrega->entregador->id,
-        ]);
     }
 
     private function salvarItensPedido(Pedido $pedido): void {
