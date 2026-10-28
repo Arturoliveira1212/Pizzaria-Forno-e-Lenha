@@ -188,4 +188,26 @@ describe('RepositorioPedidoEmBDR', function () {
             })->toThrow(new RepositorioException('Erro ao registrar pedido.'));
         });
     });
+
+    describe('registrarCancelamento()', function () {
+
+        it('persiste o motivo e a data do cancelamento do pedido', function () {
+            $idPedido = (int) $this->bancoDados->consultar('SELECT id FROM pedido ORDER BY id DESC LIMIT 1')[0]['id'];
+
+            $this->repositorioPedido->registrarCancelamento($idPedido, new Cancelamento(
+                id: 0,
+                motivo: 'Cliente desistiu do pedido',
+                data: new DateTime('2026-10-28 20:00:00'),
+            ));
+
+            $dadosCancelamento = $this->bancoDados->consultar(
+                'SELECT motivo, data FROM cancelamento WHERE idPedido = :pedidoId',
+                ['pedidoId' => $idPedido],
+            );
+            expect($dadosCancelamento)->toBe([
+                ['motivo' => 'Cliente desistiu do pedido', 'data' => '2026-10-28 20:00:00'],
+            ]);
+        });
+
+    });
 });

@@ -60,6 +60,21 @@ $app->patch('/pedidos/status', function (HttpRequest $request, HttpResponse $res
     }
 });
 
+$app->post('/pedidos/cancelamento', function (HttpRequest $request, HttpResponse $response) use ($gestorPedido) {
+    try {
+        $cancelamentoParaCadastro = CancelamentoParaCadastro::criarComArray((array) $request->body());
+        $gestorPedido->cancelarPedido($cancelamentoParaCadastro);
+
+        $response->status(201)->json(['message' => 'Pedido cancelado com sucesso.']);
+    } catch (DominioException $e) {
+        $response->status(400)->json(['message' => 'Erro ao cancelar pedido.', 'data' => [
+            'erros' => $e->erros(),
+        ]]);
+    } catch (Throwable $e) {
+        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
+    }
+});
+
 $app->post('/pedidos/valores', function (HttpRequest $request, HttpResponse $response) use ($gestorPedido) {
     try {
         $pedidoParaCadastro = PedidoParaCadastro::criarComArray((array) $request->body());

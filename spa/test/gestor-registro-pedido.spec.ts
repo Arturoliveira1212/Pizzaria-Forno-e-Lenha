@@ -31,6 +31,8 @@ export class RepositorioPedidoEmMemoria implements RepositorioPedido {
 
 	async alterarStatus(idPedido: number, status: string): Promise<void> {}
 
+	async cancelarPedido(idPedido: number, motivo: string): Promise<void> {}
+
 	async obterResumoValores(pedido: Pedido): Promise<ResumoValoresPedido> {
 		return new ResumoValoresPedido(0, 0, 0, 0, 150);
 	}

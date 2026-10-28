@@ -29,4 +29,14 @@ export class ControladoraListagemPedidos {
 			this.visaoListagemPedidos.exibirErro(mensagem);
 		}
 	}
+
+	async cancelarPedido(idPedido: number, motivo: string): Promise<void> {
+		try {
+			await this.repositorioPedido.cancelarPedido(idPedido, motivo);
+			await this.obterPedidos();
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Ocorreu um erro ao cancelar o pedido.';
+			this.visaoListagemPedidos.exibirErro(mensagem);
+		}
+	}
 }

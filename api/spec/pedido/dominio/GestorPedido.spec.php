@@ -766,6 +766,31 @@ describe('GestorPedido', function () {
         });
     });
 
+    describe('cancelarPedido()', function () {
+
+        it('lança exceção quando o motivo do cancelamento não é informado', function () {
+            /** @var DominioException $e */
+            $e = capturarExcecao(function () {
+                $this->gestorPedido->cancelarPedido(new CancelamentoParaCadastro(idPedido: 1, motivo: ''));
+            });
+
+            expect($e)->toBeAnInstanceOf(DominioException::class);
+            expect($e->erros())->toBe(['O motivo do cancelamento é obrigatório.']);
+        });
+
+        it('altera o status para cancelado e registra o cancelamento na mesma transação', function () {
+            allow($this->unidadeTrabalho)->toReceive('executar')->andRun(function (callable $operacao) {
+                $operacao();
+            });
+
+            expect($this->repositorioPedido)->toReceive('alterarStatus')->with(1, StatusPedido::CANCELADO);
+            expect($this->repositorioPedido)->toReceive('registrarCancelamento');
+
+            $this->gestorPedido->cancelarPedido(new CancelamentoParaCadastro(idPedido: 1, motivo: 'Cliente desistiu do pedido'));
+        });
+
+    });
+
 });
 
 describe('GestorPedido - integração com banco de dados', function () {

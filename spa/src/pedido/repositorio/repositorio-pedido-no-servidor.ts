@@ -38,6 +38,14 @@ export class RepositorioPedidoNoServidor implements RepositorioPedido {
 		}
 	}
 
+	async cancelarPedido(idPedido: number, motivo: string): Promise<void> {
+		try {
+			await this.servicoHttp.post(`${API}/pedidos/cancelamento`, { idPedido, motivo });
+		} catch (error) {
+			this.tratarErro(error, 'Ocorreu um erro ao cancelar o pedido.');
+		}
+	}
+
 	async obterResumoValores(pedido: Pedido): Promise<ResumoValoresPedido> {
 		try {
 			const resultado = await this.servicoHttp.post(`${API}/pedidos/valores`, this.obterCorpoRequisicaoParaPedido(pedido));

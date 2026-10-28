@@ -1,6 +1,8 @@
+import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { clonarTemplate } from '../../util/dom';
 import { ControladoraListagemPedidos } from '../controller/controladora-listagem-pedidos';
 import { PedidoListagem } from '../dominio/pedido-listagem';
+import { StatusPedido } from '../dominio/status-pedido';
 import { VisaoPedidos } from './visao-pedidos';
 
 export class VisaoListagemPedidos implements VisaoPedidos {
@@ -8,12 +10,16 @@ export class VisaoListagemPedidos implements VisaoPedidos {
 	private readonly formularioFiltroPedidos = this.pagina.querySelector<HTMLFormElement>('#formulario-filtro-pedidos')!;
 	private readonly inputFiltroPedidos = this.pagina.querySelector<HTMLInputElement>('#filtro-pedidos')!;
 	private readonly listaPedidos = this.pagina.querySelector<HTMLElement>('#lista-pedidos')!;
-	private readonly modalStatusPedido = this.pagina.querySelector<HTMLElement>('#modal-status-pedido')!;
-	private readonly formularioStatusPedido = this.modalStatusPedido.querySelector<HTMLFormElement>('#formulario-status-pedido')!;
-	private readonly selectStatusPedido = this.modalStatusPedido.querySelector<HTMLSelectElement>('#novo-status-pedido')!;
-	private readonly tituloModalStatus = this.modalStatusPedido.querySelector<HTMLElement>('#titulo-modal-status')!;
-	private readonly botaoFecharModalStatus = this.modalStatusPedido.querySelector<HTMLButtonElement>('#botao-fechar-modal-status')!;
-	private readonly botaoCancelarModalStatus = this.modalStatusPedido.querySelector<HTMLButtonElement>('#botao-cancelar-modal-status')!;
+	private readonly modalStatusPedido = bootstrap.Modal.getOrCreateInstance('#modal-status-pedido')! as bootstrap.Modal;
+	private readonly elementoModalStatusPedido = this.pagina.querySelector<HTMLElement>('#modal-status-pedido')!;
+	private readonly formularioStatusPedido = this.elementoModalStatusPedido.querySelector<HTMLFormElement>('#formulario-status-pedido')!;
+	private readonly selectStatusPedido = this.elementoModalStatusPedido.querySelector<HTMLSelectElement>('#novo-status-pedido')!;
+	private readonly tituloModalStatus = this.elementoModalStatusPedido.querySelector<HTMLElement>('#titulo-modal-status')!;
+	private readonly modalCancelamentoPedido = bootstrap.Modal.getOrCreateInstance('#modal-cancelamento-pedido')! as bootstrap.Modal;
+	private readonly elementoModalCancelamentoPedido = this.pagina.querySelector<HTMLElement>('#modal-cancelamento-pedido')!;
+	private readonly formularioCancelamentoPedido = this.elementoModalCancelamentoPedido.querySelector<HTMLFormElement>('#formulario-cancelamento-pedido')!;
+	private readonly textareaMotivoCancelamento = this.elementoModalCancelamentoPedido.querySelector<HTMLTextAreaElement>('#motivo-cancelamento')!;
+	private readonly tituloModalCancelamento = this.elementoModalCancelamentoPedido.querySelector<HTMLElement>('#titulo-modal-cancelamento')!;
 	private readonly controladoraListagemPedidos: ControladoraListagemPedidos;
 	private pedidoSelecionado: PedidoListagem | null = null;
 
@@ -28,13 +34,30 @@ export class VisaoListagemPedidos implements VisaoPedidos {
 		});
 		this.formularioStatusPedido.addEventListener('submit', (event: Event) => {
 			event.preventDefault();
-			if (this.pedidoSelecionado !== null) {
-				this.controladoraListagemPedidos.alterarStatus(this.pedidoSelecionado.id, this.selectStatusPedido.value);
-				this.fecharModalStatus();
+			if (this.pedidoSelecionado === null) {
+				return;
 			}
+
+			if (this.selectStatusPedido.value === StatusPedido.CANCELADO) {
+				this.elementoModalStatusPedido.addEventListener('hidden.bs.modal', () => this.abrirModalCancelamento(), { once: true });
+				this.modalStatusPedido.hide();
+				return;
+			}
+
+			this.controladoraListagemPedidos.alterarStatus(this.pedidoSelecionado.id, this.selectStatusPedido.value);
+			this.modalStatusPedido.hide();
 		});
-		this.botaoFecharModalStatus.addEventListener('click', () => this.fecharModalStatus());
-		this.botaoCancelarModalStatus.addEventListener('click', () => this.fecharModalStatus());
+
+		this.formularioCancelamentoPedido.addEventListener('submit', (event: Event) => {
+			event.preventDefault();
+			if (this.pedidoSelecionado === null) {
+				return;
+			}
+
+			this.controladoraListagemPedidos.cancelarPedido(this.pedidoSelecionado.id, this.textareaMotivoCancelamento.value.trim());
+			this.modalCancelamentoPedido.hide();
+		});
+		this.elementoModalCancelamentoPedido.addEventListener('shown.bs.modal', () => this.textareaMotivoCancelamento.focus());
 
 		this.controladoraListagemPedidos.obterPedidos();
 	}
@@ -93,15 +116,12 @@ export class VisaoListagemPedidos implements VisaoPedidos {
 			option.textContent = status;
 			this.selectStatusPedido.appendChild(option);
 		});
-		this.modalStatusPedido.classList.add('show');
-		this.modalStatusPedido.style.display = 'block';
-		this.modalStatusPedido.removeAttribute('aria-hidden');
+		this.modalStatusPedido.show();
 	}
 
-	private fecharModalStatus(): void {
-		this.modalStatusPedido.classList.remove('show');
-		this.modalStatusPedido.style.display = 'none';
-		this.modalStatusPedido.setAttribute('aria-hidden', 'true');
-		this.pedidoSelecionado = null;
+	private abrirModalCancelamento(): void {
+		this.tituloModalCancelamento.textContent = `Cancelar pedido #${this.pedidoSelecionado?.id}`;
+		this.textareaMotivoCancelamento.value = '';
+		this.modalCancelamentoPedido.show();
 	}
 }

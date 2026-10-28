@@ -84,6 +84,28 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
         }
     }
 
+    public function registrarCancelamento(int $idPedido, Cancelamento $cancelamento): void {
+        try {
+            $sql = 'INSERT INTO cancelamento (
+                    idPedido,
+                    motivo,
+                    data
+                ) VALUES (
+                    :pedidoId,
+                    :motivo,
+                    :data
+                )';
+
+            $this->bancoDados->executar($sql, [
+                'pedidoId' => $idPedido,
+                'motivo' => $cancelamento->motivo,
+                'data' => $cancelamento->data->format('Y-m-d H:i:s'),
+            ]);
+        } catch (Throwable $e) {
+            throw new RepositorioException('Erro ao registrar cancelamento do pedido.');
+        }
+    }
+
     public function registrarPedido(Pedido &$pedido): void {
         try {
             $this->salvarPedido($pedido);

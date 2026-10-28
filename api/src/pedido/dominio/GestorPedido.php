@@ -27,7 +27,25 @@ class GestorPedido {
             throw new DominioException("Status de pedido inválido: {$novoStatus}.");
         }
 
+        if ($status === StatusPedido::CANCELADO) {
+            throw new DominioException('O cancelamento do pedido exige um motivo.');
+        }
+
         $this->repositorioPedido->alterarStatus($idPedido, $status);
+    }
+
+    public function cancelarPedido(CancelamentoParaCadastro $cancelamentoParaCadastro): void {
+        $idPedido = $cancelamentoParaCadastro->idPedido;
+        $cancelamento = new Cancelamento(
+            id: 0,
+            motivo: $cancelamentoParaCadastro->motivo,
+            data: new DateTime(),
+        );
+
+        $this->unidadeTrabalho->executar(function () use ($idPedido, $cancelamento) {
+            $this->repositorioPedido->alterarStatus($idPedido, StatusPedido::CANCELADO);
+            $this->repositorioPedido->registrarCancelamento($idPedido, $cancelamento);
+        });
     }
 
     public function registrarPedido(PedidoParaCadastro $pedidoParaCadastro): Pedido {

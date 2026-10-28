@@ -43,15 +43,36 @@
 				<form id="formulario-status-pedido">
 					<div class="modal-header">
 						<h2 class="modal-title fs-5" id="titulo-modal-status">Alterar status</h2>
-						<button type="button" class="btn-close" aria-label="Fechar" id="botao-fechar-modal-status"></button>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
 					</div>
 					<div class="modal-body">
 						<label class="form-label" for="novo-status-pedido">Novo status</label>
 						<select class="form-select" id="novo-status-pedido"></select>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" id="botao-cancelar-modal-status">Cancelar</button>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
 						<button type="submit" class="btn btn-primary">Salvar</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="modal-cancelamento-pedido" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form id="formulario-cancelamento-pedido">
+					<div class="modal-header">
+						<h2 class="modal-title fs-5" id="titulo-modal-cancelamento">Cancelar pedido</h2>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+					</div>
+					<div class="modal-body">
+						<label class="form-label" for="motivo-cancelamento">Motivo do cancelamento</label>
+						<textarea class="form-control" id="motivo-cancelamento" rows="3" required></textarea>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
+						<button type="submit" class="btn btn-danger">Cancelar pedido</button>
 					</div>
 				</form>
 			</div>
