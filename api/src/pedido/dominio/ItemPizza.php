@@ -56,4 +56,14 @@ class ItemPizza extends ItemPedido {
 
         return $preco;
     }
+
+    public function obterDescricaoSabores(): string {
+        $nomesSabores = array_map(function (SaborEscolhido $saborEscolhido) {
+            return $saborEscolhido->pizza->nome;
+        }, $this->saboresEscolhidos);
+
+        $descricao = implode('/', $nomesSabores);
+
+        return "Pizza {$descricao} ({$this->tamanhoPizza->obterRotulo()})";
+    }
 }

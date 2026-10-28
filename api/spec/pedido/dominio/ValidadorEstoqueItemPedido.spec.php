@@ -19,7 +19,7 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($erros)->toBe(['Produto Coca-Cola (ID 1) está sem estoque.']);
+            expect($erros)->toBe(['Produto Coca-Cola (ID 1) está sem estoque. Retire o produto do pedido.']);
         });
 
         it('preenche erros corretamente quando a quantidade do produto simples é maior que o estoque disponível (1 item simples)', function () {
@@ -84,12 +84,12 @@ describe('ValidadorEstoqueItemPedido', function () {
             );
 
             expect($erros)->toBe([
-                'Produto Coca-Cola (ID 1) está sem estoque.',
-                'Produto Suco de Laranja (ID 3) está sem estoque.',
+                'Produto Coca-Cola (ID 1) está sem estoque. Retire o produto do pedido.',
+                'Produto Suco de Laranja (ID 3) está sem estoque. Retire o produto do pedido.',
             ]);
         });
 
-        it('não preenche erros corretamente quando todos os itens simples possuem estoque suficiente', function () {
+        it('array de erros vem vazio quando todos os itens simples possuem estoque suficiente', function () {
             $erros = [];
 
             $validador = new ValidadorEstoqueItemPedido();
@@ -118,7 +118,6 @@ describe('ValidadorEstoqueItemPedido', function () {
 
         beforeAll(function () {
             $this->pizzaCalabresa = PizzaFactory::calabresa();
-
             $this->pizzaMargherita = PizzaFactory::margherita();
         });
 
@@ -153,11 +152,7 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($erros)->toBe([
-                'Ingrediente Molho (ID 1) não possui estoque suficiente.',
-                'Ingrediente Mussarela (ID 2) não possui estoque suficiente.',
-                'Ingrediente Bacon (ID 7) não possui estoque suficiente.',
-            ]);
+            expect($erros)->toBe(['Pizza Calabresa (M) não possui estoque suficiente. Retire ou atualize a quantidade da pizza no pedido.']);
         });
 
         it('preenche erros corretamente quando consumo de todos os ingrediente é maior que o estoque disponível (2 itens pizza)', function () {
@@ -209,12 +204,8 @@ describe('ValidadorEstoqueItemPedido', function () {
             );
 
             expect($erros)->toBe([
-                'Ingrediente Molho (ID 1) não possui estoque suficiente.',
-                'Ingrediente Mussarela (ID 2) não possui estoque suficiente.',
-                'Ingrediente Bacon (ID 7) não possui estoque suficiente.',
-                'Ingrediente Molho (ID 1) não possui estoque suficiente.',
-                'Ingrediente Mussarela (ID 2) não possui estoque suficiente.',
-                'Ingrediente Catupiry (ID 8) não possui estoque suficiente.',
+                'Pizza Calabresa (M) não possui estoque suficiente. Retire ou atualize a quantidade da pizza no pedido.',
+                'Pizza Margherita (M) não possui estoque suficiente. Retire ou atualize a quantidade da pizza no pedido.',
             ]);
         });
 
@@ -267,14 +258,10 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($erros)->toBe([
-                'Ingrediente Molho (ID 1) não possui estoque suficiente.',
-                'Ingrediente Mussarela (ID 2) não possui estoque suficiente.',
-                'Ingrediente Catupiry (ID 8) não possui estoque suficiente.',
-            ]);
+            expect($erros)->toBe(['Pizza Margherita (G) não possui estoque suficiente. Retire ou atualize a quantidade da pizza no pedido.']);
         });
 
-        it('não preenche erros corretamente quando todos os ingredientes possuem estoque suficiente', function () {
+        it('array de erros vem vazio quando todos os ingredientes possuem estoque suficiente', function () {
             $erros = [];
 
             // Possui estoque suficiente
@@ -367,13 +354,54 @@ describe('ValidadorEstoqueItemPedido', function () {
                 erros: $erros,
             );
 
-            expect($erros)->toBe([
-                'Ingrediente Molho (ID 1) não possui estoque suficiente.',
-                'Ingrediente Mussarela (ID 2) não possui estoque suficiente.',
-            ]);
+            expect($erros)->toBe(['Pizza Calabresa/Margherita (M) não possui estoque suficiente. Retire ou atualize a quantidade da pizza no pedido.']);
         });
 
-        it('não preenche erros corretamente quando todos os ingredientes possuem estoque suficiente (meia pizza)', function () {
+        it('preenche erros corretamente quando o consumo de alguns ingredientes é maior que o estoque disponível (meia pizza + quantidade 2)', function () {
+            $erros = [];
+
+            // Possui estoque insuficiente
+            $molho = IngredienteFactory::molho(6);
+            $mussarela = IngredienteFactory::mussarela(300);
+            $catupiry = IngredienteFactory::catupiry(150);
+            $manjericao = IngredienteFactory::manjericao(3);
+
+            $validador = new ValidadorEstoqueItemPedido();
+            $validador->validarEstoqueItensPedido(
+                itensPedido: [
+                    new ItemPizza(
+                        id: 1,
+                        quantidade: 2,
+                        tamanhoPizza: TamanhoPizza::GRANDE,
+                        saboresEscolhidos: [
+                            new SaborEscolhido(
+                                id: 3,
+                                pizza: $this->pizzaCalabresa,
+                                ingredientesEscolhidos: [
+                                    IngredienteEscolhidoFactory::padrao(1, $molho),
+                                    IngredienteEscolhidoFactory::padrao(2, $mussarela),
+                                ],
+                            ),
+                            new SaborEscolhido(
+                                id: 2,
+                                pizza: $this->pizzaMargherita,
+                                ingredientesEscolhidos: [
+                                    IngredienteEscolhidoFactory::padrao(1, $molho),
+                                    IngredienteEscolhidoFactory::padrao(2, $mussarela),
+                                    IngredienteEscolhidoFactory::padrao(2, $manjericao),
+                                    IngredienteEscolhidoFactory::padrao(3, $catupiry),
+                                ],
+                            ),
+                        ],
+                    ),
+                ],
+                erros: $erros,
+            );
+
+            expect($erros)->toBe(['Pizza Calabresa/Margherita (G) não possui estoque suficiente. Retire ou atualize a quantidade da pizza no pedido.']);
+        });
+
+        it('array de erros vem vazio quando todos os ingredientes possuem estoque suficiente (meia pizza)', function () {
             $erros = [];
 
             // Possui estoque suficiente

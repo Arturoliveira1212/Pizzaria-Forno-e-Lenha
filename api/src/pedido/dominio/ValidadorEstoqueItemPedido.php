@@ -43,7 +43,7 @@ class ValidadorEstoqueItemPedido {
                 return;
             }
 
-            $erros[] = "Produto {$produtoSimples->nome} (ID {$idProdutoSimples}) está sem estoque.";
+            $erros[] = "Produto {$produtoSimples->nome} (ID {$idProdutoSimples}) está sem estoque. Retire o produto do pedido.";
         }
     }
 
@@ -75,7 +75,6 @@ class ValidadorEstoqueItemPedido {
 
                 $ingredienteAtualizado = $mapaIngredientes[$ingrediente->id];
                 if (!$ingredienteAtualizado->temEstoqueSuficiente($consumo)) {
-                    $erros[] = "Ingrediente {$ingrediente->nome} (ID {$ingrediente->id}) não possui estoque suficiente.";
                     $inconsistenciasEncontradas = true;
                     continue;
                 }
@@ -86,7 +85,7 @@ class ValidadorEstoqueItemPedido {
         }
 
         if ($inconsistenciasEncontradas) {
-            // $erros[] = "Pizza XPTO não possui estoque suficiente para os ingredientes escolhidos";
+            $erros[] = "{$itemPizza->obterDescricaoSabores()} não possui estoque suficiente. Retire ou atualize a quantidade da pizza no pedido.";
         }
     }
 }

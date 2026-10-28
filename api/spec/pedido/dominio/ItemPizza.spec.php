@@ -234,4 +234,55 @@ describe('ItemPizza', function () {
         });
     });
 
+    describe('obterDescricaoSabores()', function () {
+
+        beforeAll(function () {
+            $this->pizzaPortuguesa = PizzaFactory::portuguesa();
+
+            $this->pizzaQuatroQueijos = PizzaFactory::quatroQueijos();
+
+            $this->saborEscolhidoPortuguesa = new SaborEscolhido(
+                id: 1,
+                pizza: $this->pizzaPortuguesa,
+                ingredientesEscolhidos: [
+                    IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+                    IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
+                    IngredienteEscolhidoFactory::substituto(3, IngredienteFactory::milho()),
+                    IngredienteEscolhidoFactory::adicional(4, IngredienteFactory::bacon(), 899),
+                ],
+            );
+
+            $this->saborEscolhidoQuatroQueijos = new SaborEscolhido(
+                id: 2,
+                pizza: $this->pizzaQuatroQueijos,
+                ingredientesEscolhidos: [
+                    IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+                    IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
+                ],
+            );
+        });
+
+        it('retorna a descrição correta para 1 sabor', function () {
+            $itemPizza = new ItemPizza(
+                id: ItemPedido::MENOR_ID_PERMITIDO,
+                quantidade: 1,
+                tamanhoPizza: TamanhoPizza::MEDIA,
+                saboresEscolhidos: [$this->saborEscolhidoPortuguesa],
+            );
+
+            expect($itemPizza->obterDescricaoSabores())->toBe('Pizza Portuguesa (M)');
+        });
+
+        it('retorna a descrição correta para 2 sabores', function () {
+            $itemPizza = new ItemPizza(
+                id: ItemPedido::MENOR_ID_PERMITIDO,
+                quantidade: 1,
+                tamanhoPizza: TamanhoPizza::MEDIA,
+                saboresEscolhidos: [$this->saborEscolhidoPortuguesa, $this->saborEscolhidoQuatroQueijos],
+            );
+
+            expect($itemPizza->obterDescricaoSabores())->toBe('Pizza Portuguesa/Quatro Queijos (M)');
+        });
+    });
+
 });
