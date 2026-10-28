@@ -1,4 +1,5 @@
 import { Cliente } from '../../cliente/dominio/cliente';
+import { Entregador } from '../../entregador/dominio/entregador';
 import { ControladoraRegistroPedido } from '../controller/controladora-registro-pedido';
 
 export interface VisaoEtapaAtendimento {
@@ -11,4 +12,8 @@ export interface VisaoEtapaAtendimento {
 	exibirClientes(clientes: Cliente[]): void;
 
 	exibirErroAoObterClientes(mensagem: string): void;
+
+	exibirEntregadores(entregadores: Entregador[]): void;
+
+	exibirErroAoObterEntregadores(mensagem: string): void;
 }

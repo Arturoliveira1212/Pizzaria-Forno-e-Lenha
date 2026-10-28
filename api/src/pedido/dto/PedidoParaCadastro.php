@@ -8,6 +8,7 @@ class PedidoParaCadastro {
         public readonly string $tipoAtendimento,
         public readonly string $idCliente,
         public readonly array $itensPedido,
+        public readonly string $idEntregador = '',
     ) {}
 
     /**
@@ -27,6 +28,7 @@ class PedidoParaCadastro {
             tipoAtendimento: $dados['tipoAtendimento'] ?? '',
             idCliente: $dados['idCliente'] ?? '',
             itensPedido: $itensPedido,
+            idEntregador: $dados['idEntregador'] ?? '',
         );
     }
 

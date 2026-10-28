@@ -177,6 +177,15 @@ Funcionalidade: Definir atendimento e cliente
             Quando seleciono o tipo de cliente "Cliente"
             Então a seção de clientes deve aparecer
 
+        Cenário: Exibição da seção de entregador no atendimento Entrega
+            Quando seleciono o tipo de atendimento "Entrega"
+            Então a seção de entregador deve aparecer
+
+        Cenário: Ocultação da seção de entregador fora do atendimento Entrega
+            Dado que selecionei o tipo de atendimento "Entrega"
+            Quando seleciono o tipo de atendimento "Retirada"
+            Então a seção de entregador deve desaparecer
+
 Funcionalidade: Aplicar taxas e descontos no pedido
     A fim de cobrar o valor correto do cliente
     Como um atendente
@@ -238,3 +247,20 @@ Funcionalidade: Finalizar pedido
             Quando clico em "Registrar pedido"
             Então deve aparecer a mensagem de pedido realizado
             E devo ser redirecionado para a home
+
+        Cenário: Tentativa de finalizar pedido de entrega sem entregador
+            Dado que a pizza "Bacon" foi adicionada ao pedido
+            E acesso a etapa "Atendimento"
+            E vinculo o cliente "Artur Alves"
+            E seleciono o tipo de atendimento "Entrega"
+            Quando clico em "Registrar pedido"
+            Então deve aparecer a mensagem de erro "O entregador é obrigatório para pedidos de entrega."
+
+        Cenário: Finalização de pedido de entrega com entregador
+            Dado que a pizza "Bacon" foi adicionada ao pedido
+            E acesso a etapa "Atendimento"
+            E vinculo o cliente "Artur Alves"
+            E seleciono o tipo de atendimento "Entrega"
+            E seleciono o entregador "João Pedro Alves"
+            Quando clico em "Registrar pedido"
+            Então devo ser redirecionado para a home

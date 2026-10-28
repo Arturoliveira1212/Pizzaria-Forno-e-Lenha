@@ -15,6 +15,8 @@ import { ProdutoSimples } from '../src/produto-simples/dominio/produto-simples';
 import { TipoProdutoSimples } from '../src/produto-simples/dominio/tipo-produto-simples';
 import { RepositorioProdutoSimples } from '../src/produto-simples/repositorio/repositorio-produto-simples';
 import { RepositorioCliente } from '../src/cliente/repositorio/repositorio-cliente';
+import { Entregador } from '../src/entregador/dominio/entregador';
+import { RepositorioEntregador } from '../src/entregador/repositorio/repositorio-entregador';
 import { TamanhoPizza } from '../src/pizza/dominio/tamanho-pizza';
 import { SaborEscolhido } from '../src/pedido/dominio/sabor-escolhido';
 import { PizzaParaCardapio } from '../src/pizza/dominio/pizza-para-cardapio';
@@ -62,11 +64,23 @@ export class RepositorioClienteEmMemoria implements RepositorioCliente {
 	}
 }
 
+export class RepositorioEntregadorEmMemoria implements RepositorioEntregador {
+	async obterEntregadores(): Promise<Entregador[]> {
+		return [new Entregador(1, 'Entregador 1')];
+	}
+}
+
 describe('GestorRegistroPedido', () => {
 	let gestor: GestorRegistroPedido;
 
 	beforeEach(() => {
-		gestor = new GestorRegistroPedido(new RepositorioPedidoEmMemoria(), new RepositorioPizzaEmMemoria(), new RepositorioProdutoSimplesEmMemoria(), new RepositorioClienteEmMemoria());
+		gestor = new GestorRegistroPedido(
+			new RepositorioPedidoEmMemoria(),
+			new RepositorioPizzaEmMemoria(),
+			new RepositorioProdutoSimplesEmMemoria(),
+			new RepositorioClienteEmMemoria(),
+			new RepositorioEntregadorEmMemoria(),
+		);
 	});
 
 	describe('itens simples', () => {
@@ -461,6 +475,65 @@ describe('GestorRegistroPedido', () => {
 
 			const comEntrega = await gestor.atualizarTipoAtendimento(TipoAtendimento.ENTREGA);
 			expect(comEntrega.tipoAtendimento).toBe(TipoAtendimento.ENTREGA);
+		});
+	});
+
+	describe('entregador', () => {
+		beforeEach(async () => {
+			await gestor.adicionarItemSimples({
+				quantidade: 1,
+				idProduto: 10,
+				nome: 'Refrigerante',
+				preco: 6,
+			});
+		});
+
+		it('obtém os entregadores disponíveis', async () => {
+			const entregadores = await gestor.obterEntregadores();
+
+			expect(entregadores).toEqual([new Entregador(1, 'Entregador 1')]);
+		});
+
+		it('adiciona entregador ao pedido', async () => {
+			await gestor.atualizarTipoAtendimento(TipoAtendimento.ENTREGA);
+
+			const comEntregador = await gestor.adicionarEntregador(1);
+			expect(comEntregador.entregador).toEqual(new Entregador(1));
+		});
+
+		it('remove entregador do pedido', async () => {
+			await gestor.atualizarTipoAtendimento(TipoAtendimento.ENTREGA);
+			await gestor.adicionarEntregador(1);
+
+			const semEntregador = await gestor.removerEntregador();
+			expect(semEntregador.entregador).toBeUndefined();
+		});
+
+		it('descarta o entregador quando o tipo de atendimento deixa de ser entrega', async () => {
+			await gestor.atualizarTipoAtendimento(TipoAtendimento.ENTREGA);
+			await gestor.adicionarEntregador(1);
+
+			const comRetirada = await gestor.atualizarTipoAtendimento(TipoAtendimento.RETIRADA);
+			expect(comRetirada.entregador).toBeUndefined();
+		});
+
+		it('não registra pedido de entrega sem entregador', async () => {
+			await gestor.atualizarTipoAtendimento(TipoAtendimento.ENTREGA);
+
+			await expect(gestor.registrarPedido()).rejects.toThrow('O entregador é obrigatório para pedidos de entrega.');
+		});
+
+		it('registra pedido de entrega com entregador', async () => {
+			await gestor.atualizarTipoAtendimento(TipoAtendimento.ENTREGA);
+			await gestor.adicionarEntregador(1);
+
+			await expect(gestor.registrarPedido()).resolves.toBeUndefined();
+		});
+
+		it('registra pedido que não é de entrega sem entregador', async () => {
+			await gestor.atualizarTipoAtendimento(TipoAtendimento.RETIRADA);
+
+			await expect(gestor.registrarPedido()).resolves.toBeUndefined();
 		});
 	});
 });

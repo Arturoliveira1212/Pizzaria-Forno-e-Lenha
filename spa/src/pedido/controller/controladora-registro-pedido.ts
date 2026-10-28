@@ -5,6 +5,7 @@ import { ServicoHttpComFetch } from '../../infra/http/servico-http-com-fetch';
 import { TipoProdutoSimples } from '../../produto-simples/dominio/tipo-produto-simples';
 import { RepositorioProdutoSimplesNoServidor } from '../../produto-simples/repositorio/repositorio-produto-simples-no-servidor';
 import { RepositorioClienteNoServidor } from '../../cliente/repositorio/repositorio-cliente-no-servidor';
+import { RepositorioEntregadorNoServidor } from '../../entregador/repositorio/repositorio-entregador-no-servidor';
 import { TipoAtendimento } from '../dominio/tipo-atendimento';
 import { TamanhoPizza } from '../../pizza/dominio/tamanho-pizza';
 import { Pizza } from '../../pizza/dominio/pizza';
@@ -36,6 +37,7 @@ export class ControladoraRegistroPedido {
 			new RepositorioPizzaNoServidor(servicoHttp),
 			new RepositorioProdutoSimplesNoServidor(servicoHttp),
 			new RepositorioClienteNoServidor(servicoHttp),
+			new RepositorioEntregadorNoServidor(servicoHttp),
 		);
 	}
 
@@ -190,6 +192,36 @@ export class ControladoraRegistroPedido {
 			this.visoes.resumo.exibirResumoPedido(pedido);
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível remover o cliente do pedido.';
+			this.visoes.resumo.exibirErroNoPedido(mensagem);
+		}
+	}
+
+	async obterEntregadores() {
+		try {
+			const entregadores = await this.gestor.obterEntregadores();
+			this.visoes.atendimento.exibirEntregadores(entregadores);
+		} catch (erro) {
+			const mensagemErro = erro instanceof Error ? erro.message : 'Ocorreu um erro ao obter os entregadores.';
+			this.visoes.atendimento.exibirErroAoObterEntregadores(mensagemErro);
+		}
+	}
+
+	async adicionarEntregador(idEntregador: number): Promise<void> {
+		try {
+			const pedido = await this.gestor.adicionarEntregador(idEntregador);
+			this.visoes.resumo.exibirResumoPedido(pedido);
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível adicionar o entregador ao pedido.';
+			this.visoes.resumo.exibirErroNoPedido(mensagem);
+		}
+	}
+
+	async removerEntregador(): Promise<void> {
+		try {
+			const pedido = await this.gestor.removerEntregador();
+			this.visoes.resumo.exibirResumoPedido(pedido);
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Não foi possível remover o entregador do pedido.';
 			this.visoes.resumo.exibirErroNoPedido(mensagem);
 		}
 	}

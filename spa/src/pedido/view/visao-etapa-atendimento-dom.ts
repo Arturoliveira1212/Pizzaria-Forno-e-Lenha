@@ -1,5 +1,6 @@
 import { VisaoEtapaAtendimento } from './visao-etapa-atendimento';
 import { Cliente } from '../../cliente/dominio/cliente';
+import { Entregador } from '../../entregador/dominio/entregador';
 import { clonarTemplate } from '../../util/dom';
 import { ControladoraRegistroPedido } from '../controller/controladora-registro-pedido';
 import { TipoAtendimento } from '../dominio/tipo-atendimento';
@@ -16,6 +17,8 @@ export class VisaoEtapaAtendimentoDom implements VisaoEtapaAtendimento {
 	private readonly inputFiltroCliente = this.secaoCliente.querySelector<HTMLInputElement>('#filtro-cliente')!;
 	private readonly secaoConsumidorFinal = document.querySelector<HTMLElement>('#secao-consumidor-final')!;
 	private readonly listaClientes = document.querySelector<HTMLElement>('#lista-clientes')!;
+	private readonly secaoEntregador = document.querySelector<HTMLElement>('#secao-entregador')!;
+	private readonly selectEntregador = this.secaoEntregador.querySelector<HTMLSelectElement>('#entregador')!;
 
 	iniciar(controladora: ControladoraRegistroPedido): void {
 		this.controladoraRegistroPedido = controladora;
@@ -32,6 +35,7 @@ export class VisaoEtapaAtendimentoDom implements VisaoEtapaAtendimento {
 			}
 
 			this.atualizarRestricoesTipoAtendimento();
+			this.atualizarSecaoEntregador(radio.value === TipoAtendimento.ENTREGA);
 			this.limparInputFiltroEAdicionarFoco();
 			this.controladoraRegistroPedido.atualizarTipoAtendimento(radio.value as TipoAtendimento);
 		});
@@ -63,6 +67,25 @@ export class VisaoEtapaAtendimentoDom implements VisaoEtapaAtendimento {
 			const idCliente = Number(radio.value);
 			this.controladoraRegistroPedido.adicionarCliente(idCliente);
 		});
+
+		this.selectEntregador.addEventListener('change', () => {
+			if (this.selectEntregador.value === '') {
+				this.controladoraRegistroPedido.removerEntregador();
+				return;
+			}
+
+			this.controladoraRegistroPedido.adicionarEntregador(Number(this.selectEntregador.value));
+		});
+	}
+
+	private atualizarSecaoEntregador(ehEntrega: boolean): void {
+		this.secaoEntregador.classList.toggle('d-none', !ehEntrega);
+
+		if (ehEntrega) {
+			this.controladoraRegistroPedido.obterEntregadores();
+		} else {
+			this.selectEntregador.value = '';
+		}
 	}
 
 	private atualizarRestricoesTipoAtendimento(): void {
@@ -114,6 +137,23 @@ export class VisaoEtapaAtendimentoDom implements VisaoEtapaAtendimento {
 
 	exibirErroAoObterClientes(mensagem: string): void {
 		this.listaClientes.replaceChildren(this.criarAvisoCliente(mensagem));
+	}
+
+	exibirEntregadores(entregadores: Entregador[]): void {
+		const opcoesEntregadores = entregadores.map((entregador) => this.criarOpcaoEntregador(String(entregador.id), entregador.nome));
+		this.selectEntregador.replaceChildren(this.criarOpcaoEntregador('', 'Selecione o entregador'), ...opcoesEntregadores);
+	}
+
+	exibirErroAoObterEntregadores(mensagem: string): void {
+		this.selectEntregador.replaceChildren(this.criarOpcaoEntregador('', mensagem));
+	}
+
+	private criarOpcaoEntregador(valor: string, texto: string): HTMLOptionElement {
+		const opcao = document.createElement('option');
+		opcao.value = valor;
+		opcao.textContent = texto;
+
+		return opcao;
 	}
 
 	private criarAvisoCliente(mensagem: string): DocumentFragment {
