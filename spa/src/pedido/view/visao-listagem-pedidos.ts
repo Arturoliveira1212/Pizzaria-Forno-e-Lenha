@@ -1,11 +1,13 @@
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { Entregador } from '../../entregador/dominio/entregador';
 import { clonarTemplate } from '../../util/dom';
 import { ControladoraListagemPedidos } from '../controller/controladora-listagem-pedidos';
 import { PedidoListagem } from '../dominio/pedido-listagem';
 import { StatusPedido } from '../dominio/status-pedido';
 import { VisaoPedidos } from './visao-pedidos';
+import { VisaoSaidaParaEntrega } from './visao-saida-para-entrega';
 
-export class VisaoListagemPedidos implements VisaoPedidos {
+export class VisaoListagemPedidos implements VisaoPedidos, VisaoSaidaParaEntrega {
 	private readonly pagina = document.querySelector<HTMLElement>('#pagina-listagem-pedidos')!;
 	private readonly formularioFiltroPedidos = this.pagina.querySelector<HTMLFormElement>('#formulario-filtro-pedidos')!;
 	private readonly inputFiltroPedidos = this.pagina.querySelector<HTMLInputElement>('#filtro-pedidos')!;
@@ -20,11 +22,16 @@ export class VisaoListagemPedidos implements VisaoPedidos {
 	private readonly formularioCancelamentoPedido = this.elementoModalCancelamentoPedido.querySelector<HTMLFormElement>('#formulario-cancelamento-pedido')!;
 	private readonly textareaMotivoCancelamento = this.elementoModalCancelamentoPedido.querySelector<HTMLTextAreaElement>('#motivo-cancelamento')!;
 	private readonly tituloModalCancelamento = this.elementoModalCancelamentoPedido.querySelector<HTMLElement>('#titulo-modal-cancelamento')!;
+	private readonly modalSaidaParaEntrega = bootstrap.Modal.getOrCreateInstance('#modal-saida-para-entrega')! as bootstrap.Modal;
+	private readonly elementoModalSaidaParaEntrega = this.pagina.querySelector<HTMLElement>('#modal-saida-para-entrega')!;
+	private readonly formularioSaidaParaEntrega = this.elementoModalSaidaParaEntrega.querySelector<HTMLFormElement>('#formulario-saida-para-entrega')!;
+	private readonly selectEntregador = this.elementoModalSaidaParaEntrega.querySelector<HTMLSelectElement>('#entregador-saida-para-entrega')!;
+	private readonly tituloModalSaidaParaEntrega = this.elementoModalSaidaParaEntrega.querySelector<HTMLElement>('#titulo-modal-saida-para-entrega')!;
 	private readonly controladoraListagemPedidos: ControladoraListagemPedidos;
 	private pedidoSelecionado: PedidoListagem | null = null;
 
 	constructor() {
-		this.controladoraListagemPedidos = new ControladoraListagemPedidos(this);
+		this.controladoraListagemPedidos = new ControladoraListagemPedidos(this, this);
 	}
 
 	iniciar(): void {
@@ -44,6 +51,12 @@ export class VisaoListagemPedidos implements VisaoPedidos {
 				return;
 			}
 
+			if (this.selectStatusPedido.value === StatusPedido.SAIU_PARA_ENTREGA) {
+				this.elementoModalStatusPedido.addEventListener('hidden.bs.modal', () => this.abrirModalSaidaParaEntrega(), { once: true });
+				this.modalStatusPedido.hide();
+				return;
+			}
+
 			this.controladoraListagemPedidos.alterarStatus(this.pedidoSelecionado.id, this.selectStatusPedido.value);
 			this.modalStatusPedido.hide();
 		});
@@ -58,6 +71,16 @@ export class VisaoListagemPedidos implements VisaoPedidos {
 			this.modalCancelamentoPedido.hide();
 		});
 		this.elementoModalCancelamentoPedido.addEventListener('shown.bs.modal', () => this.textareaMotivoCancelamento.focus());
+
+		this.formularioSaidaParaEntrega.addEventListener('submit', (event: Event) => {
+			event.preventDefault();
+			if (this.pedidoSelecionado === null) {
+				return;
+			}
+
+			this.controladoraListagemPedidos.registrarSaidaParaEntrega(this.pedidoSelecionado.id, Number(this.selectEntregador.value));
+			this.modalSaidaParaEntrega.hide();
+		});
 
 		this.controladoraListagemPedidos.obterPedidos();
 	}
@@ -123,5 +146,29 @@ export class VisaoListagemPedidos implements VisaoPedidos {
 		this.tituloModalCancelamento.textContent = `Cancelar pedido #${this.pedidoSelecionado?.id}`;
 		this.textareaMotivoCancelamento.value = '';
 		this.modalCancelamentoPedido.show();
+	}
+
+	private abrirModalSaidaParaEntrega(): void {
+		this.tituloModalSaidaParaEntrega.textContent = `Saída para entrega do pedido #${this.pedidoSelecionado?.id}`;
+		this.selectEntregador.replaceChildren(this.criarOpcaoEntregador('', 'Carregando entregadores...'));
+		this.modalSaidaParaEntrega.show();
+		this.controladoraListagemPedidos.obterEntregadores();
+	}
+
+	exibirEntregadores(entregadores: Entregador[]): void {
+		const opcoesEntregadores = entregadores.map((entregador) => this.criarOpcaoEntregador(String(entregador.id), entregador.nome));
+		this.selectEntregador.replaceChildren(this.criarOpcaoEntregador('', 'Selecione o entregador'), ...opcoesEntregadores);
+	}
+
+	exibirErroAoObterEntregadores(mensagem: string): void {
+		this.selectEntregador.replaceChildren(this.criarOpcaoEntregador('', mensagem));
+	}
+
+	private criarOpcaoEntregador(valor: string, texto: string): HTMLOptionElement {
+		const option = document.createElement('option');
+		option.value = valor;
+		option.textContent = texto;
+
+		return option;
 	}
 }

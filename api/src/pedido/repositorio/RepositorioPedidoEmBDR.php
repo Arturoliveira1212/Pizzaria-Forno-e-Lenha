@@ -141,6 +141,21 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
         }
     }
 
+    public function registrarChegadaEntrega(Entrega $entrega): void {
+        try {
+            $sql = 'UPDATE entrega SET
+                dataChegada = :dataChegada
+                    WHERE id = :id';
+
+            $this->bancoDados->executar($sql, [
+                'dataChegada' => $entrega->dataChegada?->format('Y-m-d H:i:s'),
+                'id' => $entrega->id,
+            ]);
+        } catch (Throwable $e) {
+            throw new RepositorioException('Erro ao registrar chegada da entrega do pedido.');
+        }
+    }
+
     public function registrarPedido(Pedido &$pedido): void {
         try {
             $this->salvarPedido($pedido);

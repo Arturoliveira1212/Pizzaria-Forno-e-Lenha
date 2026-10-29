@@ -46,6 +46,14 @@ export class RepositorioPedidoNoServidor implements RepositorioPedido {
 		}
 	}
 
+	async registrarSaidaParaEntrega(idPedido: number, idEntregador: number): Promise<void> {
+		try {
+			await this.servicoHttp.post(`${API}/pedidos/saida-entrega`, { idPedido, idEntregador });
+		} catch (error) {
+			this.tratarErro(error, 'Ocorreu um erro ao registrar a saída para entrega do pedido.');
+		}
+	}
+
 	async obterResumoValores(pedido: Pedido): Promise<ResumoValoresPedido> {
 		try {
 			const resultado = await this.servicoHttp.post(`${API}/pedidos/valores`, this.obterCorpoRequisicaoParaPedido(pedido));

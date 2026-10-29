@@ -24,6 +24,7 @@ describe('GestorPedido', function () {
         $this->repositorioPromocao = Double::instance(['implements' => RepositorioPromocao::class]);
         $this->repositorioConfiguracaoFidelidade = Double::instance(['implements' => RepositorioConfiguracaoFidelidade::class]);
         $this->repositorioMovimentacaoEstoque = Double::instance(['implements' => RepositorioMovimentacaoEstoque::class]);
+        $this->repositorioEntregador = Double::instance(['implements' => RepositorioEntregador::class]);
 
         $this->gestorPedido = new GestorPedido(
             unidadeTrabalho: $this->unidadeTrabalho,
@@ -35,6 +36,7 @@ describe('GestorPedido', function () {
             repositorioPromocao: $this->repositorioPromocao,
             repositorioConfiguracaoFidelidade: $this->repositorioConfiguracaoFidelidade,
             repositorioMovimentacaoEstoque: $this->repositorioMovimentacaoEstoque,
+            repositorioEntregador: $this->repositorioEntregador,
         );
     });
 
@@ -655,6 +657,65 @@ describe('GestorPedido', function () {
             expect($this->repositorioPedido)->toReceive('registrarCancelamento');
 
             $this->gestorPedido->cancelarPedido(new CancelamentoParaCadastro(idPedido: 1, motivo: 'Cliente desistiu do pedido'));
+        });
+
+    });
+
+    describe('registrarSaidaParaEntrega()', function () {
+
+        beforeEach(function () {
+            allow($this->repositorioPedido)->toReceive('obterPedidoPorId')->andReturn(new Pedido(
+                id: 1,
+                usuario: UsuarioFactory::atendente(),
+                data: new DateTime(),
+                tipoAtendimento: TipoAtendimento::ENTREGA,
+                cliente: new Cliente(
+                    id: 1,
+                    nome: 'João da Silva',
+                    telefone: $this->telefone,
+                    cpf: $this->cpf,
+                    endereco: $this->endereco,
+                    beneficioFidelidade: null,
+                ),
+                itensPedido: [
+                    new ItemSimples(id: 1, quantidade: 1, produtoSimples: ProdutoSimplesFactory::cocaCola(20)),
+                ],
+                status: StatusPedido::EM_PREPARACAO,
+            ));
+        });
+
+        it('lança exceção quando o entregador não está disponível', function () {
+            $entregador = EntregadorFactory::entregador(disponivel: false);
+            allow($this->repositorioEntregador)->toReceive('obterEntregadorPorId')->andReturn($entregador);
+
+            /** @var DominioException $e */
+            $e = capturarExcecao(function () use ($entregador) {
+                $this->gestorPedido->registrarSaidaParaEntrega(new SaidaParaEntregaParaCadastro(idPedido: 1, idEntregador: $entregador->id));
+            });
+
+            expect($e)->toBeAnInstanceOf(DominioException::class);
+            expect($e->erros())->toBe(["O entregador {$entregador->nome} (ID {$entregador->id}) não está disponível."]);
+        });
+
+        it('registra a entrega com o entregador, o endereço do cliente e a data de saída', function () {
+            $entregador = EntregadorFactory::entregador();
+            allow($this->repositorioEntregador)->toReceive('obterEntregadorPorId')->andReturn($entregador);
+            allow($this->unidadeTrabalho)->toReceive('executar')->andRun(function (callable $operacao) {
+                $operacao();
+            });
+
+            $entregaRegistrada = null;
+            allow($this->repositorioPedido)->toReceive('registrarEntrega')->andRun(function (Pedido $pedido, Entrega $entrega) use (&$entregaRegistrada) {
+                $entregaRegistrada = $entrega;
+            });
+
+            $this->gestorPedido->registrarSaidaParaEntrega(new SaidaParaEntregaParaCadastro(idPedido: 1, idEntregador: $entregador->id));
+
+            expect($entregaRegistrada)->toBeAnInstanceOf(Entrega::class);
+            expect($entregaRegistrada->entregador)->toBe($entregador);
+            expect($entregaRegistrada->endereco)->toBe($this->endereco);
+            expect($entregaRegistrada->dataSaida)->toBeAnInstanceOf(DateTime::class);
+            expect($entregaRegistrada->dataChegada)->toBeNull();
         });
 
     });

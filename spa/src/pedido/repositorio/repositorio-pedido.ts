@@ -9,6 +9,8 @@ export interface RepositorioPedido {
 
 	cancelarPedido(idPedido: number, motivo: string): Promise<void>;
 
+	registrarSaidaParaEntrega(idPedido: number, idEntregador: number): Promise<void>;
+
 	obterResumoValores(pedido: Pedido): Promise<ResumoValoresPedido>;
 
 	registrarPedido(pedido: Pedido): Promise<void>;

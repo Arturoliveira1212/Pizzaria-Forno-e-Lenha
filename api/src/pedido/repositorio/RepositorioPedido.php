@@ -12,6 +12,8 @@ interface RepositorioPedido {
 
     public function registrarEntrega(Pedido $pedido, Entrega $entrega): void;
 
+    public function registrarChegadaEntrega(Entrega $entrega): void;
+
     public function registrarPedido(Pedido &$pedido): void;
 
     public function obterPedidoPorId(string $idPedido): ?Pedido;

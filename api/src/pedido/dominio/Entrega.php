@@ -11,4 +11,15 @@ class Entrega {
         public readonly ?DateTime $dataChegada,
         public readonly Dinheiro $taxa,
     ) {}
+
+    public function copiarComDataChegada(DateTime $dataChegada): Entrega {
+        return new Entrega(
+            id: $this->id,
+            endereco: $this->endereco,
+            entregador: $this->entregador,
+            dataSaida: $this->dataSaida,
+            dataChegada: $dataChegada,
+            taxa: $this->taxa,
+        );
+    }
 }

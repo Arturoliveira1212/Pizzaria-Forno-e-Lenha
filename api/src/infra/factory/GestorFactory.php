@@ -24,6 +24,7 @@ class GestorFactory {
             repositorioPromocao: new RepositorioPromocaoEmBDR($bancoDados),
             repositorioConfiguracaoFidelidade: new RepositorioConfiguracaoFidelidadeEmBDR($bancoDados),
             repositorioMovimentacaoEstoque: new RepositorioMovimentacaoEstoqueEmBDR($bancoDados),
+            repositorioEntregador: $repositorioEntregador,
         );
     }
 }

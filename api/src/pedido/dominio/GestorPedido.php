@@ -11,6 +11,7 @@ class GestorPedido {
         private readonly RepositorioPromocao $repositorioPromocao,
         private readonly RepositorioConfiguracaoFidelidade $repositorioConfiguracaoFidelidade,
         private readonly RepositorioMovimentacaoEstoque $repositorioMovimentacaoEstoque,
+        private readonly RepositorioEntregador $repositorioEntregador,
     ) {}
 
     /**
@@ -30,7 +31,77 @@ class GestorPedido {
             throw new DominioException('O cancelamento do pedido exige um motivo.');
         }
 
+        if ($status === StatusPedido::SAIU_PARA_ENTREGA) {
+            throw new DominioException('A saída para entrega do pedido exige um entregador.');
+        }
+
+        if ($status === StatusPedido::FINALIZADO) {
+            $this->finalizarPedido($idPedido);
+
+            return;
+        }
+
         $this->repositorioPedido->alterarStatus($idPedido, $status);
+    }
+
+    public function registrarSaidaParaEntrega(SaidaParaEntregaParaCadastro $saidaParaEntregaParaCadastro): void {
+        $pedido = $this->obterPedidoPorId($saidaParaEntregaParaCadastro->idPedido);
+        if (!$pedido->cliente instanceof Cliente) {
+            throw new DominioException('A entrega exige um cliente.');
+        }
+
+        $entregador = $this->obterEntregadorDisponivel($saidaParaEntregaParaCadastro->idEntregador);
+        $entrega = new Entrega(
+            id: 0,
+            endereco: $pedido->cliente->endereco,
+            entregador: $entregador,
+            dataSaida: new DateTime(),
+            dataChegada: null,
+            taxa: $pedido->calcularValorEntrega(),
+        );
+
+        $this->unidadeTrabalho->executar(function () use ($pedido, $entrega) {
+            $this->repositorioPedido->alterarStatus($pedido->id, StatusPedido::SAIU_PARA_ENTREGA);
+            $this->repositorioPedido->registrarEntrega($pedido, $entrega);
+        });
+    }
+
+    private function finalizarPedido(int $idPedido): void {
+        $pedido = $this->obterPedidoPorId($idPedido);
+        if (!$pedido->entrega instanceof Entrega) {
+            $this->repositorioPedido->alterarStatus($idPedido, StatusPedido::FINALIZADO);
+
+            return;
+        }
+
+        $entrega = $pedido->entrega->copiarComDataChegada(new DateTime());
+
+        $this->unidadeTrabalho->executar(function () use ($idPedido, $entrega) {
+            $this->repositorioPedido->alterarStatus($idPedido, StatusPedido::FINALIZADO);
+            $this->repositorioPedido->registrarChegadaEntrega($entrega);
+        });
+    }
+
+    private function obterPedidoPorId(int $idPedido): Pedido {
+        $pedido = $this->repositorioPedido->obterPedidoPorId((string) $idPedido);
+        if (!$pedido instanceof Pedido) {
+            throw new DominioException("Pedido (ID {$idPedido}) não encontrado.");
+        }
+
+        return $pedido;
+    }
+
+    private function obterEntregadorDisponivel(int $idEntregador): Entregador {
+        $entregador = $this->repositorioEntregador->obterEntregadorPorId($idEntregador);
+        if (!$entregador instanceof Entregador) {
+            throw new DominioException("Entregador (ID {$idEntregador}) não encontrado.");
+        }
+
+        if (!$entregador->disponivel) {
+            throw new DominioException("O entregador {$entregador->nome} (ID {$entregador->id}) não está disponível.");
+        }
+
+        return $entregador;
     }
 
     public function cancelarPedido(CancelamentoParaCadastro $cancelamentoParaCadastro): void {

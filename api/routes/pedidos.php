@@ -52,6 +52,23 @@ return function (Router $app, BancoDados $bancoDados) {
         }
     });
 
+    $app->post('/pedidos/saida-entrega', function (HttpRequest $request, HttpResponse $response) use ($bancoDados) {
+        try {
+            $saidaParaEntregaParaCadastro = SaidaParaEntregaParaCadastro::criarComArray((array) $request->body());
+
+            $gestorPedido = GestorFactory::criarGestorPedido($bancoDados);
+            $gestorPedido->registrarSaidaParaEntrega($saidaParaEntregaParaCadastro);
+
+            $response->status(201)->json(['message' => 'Saída para entrega registrada com sucesso.']);
+        } catch (DominioException $e) {
+            $response->status(400)->json(['message' => 'Erro ao registrar saída para entrega.', 'data' => [
+                'erros' => $e->erros(),
+            ]]);
+        } catch (Throwable $e) {
+            $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
+        }
+    });
+
     $app->post('/pedidos/cancelamento', function (HttpRequest $request, HttpResponse $response) use ($bancoDados) {
         try {
             $cancelamentoParaCadastro = CancelamentoParaCadastro::criarComArray((array) $request->body());
