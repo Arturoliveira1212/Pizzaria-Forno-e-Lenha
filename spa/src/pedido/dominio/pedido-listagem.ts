@@ -8,4 +8,17 @@ export class PedidoListagem {
 		public readonly proximosStatus: string[],
 		public readonly valorTotal: number,
 	) {}
+
+	obterNomeClienteAbreviado(): string {
+		if (this.nomeCliente === null) {
+			return 'Consumidor final';
+		}
+
+		const nomes = this.nomeCliente.split(' ');
+		if (nomes.length === 1) {
+			return nomes[0];
+		}
+
+		return `${nomes[0]} ${nomes[1].charAt(0)}.`;
+	}
 }

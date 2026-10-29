@@ -28,7 +28,7 @@ export class VisaoMonitorPedidos implements VisaoPedidos {
 		this.listaPedidos.replaceChildren();
 
 		if (pedidos.length === 0) {
-			this.listaPedidos.innerHTML = '<tr><td colspan="3" class="text-center text-body-secondary">Nenhum pedido no momento.</td></tr>';
+			this.listaPedidos.innerHTML = '<tr><td colspan="5" class="text-center text-body-secondary">Nenhum pedido no momento.</td></tr>';
 			return;
 		}
 
@@ -38,7 +38,7 @@ export class VisaoMonitorPedidos implements VisaoPedidos {
 	}
 
 	exibirErro(mensagem: string): void {
-		this.listaPedidos.innerHTML = `<tr><td colspan="3" class="text-center text-danger">${mensagem}</td></tr>`;
+		this.listaPedidos.innerHTML = `<tr><td colspan="5" class="text-center text-danger">${mensagem}</td></tr>`;
 	}
 
 	private criarLinhaPedido(pedido: PedidoListagem): DocumentFragment {
@@ -46,9 +46,18 @@ export class VisaoMonitorPedidos implements VisaoPedidos {
 		const linha = template.querySelector('tr')!;
 
 		linha.querySelector<HTMLElement>('.pedido-id')!.textContent = `#${pedido.id}`;
+		linha.querySelector<HTMLElement>('.pedido-cliente')!.textContent = pedido.obterNomeClienteAbreviado();
+		linha.querySelector<HTMLElement>('.pedido-horario')!.textContent = this.formatarHorario(pedido.data);
 		linha.querySelector<HTMLElement>('.pedido-atendimento')!.textContent = pedido.tipoAtendimento;
 		linha.querySelector<HTMLElement>('.pedido-status')!.textContent = pedido.status;
 
 		return template;
+	}
+
+	private formatarHorario(data: string): string {
+		return new Date(data.replace(' ', 'T')).toLocaleTimeString('pt-BR', {
+			hour: '2-digit',
+			minute: '2-digit',
+		});
 	}
 }
