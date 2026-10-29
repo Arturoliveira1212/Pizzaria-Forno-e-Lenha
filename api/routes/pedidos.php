@@ -2,131 +2,107 @@
 
 use phputil\router\HttpRequest;
 use phputil\router\HttpResponse;
+use phputil\router\Router;
 
-$repositorioCliente = new RepositorioClienteEmBDR($bancoDados);
-$repositorioPizza = new RepositorioPizzaEmBDR($bancoDados);
-$repositorioUsuario = new RepositorioUsuarioEmBDR();
-$repositorioPedido = new RepositorioPedidoEmBDR(
-    bancoDados: $bancoDados,
-    repositorioPizza: $repositorioPizza,
-    repositorioCliente: $repositorioCliente,
-    repositorioUsuario: $repositorioUsuario,
-);
+return function (Router $app, BancoDados $bancoDados) {
 
-$gestorPedido = new GestorPedido(
-    new UnidadeTrabalhoEmBDR($bancoDados),
-    $repositorioPedido,
-    $repositorioCliente,
-    $repositorioPizza,
-    new RepositorioProdutoSimplesEmBDR($bancoDados),
-    new RepositorioIngredienteEmBDR($bancoDados),
-    new RepositorioPromocaoEmBDR($bancoDados),
-    new RepositorioConfiguracaoFidelidadeEmBDR($bancoDados),
-    new RepositorioMovimentacaoEstoqueEmBDR($bancoDados),
-);
+    $app->get('/pedidos', function (HttpRequest $request, HttpResponse $response) use ($bancoDados) {
+        try {
+            $identificador = trim($request->queries()['identificador'] ?? '');
+            $idPedido = $identificador === '' ? null : filter_var($identificador, FILTER_VALIDATE_INT);
 
-$app->get('/pedidos', function (HttpRequest $request, HttpResponse $response) use ($gestorPedido) {
-    try {
-        $identificador = trim($request->queries()['identificador'] ?? '');
-        $idPedido = $identificador === '' ? null : filter_var($identificador, FILTER_VALIDATE_INT);
+            if ($identificador !== '' && $idPedido === false) {
+                throw new DominioException('O identificador do pedido deve ser um número.');
+            }
 
-        if ($identificador !== '' && $idPedido === false) {
-            throw new DominioException('O identificador do pedido deve ser um número.');
+            $gestorPedido = GestorFactory::criarGestorPedido($bancoDados);
+            $pedidos = $gestorPedido->obterPedidosParaListagem($idPedido);
+
+            $response->status(200)->json(['message' => 'Pedidos obtidos com sucesso.', 'data' => [
+                'pedidos' => $pedidos,
+            ]]);
+        } catch (DominioException $e) {
+            $response->status(400)->json(['message' => 'Erro ao obter pedidos.', 'data' => [
+                'erros' => $e->erros(),
+            ]]);
+        } catch (Throwable $e) {
+            $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
         }
+    });
 
-        $pedidos = $gestorPedido->obterPedidosParaListagem($idPedido);
+    $app->patch('/pedidos/status', function (HttpRequest $request, HttpResponse $response) use ($bancoDados) {
+        try {
+            $dados = (array) $request->body();
+            $idPedido = filter_var($dados['idPedido'] ?? '', FILTER_VALIDATE_INT);
+            $status = (string) ($dados['status'] ?? '');
 
-        $response->status(200)->json(['message' => 'Pedidos obtidos com sucesso.', 'data' => [
-            'pedidos' => $pedidos,
-        ]]);
-    } catch (DominioException $e) {
-        $response->status(400)->json(['message' => 'Erro ao obter pedidos.', 'data' => [
-            'erros' => $e->erros(),
-        ]]);
-    } catch (Throwable $e) {
-        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
-    }
-});
+            if ($idPedido === false || $status === '') {
+                throw new DominioException('ID e status do pedido são obrigatórios.');
+            }
 
-$app->patch('/pedidos/status', function (HttpRequest $request, HttpResponse $response) use ($gestorPedido) {
-    try {
-        $dados = (array) $request->body();
-        $idPedido = filter_var($dados['idPedido'] ?? '', FILTER_VALIDATE_INT);
-        $status = (string) ($dados['status'] ?? '');
-
-        if ($idPedido === false || $status === '') {
-            throw new DominioException('ID e status do pedido são obrigatórios.');
+            $gestorPedido = GestorFactory::criarGestorPedido($bancoDados);
+            $gestorPedido->alterarStatus($idPedido, $status);
+            $response->status(200)->json(['message' => 'Status do pedido alterado com sucesso.']);
+        } catch (DominioException $e) {
+            $response->status(400)->json(['message' => 'Erro ao alterar status do pedido.', 'data' => [
+                'erros' => $e->erros(),
+            ]]);
+        } catch (Throwable $e) {
+            $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
         }
+    });
 
-        $gestorPedido->alterarStatus($idPedido, $status);
-        $response->status(200)->json(['message' => 'Status do pedido alterado com sucesso.']);
-    } catch (DominioException $e) {
-        $response->status(400)->json(['message' => 'Erro ao alterar status do pedido.', 'data' => [
-            'erros' => $e->erros(),
-        ]]);
-    } catch (Throwable $e) {
-        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
-    }
-});
+    $app->post('/pedidos/cancelamento', function (HttpRequest $request, HttpResponse $response) use ($bancoDados) {
+        try {
+            $cancelamentoParaCadastro = CancelamentoParaCadastro::criarComArray((array) $request->body());
 
-$app->post('/pedidos/cancelamento', function (HttpRequest $request, HttpResponse $response) use ($gestorPedido) {
-    try {
-        $cancelamentoParaCadastro = CancelamentoParaCadastro::criarComArray((array) $request->body());
-        $gestorPedido->cancelarPedido($cancelamentoParaCadastro);
+            $gestorPedido = GestorFactory::criarGestorPedido($bancoDados);
+            $gestorPedido->cancelarPedido($cancelamentoParaCadastro);
 
-        $response->status(201)->json(['message' => 'Pedido cancelado com sucesso.']);
-    } catch (DominioException $e) {
-        $response->status(400)->json(['message' => 'Erro ao cancelar pedido.', 'data' => [
-            'erros' => $e->erros(),
-        ]]);
-    } catch (Throwable $e) {
-        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
-    }
-});
+            $response->status(201)->json(['message' => 'Pedido cancelado com sucesso.']);
+        } catch (DominioException $e) {
+            $response->status(400)->json(['message' => 'Erro ao cancelar pedido.', 'data' => [
+                'erros' => $e->erros(),
+            ]]);
+        } catch (Throwable $e) {
+            $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
+        }
+    });
 
-$app->post('/pedidos/valores', function (HttpRequest $request, HttpResponse $response) use ($gestorPedido) {
-    try {
-        $pedidoParaCadastro = PedidoParaCadastro::criarComArray((array) $request->body());
-        $resumoValores = $gestorPedido->obterResumoValores($pedidoParaCadastro);
+    $app->post('/pedidos/valores', function (HttpRequest $request, HttpResponse $response) use ($bancoDados) {
+        try {
+            $pedidoParaCadastro = PedidoParaCadastro::criarComArray((array) $request->body());
 
-        $response->status(200)->json(['message' => 'Resumo dos descontos obtido com sucesso.', 'data' => [
-            'resumoValores' => $resumoValores,
-        ]]);
-    } catch (DominioException $e) {
-        $response->status(400)->json(['message' => 'Erro ao validar pedido.', 'data' => [
-            'erros' => $e->erros(),
-        ]]);
-    } catch (Throwable $e) {
-        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.' . $e->getMessage()]);
-    }
-});
+            $gestorPedido = GestorFactory::criarGestorPedido($bancoDados);
+            $resumoValores = $gestorPedido->obterResumoValores($pedidoParaCadastro);
 
-$app->post('/pedidos', function (HttpRequest $request, HttpResponse $response) use ($gestorPedido) {
-    try {
-        $pedidoParaCadastro = PedidoParaCadastro::criarComArray((array) $request->body());
-        $gestorPedido->registrarPedido($pedidoParaCadastro);
+            $response->status(200)->json(['message' => 'Resumo dos descontos obtido com sucesso.', 'data' => [
+                'resumoValores' => $resumoValores,
+            ]]);
+        } catch (DominioException $e) {
+            $response->status(400)->json(['message' => 'Erro ao validar pedido.', 'data' => [
+                'erros' => $e->erros(),
+            ]]);
+        } catch (Throwable $e) {
+            $response->status(500)->json(['message' => 'Houve um erro interno no servidor.' . $e->getMessage()]);
+        }
+    });
 
-        $response->status(201)->json(['message' => 'Pedido registrado com sucesso.']);
-    } catch (DominioException $e) {
-        $response->status(400)->json(['message' => 'Erro ao registrar pedido.', 'data' => [
-            'erros' => $e->erros(),
-        ]]);
-    } catch (Throwable $e) {
-        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
-    }
-});
+    $app->post('/pedidos', function (HttpRequest $request, HttpResponse $response) use ($bancoDados) {
+        try {
+            $pedidoParaCadastro = PedidoParaCadastro::criarComArray((array) $request->body());
 
-$app->get('/pedidos/:id', function (HttpRequest $request, HttpResponse $response) use ($repositorioPedido) {
-    try {
-        $id = (int) $request->param('id');
-        $pedido = $repositorioPedido->obterPedidoPorId($id);
+            $gestorPedido = GestorFactory::criarGestorPedido($bancoDados);
+            $gestorPedido->registrarPedido($pedidoParaCadastro);
 
-        $response->status(200)->json(['message' => 'Pedido obtido com sucesso.', 'data' => [
-            'pedido' => $pedido,
-        ]]);
-    } catch (NaoEncontradoException $e) {
-        $response->status(404)->json(['message' => 'Pedido não encontrado.', 'data']);
-    } catch (Throwable $e) {
-        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.' . $e->getMessage()]);
-    }
-});
+            $response->status(201)->json(['message' => 'Pedido registrado com sucesso.']);
+        } catch (DominioException $e) {
+            $response->status(400)->json(['message' => 'Erro ao registrar pedido.', 'data' => [
+                'erros' => $e->erros(),
+            ]]);
+        } catch (Throwable $e) {
+            $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
+        }
+    });
+
+};

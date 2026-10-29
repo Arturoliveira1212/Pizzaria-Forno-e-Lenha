@@ -38,7 +38,8 @@ try {
 
     $caminhos = glob('routes/*.php') ?: [];
     foreach ($caminhos as $arquivo) {
-        require_once $arquivo;
+        $funcao = require_once $arquivo;
+        $funcao($app, $bancoDados);
     }
 
     $app->listen();

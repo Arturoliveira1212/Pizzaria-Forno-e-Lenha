@@ -47,6 +47,7 @@
                 "src/entregador/repositorio/",
                 "src/infra/db/",
                 "src/infra/exceptions/",
+                "src/infra/factory/",
                 "src/ingrediente/dominio/",
                 "src/ingrediente/repositorio/",
                 "src/movimentacao-estoque/dominio/",
