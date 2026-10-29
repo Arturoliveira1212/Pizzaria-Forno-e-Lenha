@@ -98,6 +98,43 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
         }
     }
 
+    public function obterPizzasPorIds(array $idsPizzas): array {
+        try {
+            $idsPizzasString = implode(',', $idsPizzas);
+            $sql = "SELECT
+                pizza.id,
+                pizza.nome,
+                pizza.descricao
+                    FROM pizza
+                        WHERE pizza.id IN ({$idsPizzasString})";
+
+            $resultado = $this->bancoDados->consultar($sql);
+            if (empty($resultado)) {
+                return [];
+            }
+
+            $precos = $this->buscarPrecosPorTamanho($idsPizzas);
+            $ingredientesPadrao = $this->buscarIngredientesPadrao($idsPizzas);
+            $ingredientesSubstitutos = $this->buscarIngredientesSubstitutos($idsPizzas);
+            $adicionais = $this->buscarIngredientesAdicionais($idsPizzas);
+
+            $pizzas = [];
+            foreach ($resultado as $linha) {
+                $pizzas[(int) $linha['id']] = $this->criarPizza(
+                    linha: $linha,
+                    ingredientesPadrao: $ingredientesPadrao,
+                    ingredientesSubstitutos: $ingredientesSubstitutos,
+                    adicionais: $adicionais,
+                    precos: $precos,
+                );
+            }
+
+            return $pizzas;
+        } catch (Throwable $e) {
+            throw new RepositorioException('Erro ao obter pizzas por ID.');
+        }
+    }
+
     /**
      * @param array<string, mixed> $linha
      * @param array<int, IngredientePadrao[]> $ingredientesPadrao
@@ -297,7 +334,7 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
      * @return array<int, QuantidadePorTamanho[]>
      */
     private function buscarQuantidadesPorTamanho(string $tabela, string $colunaId, array $ids): array {
-        $idsString = implode(',', array_map('intval', $ids));
+        $idsString = implode(',', $ids);
         $sql = "SELECT
             {$tabela}.id,
             {$tabela}.{$colunaId},

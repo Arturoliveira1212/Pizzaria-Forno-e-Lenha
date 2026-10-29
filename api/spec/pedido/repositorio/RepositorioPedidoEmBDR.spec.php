@@ -10,7 +10,12 @@ describe('RepositorioPedidoEmBDR', function () {
             senha: $_ENV['DB_PASSWORD_TEST'],
         ));
 
-        $this->repositorioPedido = new RepositorioPedidoEmBDR($this->bancoDados);
+        $this->repositorioPedido = new RepositorioPedidoEmBDR(
+            bancoDados: $this->bancoDados,
+            repositorioPizza: new RepositorioPizzaEmBDR($this->bancoDados),
+            repositorioCliente: new RepositorioClienteEmBDR($this->bancoDados),
+            repositorioUsuario: new RepositorioUsuarioEmBDR(),
+        );
     });
 
     describe('registrarPedido()', function () {

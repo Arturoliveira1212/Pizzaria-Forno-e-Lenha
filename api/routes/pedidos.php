@@ -3,11 +3,21 @@
 use phputil\router\HttpRequest;
 use phputil\router\HttpResponse;
 
+$repositorioCliente = new RepositorioClienteEmBDR($bancoDados);
+$repositorioPizza = new RepositorioPizzaEmBDR($bancoDados);
+$repositorioUsuario = new RepositorioUsuarioEmBDR();
+$repositorioPedido = new RepositorioPedidoEmBDR(
+    bancoDados: $bancoDados,
+    repositorioPizza: $repositorioPizza,
+    repositorioCliente: $repositorioCliente,
+    repositorioUsuario: $repositorioUsuario,
+);
+
 $gestorPedido = new GestorPedido(
     new UnidadeTrabalhoEmBDR($bancoDados),
-    new RepositorioPedidoEmBDR($bancoDados),
-    new RepositorioClienteEmBDR($bancoDados),
-    new RepositorioPizzaEmBDR($bancoDados),
+    $repositorioPedido,
+    $repositorioCliente,
+    $repositorioPizza,
     new RepositorioProdutoSimplesEmBDR($bancoDados),
     new RepositorioIngredienteEmBDR($bancoDados),
     new RepositorioPromocaoEmBDR($bancoDados),
@@ -103,5 +113,20 @@ $app->post('/pedidos', function (HttpRequest $request, HttpResponse $response) u
         ]]);
     } catch (Throwable $e) {
         $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
+    }
+});
+
+$app->get('/pedidos/:id', function (HttpRequest $request, HttpResponse $response) use ($repositorioPedido) {
+    try {
+        $id = (int) $request->param('id');
+        $pedido = $repositorioPedido->obterPedidoPorId($id);
+
+        $response->status(200)->json(['message' => 'Pedido obtido com sucesso.', 'data' => [
+            'pedido' => $pedido,
+        ]]);
+    } catch (NaoEncontradoException $e) {
+        $response->status(404)->json(['message' => 'Pedido não encontrado.', 'data']);
+    } catch (Throwable $e) {
+        $response->status(500)->json(['message' => 'Houve um erro interno no servidor.' . $e->getMessage()]);
     }
 });

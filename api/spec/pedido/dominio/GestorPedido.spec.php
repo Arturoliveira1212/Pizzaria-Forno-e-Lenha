@@ -671,11 +671,21 @@ describe('GestorPedido - integração com banco de dados', function () {
             senha: $_ENV['DB_PASSWORD_TEST'],
         ));
 
+        $repositorioCliente = new RepositorioClienteEmBDR($this->bancoDados);
+        $repositorioPizza = new RepositorioPizzaEmBDR($this->bancoDados);
+        $repositorioUsuario = new RepositorioUsuarioEmBDR();
+        $repositorioPedido = new RepositorioPedidoEmBDR(
+            bancoDados: $this->bancoDados,
+            repositorioPizza: $repositorioPizza,
+            repositorioCliente: $repositorioCliente,
+            repositorioUsuario: $repositorioUsuario,
+        );
+
         $this->gestorPedido = new GestorPedido(
             unidadeTrabalho: new UnidadeTrabalhoEmBDR($this->bancoDados),
-            repositorioPedido: new RepositorioPedidoEmBDR($this->bancoDados),
-            repositorioCliente: new RepositorioClienteEmBDR($this->bancoDados),
-            repositorioPizza: new RepositorioPizzaEmBDR($this->bancoDados),
+            repositorioPedido: $repositorioPedido,
+            repositorioCliente: $repositorioCliente,
+            repositorioPizza: $repositorioPizza,
             repositorioProdutoSimples: new RepositorioProdutoSimplesEmBDR($this->bancoDados),
             repositorioIngrediente: new RepositorioIngredienteEmBDR($this->bancoDados),
             repositorioPromocao: new RepositorioPromocaoEmBDR($this->bancoDados),
