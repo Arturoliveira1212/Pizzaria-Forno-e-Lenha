@@ -6,6 +6,7 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
         private readonly RepositorioUsuario $repositorioUsuario,
         private readonly RepositorioCliente $repositorioCliente,
         private readonly RepositorioPizza $repositorioPizza,
+        private readonly RepositorioEntregador $repositorioEntregador,
     ) {}
 
     public function obterPedidosParaListagem(?int $idPedido = null): array {
@@ -106,6 +107,37 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
             ]);
         } catch (Throwable $e) {
             throw new RepositorioException('Erro ao registrar cancelamento do pedido.');
+        }
+    }
+
+    public function registrarEntrega(Pedido $pedido, Entrega $entrega): void {
+        try {
+            $sql = 'INSERT INTO entrega (
+                    idPedido,
+                    dataSaida,
+                    dataChegada,
+                    taxa,
+                    idEndereco,
+                    idEntregador
+                ) VALUES (
+                    :pedidoId,
+                    :dataSaida,
+                    :dataChegada,
+                    :taxa,
+                    :enderecoId,
+                    :entregadorId
+                )';
+
+            $this->bancoDados->executar($sql, [
+                'pedidoId' => $pedido->id,
+                'dataSaida' => $entrega->dataSaida?->format('Y-m-d H:i:s'),
+                'dataChegada' => $entrega->dataChegada?->format('Y-m-d H:i:s'),
+                'taxa' => $entrega->taxa->centavos,
+                'enderecoId' => $entrega->endereco->id,
+                'entregadorId' => $entrega->entregador->id,
+            ]);
+        } catch (Throwable $e) {
+            throw new RepositorioException('Erro ao registrar entrega do pedido.');
         }
     }
 
@@ -324,6 +356,7 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
             $itensPedido = $this->buscarItensPedido($idsPedidos);
             $descontosPromocao = $this->buscarDescontosPromocao($idsPedidos);
             $descontosFidelidade = $this->buscarDescontoFidelidade($idsPedidos);
+            $entregas = $this->buscarEntrega($idsPedidos);
             $cancelamentos = $this->buscarCancelamento($idsPedidos);
             $movimentacoesEstoque = $this->buscarMovimentacoesEstoque($idsPedidos);
 
@@ -337,7 +370,7 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
                 status: StatusPedido::from($linha['status']),
                 descontosPromocao: $descontosPromocao[$idPedido] ?? [],
                 descontoFidelidade: $descontosFidelidade[$idPedido][0] ?? null,
-                entrega: null, // TODO Implementar
+                entrega: $entregas[$idPedido][0] ?? null,
                 cancelamento: $cancelamentos[$idPedido][0] ?? null,
                 taxaEntrega: new Dinheiro((int) $linha['taxaEntrega']),
                 movimentacoesEstoque: $movimentacoesEstoque[$idPedido] ?? [],
@@ -656,6 +689,60 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
                 validade: new DateTime($linha['validade']),
                 utilizado: (bool) $linha['utilizado'],
             ),
+        );
+    }
+
+    /**
+     * @param int[] $idsPedidos
+     * @return array<int, Entrega[]>
+     */
+    private function buscarEntrega(array $idsPedidos): array {
+        $idsPedidosString = implode(',', $idsPedidos);
+        $sql = "SELECT
+            entrega.id,
+            entrega.idPedido,
+            entrega.idEntregador,
+            entrega.dataSaida,
+            entrega.dataChegada,
+            entrega.taxa,
+            endereco.id AS idEndereco,
+            endereco.logradouro,
+            endereco.numero,
+            endereco.bairro,
+            endereco.cidade,
+            endereco.estado,
+            endereco.uf
+                FROM entrega
+                    INNER JOIN endereco ON endereco.id = entrega.idEndereco
+                        WHERE entrega.idPedido IN ({$idsPedidosString})";
+
+        $resultado = $this->bancoDados->consultar($sql);
+        if (empty($resultado)) {
+            return [];
+        }
+
+        return $this->agruparPorPedido($resultado, $this->criarEntrega(...));
+    }
+
+    /**
+     * @param array<string, mixed> $linha
+     */
+    private function criarEntrega(array $linha): Entrega {
+        return new Entrega(
+            id: (int) $linha['id'],
+            endereco: new Endereco(
+                id: (int) $linha['idEndereco'],
+                logradouro: $linha['logradouro'],
+                numero: $linha['numero'],
+                bairro: $linha['bairro'],
+                cidade: $linha['cidade'],
+                estado: $linha['estado'],
+                uf: $linha['uf'],
+            ),
+            entregador: $this->repositorioEntregador->obterEntregadorPorId((int) $linha['idEntregador']),
+            dataSaida: $linha['dataSaida'] !== null ? new DateTime($linha['dataSaida']) : null,
+            dataChegada: $linha['dataChegada'] !== null ? new DateTime($linha['dataChegada']) : null,
+            taxa: new Dinheiro((int) $linha['taxa']),
         );
     }
 

@@ -15,6 +15,7 @@ describe('RepositorioPedidoEmBDR', function () {
             repositorioPizza: new RepositorioPizzaEmBDR($this->bancoDados),
             repositorioCliente: new RepositorioClienteEmBDR($this->bancoDados),
             repositorioUsuario: new RepositorioUsuarioEmBDR(),
+            repositorioEntregador: new RepositorioEntregadorEmBDR($this->bancoDados),
         );
     });
 
@@ -212,6 +213,61 @@ describe('RepositorioPedidoEmBDR', function () {
             expect($dadosCancelamento)->toBe([
                 ['motivo' => 'Cliente desistiu do pedido', 'data' => '2026-10-28 20:00:00'],
             ]);
+        });
+
+    });
+
+    describe('obterPedidoPorId()', function () {
+
+        it('retorna o pedido com cliente, itens e entrega registrados', function () {
+            $pizza = new RepositorioPizzaEmBDR($this->bancoDados)->obterPizzaPorId(1);
+            $cliente = new RepositorioClienteEmBDR($this->bancoDados)->obterClientePorId('1');
+            $entregador = new RepositorioEntregadorEmBDR($this->bancoDados)->obterEntregadorPorId(1);
+
+            $pedido = new Pedido(
+                id: 0,
+                usuario: UsuarioFactory::atendente(),
+                data: new DateTime(),
+                tipoAtendimento: TipoAtendimento::ENTREGA,
+                cliente: $cliente,
+                itensPedido: [
+                    new ItemPizza(
+                        id: 0,
+                        quantidade: 1,
+                        saboresEscolhidos: [
+                            new SaborEscolhido(
+                                id: 0,
+                                pizza: $pizza,
+                                ingredientesEscolhidos: array_map(
+                                    fn(IngredientePadrao $ingredientePadrao): IngredienteEscolhido => IngredienteEscolhidoFactory::padrao(0, $ingredientePadrao->ingrediente),
+                                    $pizza->ingredientesPadrao,
+                                ),
+                            ),
+                        ],
+                        tamanhoPizza: $pizza->precosPorTamanho[0]->tamanhoPizza,
+                    ),
+                ],
+                status: StatusPedido::EM_PREPARACAO,
+            );
+            $this->repositorioPedido->registrarPedido($pedido);
+            $this->repositorioPedido->registrarEntrega($pedido, new Entrega(
+                id: 0,
+                endereco: $cliente->endereco,
+                entregador: $entregador,
+                dataSaida: new DateTime('2026-10-28 20:00:00'),
+                dataChegada: null,
+                taxa: $pedido->calcularValorEntrega(),
+            ));
+
+            $pedidoObtido = $this->repositorioPedido->obterPedidoPorId((string) $pedido->id);
+
+            expect($pedidoObtido)->toBeAnInstanceOf(Pedido::class);
+            expect($pedidoObtido->tipoAtendimento)->toBe(TipoAtendimento::ENTREGA);
+            expect($pedidoObtido->cliente->id)->toBe(1);
+            expect($pedidoObtido->itensPedido[0]->saboresEscolhidos[0]->pizza->id)->toBe(1);
+            expect($pedidoObtido->calcularValorTotal()->centavos)->toBe($pedido->calcularValorTotal()->centavos);
+            expect($pedidoObtido->entrega->entregador->id)->toBe(1);
+            expect($pedidoObtido->entrega->dataSaida->format('Y-m-d H:i:s'))->toBe('2026-10-28 20:00:00');
         });
 
     });

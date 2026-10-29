@@ -5,11 +5,13 @@ class GestorFactory {
         $repositorioCliente = new RepositorioClienteEmBDR($bancoDados);
         $repositorioPizza = new RepositorioPizzaEmBDR($bancoDados);
         $repositorioUsuario = new RepositorioUsuarioEmBDR();
+        $repositorioEntregador = new RepositorioEntregadorEmBDR($bancoDados);
         $repositorioPedido = new RepositorioPedidoEmBDR(
             bancoDados: $bancoDados,
             repositorioPizza: $repositorioPizza,
             repositorioCliente: $repositorioCliente,
             repositorioUsuario: $repositorioUsuario,
+            repositorioEntregador: $repositorioEntregador,
         );
 
         return new GestorPedido(

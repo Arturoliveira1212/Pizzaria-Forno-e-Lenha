@@ -10,6 +10,8 @@ interface RepositorioPedido {
 
     public function registrarCancelamento(int $idPedido, Cancelamento $cancelamento): void;
 
+    public function registrarEntrega(Pedido $pedido, Entrega $entrega): void;
+
     public function registrarPedido(Pedido &$pedido): void;
 
     public function obterPedidoPorId(string $idPedido): ?Pedido;
