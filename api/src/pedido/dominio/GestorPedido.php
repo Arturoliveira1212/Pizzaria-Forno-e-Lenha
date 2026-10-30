@@ -21,6 +21,10 @@ class GestorPedido {
         return $this->repositorioPedido->obterPedidosParaListagem($idPedido);
     }
 
+    public function obterDetalhesPedido(int $idPedido): DetalhesPedido {
+        return DetalhesPedido::criarComEntidade($this->obterPedidoPorId($idPedido));
+    }
+
     public function alterarStatus(int $idPedido, string $novoStatus): void {
         $status = StatusPedido::tryFrom($novoStatus);
         if ($status === null) {
@@ -85,7 +89,7 @@ class GestorPedido {
     private function obterPedidoPorId(int $idPedido): Pedido {
         $pedido = $this->repositorioPedido->obterPedidoPorId((string) $idPedido);
         if (!$pedido instanceof Pedido) {
-            throw new DominioException("Pedido (ID {$idPedido}) não encontrado.");
+            throw new NaoEncontradoException("Pedido (ID {$idPedido}) não encontrado.");
         }
 
         return $pedido;

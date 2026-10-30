@@ -661,6 +661,50 @@ describe('GestorPedido', function () {
 
     });
 
+    describe('obterDetalhesPedido()', function () {
+
+        it('retorna os detalhes do pedido com os ingredientes removidos, substitutos e adicionais de cada sabor', function () {
+            allow($this->repositorioPedido)->toReceive('obterPedidoPorId')->andReturn(new Pedido(
+                id: 1,
+                usuario: UsuarioFactory::atendente(),
+                data: new DateTime(),
+                tipoAtendimento: TipoAtendimento::BALCAO,
+                cliente: null,
+                itensPedido: [
+                    new ItemPizza(
+                        id: 1,
+                        quantidade: 1,
+                        saboresEscolhidos: [
+                            new SaborEscolhido(
+                                id: 1,
+                                pizza: PizzaFactory::portuguesa(),
+                                ingredientesEscolhidos: [
+                                    IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
+                                    IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
+                                    IngredienteEscolhidoFactory::padrao(3, IngredienteFactory::presunto()),
+                                    IngredienteEscolhidoFactory::substituto(4, IngredienteFactory::cebola()),
+                                    IngredienteEscolhidoFactory::adicional(5, IngredienteFactory::bacon(), 899),
+                                    IngredienteEscolhidoFactory::adicional(6, IngredienteFactory::bacon(), 899),
+                                ],
+                            ),
+                        ],
+                        tamanhoPizza: TamanhoPizza::MEDIA,
+                    ),
+                ],
+                status: StatusPedido::RECEBIDO,
+            ));
+
+            $detalhesPedido = $this->gestorPedido->obterDetalhesPedido(1);
+
+            $detalhesSabor = $detalhesPedido->itens[0]->sabores[0];
+            expect($detalhesSabor->nome)->toBe('Portuguesa');
+            expect($detalhesSabor->ingredientesRemovidos)->toBe([IngredienteFactory::azeitona()->nome]);
+            expect($detalhesSabor->ingredientesSubstitutos)->toBe([IngredienteFactory::cebola()->nome]);
+            expect($detalhesSabor->adicionais)->toEqual([new DetalhesAdicionalSabor(nome: IngredienteFactory::bacon()->nome, quantidade: 2)]);
+        });
+
+    });
+
     describe('registrarSaidaParaEntrega()', function () {
 
         beforeEach(function () {

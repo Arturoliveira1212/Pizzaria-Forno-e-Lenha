@@ -33,9 +33,104 @@
 			<td class="pedido-atendimento"></td>
 			<td class="pedido-status"></td>
 			<td class="pedido-total"></td>
-			<td><button type="button" class="btn btn-outline-secondary btn-sm botao-alterar-status">Alterar status</button></td>
+			<td class="text-nowrap">
+				<button type="button" class="btn btn-outline-primary btn-sm botao-detalhes-pedido">Detalhes</button>
+				<button type="button" class="btn btn-outline-secondary btn-sm botao-alterar-status">Alterar status</button>
+			</td>
 		</tr>
 	</template>
+
+	<template id="template-item-detalhes-pedido">
+		<li class="list-group-item item-detalhes-pedido">
+			<div class="d-flex justify-content-between gap-3">
+				<span class="fw-semibold"><span class="quantidade-item-detalhes"></span>x <span class="descricao-item-detalhes"></span></span>
+				<span class="text-nowrap preco-item-detalhes"></span>
+			</div>
+			<ul class="list-unstyled small text-body-secondary mb-0 mt-1 sabores-item-detalhes"></ul>
+		</li>
+	</template>
+
+	<div class="modal fade" id="modal-detalhes-pedido" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h2 class="modal-title fs-5" id="titulo-modal-detalhes">Detalhes do pedido</h2>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+				</div>
+				<div class="modal-body">
+					<p class="text-body-secondary mb-0" id="aviso-detalhes-pedido"></p>
+					<div class="d-none" id="conteudo-detalhes-pedido">
+						<dl class="row mb-0">
+							<dt class="col-sm-4">Data</dt>
+							<dd class="col-sm-8" id="detalhes-data"></dd>
+							<dt class="col-sm-4">Atendimento</dt>
+							<dd class="col-sm-8" id="detalhes-atendimento"></dd>
+							<dt class="col-sm-4">Status</dt>
+							<dd class="col-sm-8" id="detalhes-status"></dd>
+						</dl>
+
+						<section class="mt-3" id="secao-detalhes-cliente">
+							<h3 class="fs-6 fw-bold border-bottom pb-1">Cliente</h3>
+							<dl class="row mb-0">
+								<dt class="col-sm-4">Nome</dt>
+								<dd class="col-sm-8" id="detalhes-nome-cliente"></dd>
+								<dt class="col-sm-4">Telefone</dt>
+								<dd class="col-sm-8" id="detalhes-telefone-cliente"></dd>
+								<dt class="col-sm-4">Endereço</dt>
+								<dd class="col-sm-8" id="detalhes-endereco"></dd>
+							</dl>
+						</section>
+
+						<section class="mt-3">
+							<h3 class="fs-6 fw-bold border-bottom pb-1">Itens</h3>
+							<ul class="list-group" id="lista-itens-detalhes-pedido"></ul>
+						</section>
+
+						<section class="mt-3">
+							<h3 class="fs-6 fw-bold border-bottom pb-1">Valores</h3>
+							<dl class="row mb-0">
+								<dt class="col-sm-4">Subtotal</dt>
+								<dd class="col-sm-8" id="detalhes-subtotal"></dd>
+								<dt class="col-sm-4 secao-detalhes-promocao">Desconto de promoção</dt>
+								<dd class="col-sm-8 secao-detalhes-promocao" id="detalhes-desconto-promocao"></dd>
+								<dt class="col-sm-4 secao-detalhes-fidelidade">Desconto de fidelidade</dt>
+								<dd class="col-sm-8 secao-detalhes-fidelidade" id="detalhes-desconto-fidelidade"></dd>
+								<dt class="col-sm-4 secao-detalhes-taxa-entrega">Taxa de entrega</dt>
+								<dd class="col-sm-8 secao-detalhes-taxa-entrega" id="detalhes-taxa-entrega"></dd>
+								<dt class="col-sm-4">Total</dt>
+								<dd class="col-sm-8 fw-semibold" id="detalhes-valor-total"></dd>
+							</dl>
+						</section>
+
+						<section class="mt-3" id="secao-detalhes-entrega">
+							<h3 class="fs-6 fw-bold border-bottom pb-1">Entrega</h3>
+							<dl class="row mb-0">
+								<dt class="col-sm-4">Entregador</dt>
+								<dd class="col-sm-8" id="detalhes-entregador"></dd>
+								<dt class="col-sm-4">Saída</dt>
+								<dd class="col-sm-8" id="detalhes-data-saida"></dd>
+								<dt class="col-sm-4">Chegada</dt>
+								<dd class="col-sm-8" id="detalhes-data-chegada"></dd>
+							</dl>
+						</section>
+
+						<section class="mt-3" id="secao-detalhes-cancelamento">
+							<h3 class="fs-6 fw-bold border-bottom pb-1">Cancelamento</h3>
+							<dl class="row mb-0">
+								<dt class="col-sm-4">Motivo</dt>
+								<dd class="col-sm-8" id="detalhes-motivo-cancelamento"></dd>
+								<dt class="col-sm-4">Data</dt>
+								<dd class="col-sm-8" id="detalhes-data-cancelamento"></dd>
+							</dl>
+						</section>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<div class="modal fade" id="modal-status-pedido" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog">

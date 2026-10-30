@@ -3,6 +3,7 @@ import { RepositorioEntregadorNoServidor } from '../../entregador/repositorio/re
 import { ServicoHttpComFetch } from '../../infra/http/servico-http-com-fetch';
 import { VisaoPedidos } from '../view/visao-pedidos';
 import { VisaoSaidaParaEntrega } from '../view/visao-saida-para-entrega';
+import { VisaoDetalhesPedido } from '../view/visao-detalhes-pedido';
 
 export class ControladoraListagemPedidos {
 	private readonly repositorioPedido: RepositorioPedidoNoServidor;
@@ -11,6 +12,7 @@ export class ControladoraListagemPedidos {
 	constructor(
 		private readonly visaoListagemPedidos: VisaoPedidos,
 		private readonly visaoSaidaParaEntrega?: VisaoSaidaParaEntrega,
+		private readonly visaoDetalhesPedido?: VisaoDetalhesPedido,
 	) {
 		const servicoHttp = new ServicoHttpComFetch();
 		this.repositorioPedido = new RepositorioPedidoNoServidor(servicoHttp);
@@ -24,6 +26,16 @@ export class ControladoraListagemPedidos {
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Ocorreu um erro ao obter os pedidos.';
 			this.visaoListagemPedidos.exibirErro(mensagem);
+		}
+	}
+
+	async obterDetalhesPedido(idPedido: number) {
+		try {
+			const detalhesPedido = await this.repositorioPedido.obterDetalhesPedido(idPedido);
+			this.visaoDetalhesPedido?.exibirDetalhesPedido(detalhesPedido);
+		} catch (erro) {
+			const mensagemErro = erro instanceof Error ? erro.message : 'Ocorreu um erro ao obter os detalhes do pedido.';
+			this.visaoDetalhesPedido?.exibirErroAoObterDetalhesPedido(mensagemErro);
 		}
 	}
 

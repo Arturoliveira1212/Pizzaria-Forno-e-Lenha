@@ -8,6 +8,7 @@ import { ResumoValoresPedido } from '../src/pedido/dominio/resumo-valores-pedido
 import { Pedido } from '../src/pedido/dominio/pedido';
 import { DominioError } from '../src/infra/exceptions/dominio-error';
 import { PedidoListagem } from '../src/pedido/dominio/pedido-listagem';
+import { DetalhesPedido } from '../src/pedido/dominio/detalhes-pedido';
 import { GestorRegistroPedido } from '../src/pedido/dominio/gestor-registro-pedido';
 import { Pizza } from '../src/pizza/dominio/pizza';
 import { RepositorioPizza } from '../src/pizza/repositorio/repositorio-pizza';
@@ -25,6 +26,10 @@ import { Ingrediente } from '../src/ingrediente/dominio/ingrediente';
 export class RepositorioPedidoEmMemoria implements RepositorioPedido {
 	async obterPedidos(identificador?: string): Promise<PedidoListagem[]> {
 		return [new PedidoListagem(1, '2024-06-01', 'Cliente 1', 'BALCAO', 'PENDENTE', ['EM_PREPARO'], 50)];
+	}
+
+	async obterDetalhesPedido(idPedido: number): Promise<DetalhesPedido> {
+		return new DetalhesPedido(idPedido, '2024-06-01', 'BALCAO', 'RECEBIDO', null, null, null, [], 50, 0, 0, 0, 50, null, null, null, null, null);
 	}
 
 	async alterarStatus(idPedido: number, status: string): Promise<void> {}

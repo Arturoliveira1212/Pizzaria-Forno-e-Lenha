@@ -126,6 +126,35 @@ class SaborEscolhido {
         return $preco;
     }
 
+    /**
+     * @return Ingrediente[]
+     */
+    public function obterIngredientesRemovidos(): array {
+        $idsIngredientesPadraoEscolhidos = array_map(
+            fn(IngredienteEscolhido $ingredienteEscolhido): int => $ingredienteEscolhido->ingrediente->id,
+            $this->obterIngredientesEscolhidosPorPapel(PapelIngrediente::PADRAO),
+        );
+
+        $ingredientesRemovidos = [];
+        foreach ($this->pizza->ingredientesPadrao as $ingredientePadrao) {
+            if (!in_array($ingredientePadrao->ingrediente->id, $idsIngredientesPadraoEscolhidos, true)) {
+                $ingredientesRemovidos[] = $ingredientePadrao->ingrediente;
+            }
+        }
+
+        return $ingredientesRemovidos;
+    }
+
+    /**
+     * @return IngredienteEscolhido[]
+     */
+    public function obterIngredientesEscolhidosPorPapel(PapelIngrediente $papel): array {
+        return array_values(array_filter(
+            $this->ingredientesEscolhidos,
+            fn(IngredienteEscolhido $ingredienteEscolhido): bool => $ingredienteEscolhido->papel === $papel,
+        ));
+    }
+
     public function obterConsumo(IngredienteEscolhido $ingredienteEscolhido, TamanhoPizza $tamanhoPizza, int $quantidadeSabores, int $quantidadeItem): QuantidadeMedida {
         $ingrediente = $ingredienteEscolhido->ingrediente;
         $pizza = $this->pizza;

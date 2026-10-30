@@ -8,6 +8,7 @@ import { ItemPizza } from '../dominio/item-pizza';
 import { ItemSimples } from '../dominio/item-simples';
 import { ResumoValoresPedido } from '../dominio/resumo-valores-pedido';
 import { PedidoListagem } from '../dominio/pedido-listagem';
+import { DetalhesAdicionalSabor, DetalhesItemPedido, DetalhesPedido, DetalhesSaborEscolhido } from '../dominio/detalhes-pedido';
 
 export class RepositorioPedidoNoServidor implements RepositorioPedido {
 	constructor(private readonly servicoHttp: ServicoHttp) {}
@@ -27,6 +28,58 @@ export class RepositorioPedidoNoServidor implements RepositorioPedido {
 			);
 		} catch (error) {
 			this.tratarErro(error, 'Ocorreu um erro ao obter a lista de pedidos.');
+		}
+	}
+
+	async obterDetalhesPedido(idPedido: number): Promise<DetalhesPedido> {
+		try {
+			const resultado = await this.servicoHttp.get(`${API}/pedidos/${idPedido}`);
+
+			const pedido = resultado.data.pedido;
+			const itens = pedido.itens.map(
+				(item: any) =>
+					new DetalhesItemPedido(
+						item.descricao,
+						item.quantidade,
+						item.precoUnitario,
+						item.precoTotal,
+						item.sabores.map(
+							(sabor: any) =>
+								new DetalhesSaborEscolhido(
+									sabor.nome,
+									sabor.ingredientesRemovidos,
+									sabor.ingredientesSubstitutos,
+									sabor.adicionais.map((adicional: { nome: string; quantidade: number }) => new DetalhesAdicionalSabor(adicional.nome, adicional.quantidade)),
+								),
+						),
+					),
+			);
+			const valorDescontoPromocao = pedido.promocoes.map((promocao: { valorDesconto: number }) => promocao.valorDesconto).reduce((total: number, valor: number) => total + valor, 0);
+			const valorDescontoFidelidade = pedido.fidelidade?.valorDesconto ?? 0;
+			const endereco = pedido.endereco ? `${pedido.endereco.logradouro}, ${pedido.endereco.numero} - ${pedido.endereco.bairro}, ${pedido.endereco.cidade}/${pedido.endereco.uf}` : null;
+
+			return new DetalhesPedido(
+				pedido.id,
+				pedido.data,
+				pedido.tipoAtendimento,
+				pedido.status,
+				pedido.nomeCliente,
+				pedido.telefoneCliente,
+				endereco,
+				itens,
+				pedido.subtotal,
+				valorDescontoPromocao,
+				valorDescontoFidelidade,
+				pedido.taxaEntrega,
+				pedido.valorTotal,
+				pedido.nomeEntregador,
+				pedido.dataSaida,
+				pedido.dataChegada,
+				pedido.motivoCancelamento,
+				pedido.dataCancelamento,
+			);
+		} catch (error) {
+			this.tratarErro(error, 'Ocorreu um erro ao obter os detalhes do pedido.');
 		}
 	}
 

@@ -30,6 +30,25 @@ return function (Router $app, BancoDados $bancoDados) {
         }
     });
 
+    $app->get('/pedidos/:id', function (HttpRequest $request, HttpResponse $response) use ($bancoDados) {
+        try {
+            $id = (int) $request->param('id');
+
+            $gestorPedido = GestorFactory::criarGestorPedido($bancoDados);
+            $detalhesPedido = $gestorPedido->obterDetalhesPedido($id);
+
+            $response->status(200)->json(['message' => 'Pedido obtido com sucesso.', 'data' => [
+                'pedido' => $detalhesPedido,
+            ]]);
+        } catch (NaoEncontradoException $e) {
+            $response->status(404)->json(['message' => 'Erro ao obter pedido.', 'data' => [
+                'erros' => [$e->getMessage()],
+            ]]);
+        } catch (Throwable $e) {
+            $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
+        }
+    });
+
     $app->patch('/pedidos/status', function (HttpRequest $request, HttpResponse $response) use ($bancoDados) {
         try {
             $dados = (array) $request->body();
@@ -47,6 +66,10 @@ return function (Router $app, BancoDados $bancoDados) {
             $response->status(400)->json(['message' => 'Erro ao alterar status do pedido.', 'data' => [
                 'erros' => $e->erros(),
             ]]);
+        } catch (NaoEncontradoException $e) {
+            $response->status(404)->json(['message' => 'Erro ao alterar status do pedido.', 'data' => [
+                'erros' => [$e->getMessage()],
+            ]]);
         } catch (Throwable $e) {
             $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
         }
@@ -63,6 +86,10 @@ return function (Router $app, BancoDados $bancoDados) {
         } catch (DominioException $e) {
             $response->status(400)->json(['message' => 'Erro ao registrar saída para entrega.', 'data' => [
                 'erros' => $e->erros(),
+            ]]);
+        } catch (NaoEncontradoException $e) {
+            $response->status(404)->json(['message' => 'Erro ao registrar saída para entrega.', 'data' => [
+                'erros' => [$e->getMessage()],
             ]]);
         } catch (Throwable $e) {
             $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
