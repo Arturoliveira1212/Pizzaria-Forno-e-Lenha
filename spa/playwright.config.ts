@@ -7,6 +7,19 @@ export default defineConfig({
 	use: {
 		baseURL: 'http://localhost:5174',
 	},
+	projects: [
+		{
+			name: 'autenticacao',
+			testMatch: /autenticacao\.setup\.ts/,
+		},
+		{
+			name: 'e2e',
+			dependencies: ['autenticacao'],
+			use: {
+				storageState: 'e2e/.auth/usuario.json',
+			},
+		},
+	],
 	webServer: [
 		{
 			command: 'composer start:test',

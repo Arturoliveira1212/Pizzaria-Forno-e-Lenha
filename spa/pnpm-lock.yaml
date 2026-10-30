@@ -209,6 +209,9 @@ importers:
             bootstrap:
                 specifier: ^5.3.8
                 version: 5.3.8(@popperjs/core@2.11.8)
+            buffer:
+                specifier: ^6.0.3
+                version: 6.0.3
             page:
                 specifier: ^1.11.6
                 version: 1.11.6
@@ -437,10 +440,16 @@ packages:
     ast-v8-to-istanbul@1.0.7:
         resolution: { integrity: sha512-kFL68AG6ajd8fg248zwM9GQrUWEp79gsmjum34OEXjs4yHuUMZfYKwOLW9GMmB4oNvVrj+EAGxsP7ye2UR9UlA== }
 
+    base64-js@1.5.1:
+        resolution: { integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA== }
+
     bootstrap@5.3.8:
         resolution: { integrity: sha512-HP1SZDqaLDPwsNiqRqi5NcP0SSXciX2s9E+RyqJIIqGo+vJeN5AJVM98CXmW/Wux0nQ5L7jeWUdplCEf0Ee+tg== }
         peerDependencies:
             '@popperjs/core': ^2.11.8
+
+    buffer@6.0.3:
+        resolution: { integrity: sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA== }
 
     chai@6.2.2:
         resolution: { integrity: sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg== }
@@ -483,6 +492,9 @@ packages:
 
     html-escaper@2.0.2:
         resolution: { integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg== }
+
+    ieee754@1.2.1:
+        resolution: { integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA== }
 
     isarray@0.0.1:
         resolution: { integrity: sha512-D2S+3GLxWH+uhrNEcoh/fnmYeP8E8/zHl644d/jdA0g2uyXvy3sb0qxotE+ne0LtccHknQzWwZEzhak7oJ0COQ== }
@@ -916,9 +928,16 @@ snapshots:
             estree-walker: 3.0.3
             js-tokens: 10.0.0
 
+    base64-js@1.5.1: {}
+
     bootstrap@5.3.8(@popperjs/core@2.11.8):
         dependencies:
             '@popperjs/core': 2.11.8
+
+    buffer@6.0.3:
+        dependencies:
+            base64-js: 1.5.1
+            ieee754: 1.2.1
 
     chai@6.2.2: {}
 
@@ -944,6 +963,8 @@ snapshots:
     has-flag@4.0.0: {}
 
     html-escaper@2.0.2: {}
+
+    ieee754@1.2.1: {}
 
     isarray@0.0.1: {}
 

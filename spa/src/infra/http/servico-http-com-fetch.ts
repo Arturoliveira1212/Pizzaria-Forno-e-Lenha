@@ -2,6 +2,8 @@ import { ServicoHttp } from './servico-http';
 import { RespostaHttp } from './resposta-http';
 import { HttpError } from '../exceptions/http-error';
 
+export const EVENTO_SESSAO_EXPIRADA = 'sessao-expirada';
+
 export class ServicoHttpComFetch implements ServicoHttp {
 	constructor() {}
 
@@ -39,6 +41,10 @@ export class ServicoHttpComFetch implements ServicoHttp {
 		const data = await resposta.json();
 
 		if (!resposta.ok) {
+			if (resposta.status === 401 && !url.endsWith('/login')) {
+				window.dispatchEvent(new CustomEvent(EVENTO_SESSAO_EXPIRADA));
+			}
+
 			throw new HttpError(`Erro ao realizar requisição`, resposta.status, data.data);
 		}
 

@@ -6,3 +6,4 @@ output/
 .php-cs-fixer.cache
 teste.php
 test-results/
+spa/e2e/.auth/

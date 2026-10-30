@@ -17,7 +17,7 @@
 						<span class="navbar-toggler-icon"></span>
 					</button>
 					<div class="collapse navbar-collapse">
-						<ul class="navbar-nav">
+						<ul class="navbar-nav d-none" id="menu-navegacao">
 							<li class="nav-item">
 								<a class="nav-link" href="/pedido/registrar">Novo Pedido</a>
 							</li>
@@ -25,6 +25,11 @@
 								<a class="nav-link" href="/pedido">Gerenciar Pedidos</a>
 							</li>
 						</ul>
+
+						<div class="ms-auto d-none align-items-center gap-3" id="menu-usuario">
+							<span class="navbar-text" id="nome-usuario"></span>
+							<button class="btn btn-outline-secondary btn-sm" type="button" id="botao-sair">Sair</button>
+						</div>
 					</div>
 				</div>
 			</nav>
