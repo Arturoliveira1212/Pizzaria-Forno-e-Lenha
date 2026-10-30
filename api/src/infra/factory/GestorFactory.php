@@ -4,7 +4,7 @@ class GestorFactory {
     public static function criarGestorPedido(BancoDados $bancoDados): GestorPedido {
         $repositorioCliente = new RepositorioClienteEmBDR($bancoDados);
         $repositorioPizza = new RepositorioPizzaEmBDR($bancoDados);
-        $repositorioUsuario = new RepositorioUsuarioEmBDR();
+        $repositorioUsuario = new RepositorioUsuarioEmBDR($bancoDados);
         $repositorioEntregador = new RepositorioEntregadorEmBDR($bancoDados);
         $repositorioPedido = new RepositorioPedidoEmBDR(
             bancoDados: $bancoDados,

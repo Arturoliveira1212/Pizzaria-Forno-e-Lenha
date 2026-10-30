@@ -14,7 +14,7 @@ describe('RepositorioPedidoEmBDR', function () {
             bancoDados: $this->bancoDados,
             repositorioPizza: new RepositorioPizzaEmBDR($this->bancoDados),
             repositorioCliente: new RepositorioClienteEmBDR($this->bancoDados),
-            repositorioUsuario: new RepositorioUsuarioEmBDR(),
+            repositorioUsuario: new RepositorioUsuarioEmBDR($this->bancoDados),
             repositorioEntregador: new RepositorioEntregadorEmBDR($this->bancoDados),
         );
     });
