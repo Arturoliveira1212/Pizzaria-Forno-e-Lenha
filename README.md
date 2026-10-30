@@ -17,6 +17,18 @@ OBS: Os comandos de instalação e execução devem ser rodados na raiz do proje
 cd api/ && cp .env.example .env
 ```
 
+Além dos dados de acesso aos bancos, o `.env` precisa da `PIMENTA`, um valor usado junto com a senha para gerar o hash das senhas dos usuários. Deve ser preenchida antes do passo 2, pois a semeadura do banco já grava as senhas com hash. Para gerar um valor aleatório:
+
+````bash
+php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
+````
+
+````env
+PIMENTA=valor
+````
+
+> Não altere o valor de pimenta após o cadastro dos usuários, pois deixaria de funcionar.
+
 2. Instalar as dependências e construir o banco de dados:
 
 ````bash
@@ -42,6 +54,15 @@ pnpm start
 ````bash
 pnpm test
 ````
+
+## Login
+
+Todas as telas exigem login com CPF e senha. A semeadura do banco cria os seguintes usuários:
+
+* Mariana Silva:  987.654.321-00 | atendente123
+* Miguel Coves: 123.456.789-01 | admin123
+
+A sessão expira após 15 minutos sem uso.
 
 ## Referências Bibliográficas
 
