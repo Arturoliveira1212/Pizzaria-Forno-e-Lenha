@@ -8,9 +8,7 @@ export interface RepositorioPedido {
 
 	obterDetalhesPedido(idPedido: number): Promise<DetalhesPedido>;
 
-	alterarStatus(idPedido: number, status: string): Promise<void>;
-
-	cancelarPedido(idPedido: number, motivo: string): Promise<void>;
+	alterarStatus(idPedido: number, status: string, motivoCancelamento?: string): Promise<void>;
 
 	registrarSaidaParaEntrega(idPedido: number, idEntregador: number): Promise<void>;
 

@@ -76,7 +76,7 @@ export class VisaoListagemPedidos implements VisaoPedidos, VisaoSaidaParaEntrega
 				return;
 			}
 
-			this.controladoraListagemPedidos.cancelarPedido(this.pedidoSelecionado.id, this.textareaMotivoCancelamento.value.trim());
+			this.controladoraListagemPedidos.alterarStatus(this.pedidoSelecionado.id, StatusPedido.CANCELADO, this.textareaMotivoCancelamento.value.trim());
 			this.modalCancelamentoPedido.hide();
 		});
 		this.elementoModalCancelamentoPedido.addEventListener('shown.bs.modal', () => this.textareaMotivoCancelamento.focus());

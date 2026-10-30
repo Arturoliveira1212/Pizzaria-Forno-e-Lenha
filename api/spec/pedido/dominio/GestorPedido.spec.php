@@ -636,12 +636,12 @@ describe('GestorPedido', function () {
         });
     });
 
-    describe('cancelarPedido()', function () {
+    describe('alterarStatus()', function () {
 
         it('lança exceção quando o motivo do cancelamento não é informado', function () {
             /** @var DominioException $e */
             $e = capturarExcecao(function () {
-                $this->gestorPedido->cancelarPedido(new CancelamentoParaCadastro(idPedido: 1, motivo: ''));
+                $this->gestorPedido->alterarStatus(1, StatusPedido::CANCELADO->value, '');
             });
 
             expect($e)->toBeAnInstanceOf(DominioException::class);
@@ -656,7 +656,7 @@ describe('GestorPedido', function () {
             expect($this->repositorioPedido)->toReceive('alterarStatus')->with(1, StatusPedido::CANCELADO);
             expect($this->repositorioPedido)->toReceive('registrarCancelamento');
 
-            $this->gestorPedido->cancelarPedido(new CancelamentoParaCadastro(idPedido: 1, motivo: 'Cliente desistiu do pedido'));
+            $this->gestorPedido->alterarStatus(1, StatusPedido::CANCELADO->value, 'Cliente desistiu do pedido');
         });
 
     });

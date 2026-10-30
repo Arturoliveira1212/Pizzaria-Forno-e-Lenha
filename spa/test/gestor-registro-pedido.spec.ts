@@ -32,9 +32,7 @@ export class RepositorioPedidoEmMemoria implements RepositorioPedido {
 		return new DetalhesPedido(idPedido, '2024-06-01', 'BALCAO', 'RECEBIDO', null, null, null, [], 50, 0, 0, 0, 50, null, null, null, null, null);
 	}
 
-	async alterarStatus(idPedido: number, status: string): Promise<void> {}
-
-	async cancelarPedido(idPedido: number, motivo: string): Promise<void> {}
+	async alterarStatus(idPedido: number, status: string, motivoCancelamento?: string): Promise<void> {}
 
 	async registrarSaidaParaEntrega(idPedido: number, idEntregador: number): Promise<void> {}
 

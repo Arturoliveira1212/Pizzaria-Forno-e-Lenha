@@ -54,13 +54,14 @@ return function (Router $app, BancoDados $bancoDados) {
             $dados = (array) $request->body();
             $idPedido = filter_var($dados['idPedido'] ?? '', FILTER_VALIDATE_INT);
             $status = (string) ($dados['status'] ?? '');
+            $motivoCancelamento = (string) ($dados['motivoCancelamento'] ?? '');
 
             if ($idPedido === false || $status === '') {
                 throw new DominioException('ID e status do pedido são obrigatórios.');
             }
 
             $gestorPedido = GestorFactory::criarGestorPedido($bancoDados);
-            $gestorPedido->alterarStatus($idPedido, $status);
+            $gestorPedido->alterarStatus($idPedido, $status, $motivoCancelamento);
             $response->status(200)->json(['message' => 'Status do pedido alterado com sucesso.']);
         } catch (DominioException $e) {
             $response->status(400)->json(['message' => 'Erro ao alterar status do pedido.', 'data' => [
@@ -90,23 +91,6 @@ return function (Router $app, BancoDados $bancoDados) {
         } catch (NaoEncontradoException $e) {
             $response->status(404)->json(['message' => 'Erro ao registrar saída para entrega.', 'data' => [
                 'erros' => [$e->getMessage()],
-            ]]);
-        } catch (Throwable $e) {
-            $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
-        }
-    });
-
-    $app->post('/pedidos/cancelamento', function (HttpRequest $request, HttpResponse $response) use ($bancoDados) {
-        try {
-            $cancelamentoParaCadastro = CancelamentoParaCadastro::criarComArray((array) $request->body());
-
-            $gestorPedido = GestorFactory::criarGestorPedido($bancoDados);
-            $gestorPedido->cancelarPedido($cancelamentoParaCadastro);
-
-            $response->status(201)->json(['message' => 'Pedido cancelado com sucesso.']);
-        } catch (DominioException $e) {
-            $response->status(400)->json(['message' => 'Erro ao cancelar pedido.', 'data' => [
-                'erros' => $e->erros(),
             ]]);
         } catch (Throwable $e) {
             $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);

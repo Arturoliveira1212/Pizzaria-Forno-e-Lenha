@@ -25,14 +25,16 @@ class GestorPedido {
         return DetalhesPedido::criarComEntidade($this->obterPedidoPorId($idPedido));
     }
 
-    public function alterarStatus(int $idPedido, string $novoStatus): void {
+    public function alterarStatus(int $idPedido, string $novoStatus, string $motivoCancelamento = ''): void {
         $status = StatusPedido::tryFrom($novoStatus);
         if ($status === null) {
             throw new DominioException("Status de pedido inválido: {$novoStatus}.");
         }
 
         if ($status === StatusPedido::CANCELADO) {
-            throw new DominioException('O cancelamento do pedido exige um motivo.');
+            $this->cancelarPedido($idPedido, $motivoCancelamento);
+
+            return;
         }
 
         if ($status === StatusPedido::SAIU_PARA_ENTREGA) {
@@ -108,11 +110,10 @@ class GestorPedido {
         return $entregador;
     }
 
-    public function cancelarPedido(CancelamentoParaCadastro $cancelamentoParaCadastro): void {
-        $idPedido = $cancelamentoParaCadastro->idPedido;
+    private function cancelarPedido(int $idPedido, string $motivoCancelamento): void {
         $cancelamento = new Cancelamento(
             id: 0,
-            motivo: $cancelamentoParaCadastro->motivo,
+            motivo: trim($motivoCancelamento),
             data: new DateTime(),
         );
 

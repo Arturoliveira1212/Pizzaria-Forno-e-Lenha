@@ -83,19 +83,11 @@ export class RepositorioPedidoNoServidor implements RepositorioPedido {
 		}
 	}
 
-	async alterarStatus(idPedido: number, status: string): Promise<void> {
+	async alterarStatus(idPedido: number, status: string, motivoCancelamento: string = ''): Promise<void> {
 		try {
-			await this.servicoHttp.patch(`${API}/pedidos/status`, { idPedido, status });
+			await this.servicoHttp.patch(`${API}/pedidos/status`, { idPedido, status, motivoCancelamento });
 		} catch (error) {
 			this.tratarErro(error, 'Ocorreu um erro ao alterar o status do pedido.');
-		}
-	}
-
-	async cancelarPedido(idPedido: number, motivo: string): Promise<void> {
-		try {
-			await this.servicoHttp.post(`${API}/pedidos/cancelamento`, { idPedido, motivo });
-		} catch (error) {
-			this.tratarErro(error, 'Ocorreu um erro ao cancelar o pedido.');
 		}
 	}
 

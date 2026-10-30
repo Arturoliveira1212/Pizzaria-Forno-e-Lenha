@@ -49,9 +49,9 @@ export class ControladoraListagemPedidos {
 		}
 	}
 
-	async alterarStatus(idPedido: number, status: string): Promise<void> {
+	async alterarStatus(idPedido: number, status: string, motivoCancelamento: string = ''): Promise<void> {
 		try {
-			await this.repositorioPedido.alterarStatus(idPedido, status);
+			await this.repositorioPedido.alterarStatus(idPedido, status, motivoCancelamento);
 			await this.obterPedidos();
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Ocorreu um erro ao alterar o status do pedido.';
@@ -65,16 +65,6 @@ export class ControladoraListagemPedidos {
 			await this.obterPedidos();
 		} catch (erro) {
 			const mensagem = erro instanceof Error ? erro.message : 'Ocorreu um erro ao registrar a saída para entrega do pedido.';
-			this.visaoListagemPedidos.exibirErro(mensagem);
-		}
-	}
-
-	async cancelarPedido(idPedido: number, motivo: string): Promise<void> {
-		try {
-			await this.repositorioPedido.cancelarPedido(idPedido, motivo);
-			await this.obterPedidos();
-		} catch (erro) {
-			const mensagem = erro instanceof Error ? erro.message : 'Ocorreu um erro ao cancelar o pedido.';
 			this.visaoListagemPedidos.exibirErro(mensagem);
 		}
 	}
