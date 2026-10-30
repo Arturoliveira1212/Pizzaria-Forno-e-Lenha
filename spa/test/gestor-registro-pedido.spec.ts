@@ -29,7 +29,7 @@ export class RepositorioPedidoEmMemoria implements RepositorioPedido {
 	}
 
 	async obterDetalhesPedido(idPedido: number): Promise<DetalhesPedido> {
-		return new DetalhesPedido(idPedido, '2024-06-01', 'BALCAO', 'RECEBIDO', null, null, null, [], 50, 0, 0, 0, 50, null, null, null, null, null);
+		return new DetalhesPedido(idPedido, '2024-06-01', 'BALCAO', 'RECEBIDO', 'Atendente', null, null, null, [], 50, 0, 0, 0, 50, null, null, null, null, null);
 	}
 
 	async alterarStatus(idPedido: number, status: string, motivoCancelamento?: string): Promise<void> {}

@@ -12,6 +12,7 @@ class GestorPedido {
         private readonly RepositorioConfiguracaoFidelidade $repositorioConfiguracaoFidelidade,
         private readonly RepositorioMovimentacaoEstoque $repositorioMovimentacaoEstoque,
         private readonly RepositorioEntregador $repositorioEntregador,
+        private readonly ProvedorUsuarioLogado $provedorUsuarioLogado,
     ) {}
 
     /**
@@ -169,7 +170,7 @@ class GestorPedido {
 
         return new Pedido(
             id: 0,
-            usuario: UsuarioFactory::atendente(), // TODO: Temporário para passar os testes
+            usuario: $this->provedorUsuarioLogado->obterUsuarioLogado(),
             data: new DateTime(),
             tipoAtendimento: $tipoAtendimento,
             cliente: $cliente,

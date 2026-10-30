@@ -40,9 +40,9 @@ test.describe('Listagem de pedidos', () => {
 	*/
 	test.describe('Registrar saída do pedido para entrega', () => {
 		test.describe('Dado que existe um pedido de entrega com status "EM_PREPARACAO" E estou na tela de listagem de pedidos', () => {
-			test.beforeEach(async ({ request }) => {
-				idPedido = await registrarPedido(request, 'ENTREGA', '1');
-				await alterarStatusDoPedido(request, idPedido, 'EM_PREPARACAO');
+			test.beforeEach(async ({ page }) => {
+				idPedido = await registrarPedido(page.request, 'ENTREGA', '1');
+				await alterarStatusDoPedido(page.request, idPedido, 'EM_PREPARACAO');
 				await tela.abrir();
 			});
 
@@ -71,8 +71,8 @@ test.describe('Listagem de pedidos', () => {
 	*/
 	test.describe('Cancelar pedido', () => {
 		test.describe('Dado que existe um pedido de balcão com status "RECEBIDO" E estou na tela de listagem de pedidos', () => {
-			test.beforeEach(async ({ request }) => {
-				idPedido = await registrarPedido(request, 'BALCAO');
+			test.beforeEach(async ({ page }) => {
+				idPedido = await registrarPedido(page.request, 'BALCAO');
 				await tela.abrir();
 			});
 

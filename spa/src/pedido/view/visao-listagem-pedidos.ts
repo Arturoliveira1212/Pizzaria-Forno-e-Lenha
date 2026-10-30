@@ -187,6 +187,7 @@ export class VisaoListagemPedidos implements VisaoPedidos, VisaoSaidaParaEntrega
 		this.preencherDetalhe('#detalhes-data', this.formatarData(detalhesPedido.data));
 		this.preencherDetalhe('#detalhes-atendimento', detalhesPedido.tipoAtendimento);
 		this.preencherDetalhe('#detalhes-status', detalhesPedido.status);
+		this.preencherDetalhe('#detalhes-atendente', detalhesPedido.nomeAtendente);
 
 		this.exibirSecaoDetalhes('#secao-detalhes-cliente', detalhesPedido.nomeCliente !== null);
 		this.preencherDetalhe('#detalhes-nome-cliente', detalhesPedido.nomeCliente ?? '');

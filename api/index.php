@@ -36,6 +36,8 @@ try {
         'maxAge' => 3600,
     ]));
 
+    $app->use(new ExigirAutenticacao(GestorFactory::criarGestorAutenticacao($bancoDados)));
+
     $caminhos = glob('routes/*.php') ?: [];
     foreach ($caminhos as $arquivo) {
         $funcao = require_once $arquivo;

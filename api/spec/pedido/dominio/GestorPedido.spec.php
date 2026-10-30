@@ -25,6 +25,8 @@ describe('GestorPedido', function () {
         $this->repositorioConfiguracaoFidelidade = Double::instance(['implements' => RepositorioConfiguracaoFidelidade::class]);
         $this->repositorioMovimentacaoEstoque = Double::instance(['implements' => RepositorioMovimentacaoEstoque::class]);
         $this->repositorioEntregador = Double::instance(['implements' => RepositorioEntregador::class]);
+        $this->provedorUsuarioLogado = Double::instance(['implements' => ProvedorUsuarioLogado::class]);
+        allow($this->provedorUsuarioLogado)->toReceive('obterUsuarioLogado')->andReturn(UsuarioFactory::atendente());
 
         $this->gestorPedido = new GestorPedido(
             unidadeTrabalho: $this->unidadeTrabalho,
@@ -37,6 +39,7 @@ describe('GestorPedido', function () {
             repositorioConfiguracaoFidelidade: $this->repositorioConfiguracaoFidelidade,
             repositorioMovimentacaoEstoque: $this->repositorioMovimentacaoEstoque,
             repositorioEntregador: $this->repositorioEntregador,
+            provedorUsuarioLogado: $this->provedorUsuarioLogado,
         );
     });
 
@@ -776,7 +779,7 @@ describe('GestorPedido - integração com banco de dados', function () {
             senha: $_ENV['DB_PASSWORD_TEST'],
         ));
 
-        $this->gestorPedido = GestorFactory::criarGestorPedido($this->bancoDados);
+        $this->gestorPedido = GestorFactory::criarGestorPedido($this->bancoDados, new UsuarioLogadoFixo(UsuarioFactory::atendente()));
     });
 
     describe('registrarPedido()', function () {

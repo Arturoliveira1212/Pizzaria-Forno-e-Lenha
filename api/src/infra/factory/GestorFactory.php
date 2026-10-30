@@ -1,7 +1,7 @@
 <?php
 
 class GestorFactory {
-    public static function criarGestorPedido(BancoDados $bancoDados): GestorPedido {
+    public static function criarGestorPedido(BancoDados $bancoDados, ?ProvedorUsuarioLogado $provedorUsuarioLogado = null): GestorPedido {
         $repositorioCliente = new RepositorioClienteEmBDR($bancoDados);
         $repositorioPizza = new RepositorioPizzaEmBDR($bancoDados);
         $repositorioUsuario = new RepositorioUsuarioEmBDR($bancoDados);
@@ -25,6 +25,7 @@ class GestorFactory {
             repositorioConfiguracaoFidelidade: new RepositorioConfiguracaoFidelidadeEmBDR($bancoDados),
             repositorioMovimentacaoEstoque: new RepositorioMovimentacaoEstoqueEmBDR($bancoDados),
             repositorioEntregador: $repositorioEntregador,
+            provedorUsuarioLogado: $provedorUsuarioLogado ?? self::criarGestorAutenticacao($bancoDados),
         );
     }
 

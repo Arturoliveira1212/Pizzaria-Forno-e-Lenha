@@ -63,6 +63,7 @@ export class RepositorioPedidoNoServidor implements RepositorioPedido {
 				pedido.data,
 				pedido.tipoAtendimento,
 				pedido.status,
+				pedido.nomeAtendente,
 				pedido.nomeCliente,
 				pedido.telefoneCliente,
 				endereco,

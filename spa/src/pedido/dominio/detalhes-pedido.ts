@@ -30,6 +30,7 @@ export class DetalhesPedido {
 		public readonly data: string,
 		public readonly tipoAtendimento: string,
 		public readonly status: string,
+		public readonly nomeAtendente: string,
 		public readonly nomeCliente: string | null,
 		public readonly telefoneCliente: string | null,
 		public readonly endereco: string | null,
