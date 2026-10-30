@@ -27,4 +27,12 @@ class GestorFactory {
             repositorioEntregador: $repositorioEntregador,
         );
     }
+
+    public static function criarGestorAutenticacao(BancoDados $bancoDados): GestorAutenticacao {
+        return new GestorAutenticacao(
+            repositorioUsuario: new RepositorioUsuarioEmBDR($bancoDados),
+            sessao: new SessaoPHP(),
+            geradorHashSenha: new GeradorHashSenha($_ENV['PIMENTA']),
+        );
+    }
 }
