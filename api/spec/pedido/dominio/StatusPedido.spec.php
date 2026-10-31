@@ -4,8 +4,8 @@ describe('StatusPedido', function () {
 
     describe('proximos()', function () {
 
-        it('retorna cancelado entre os próximos status quando o pedido está em preparação', function () {
-            $proximos = StatusPedido::EM_PREPARACAO->proximos(TipoAtendimento::ENTREGA);
+        it('retorna cancelado entre os próximos status quando o pedido está em recebido', function () {
+            $proximos = StatusPedido::RECEBIDO->proximos(TipoAtendimento::ENTREGA);
 
             expect($proximos)->toContain(StatusPedido::CANCELADO);
         });

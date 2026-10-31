@@ -19,9 +19,9 @@ enum StatusPedido: string {
         return match ($this) {
             self::RECEBIDO => [self::EM_PREPARACAO, self::CANCELADO],
             self::EM_PREPARACAO => match ($tipoAtendimento) {
-                TipoAtendimento::ENTREGA => [self::SAIU_PARA_ENTREGA, self::CANCELADO],
-                TipoAtendimento::RETIRADA => [self::PRONTO_PARA_RETIRADA, self::CANCELADO],
-                TipoAtendimento::BALCAO => [self::FINALIZADO, self::CANCELADO],
+                TipoAtendimento::ENTREGA => [self::SAIU_PARA_ENTREGA],
+                TipoAtendimento::RETIRADA => [self::PRONTO_PARA_RETIRADA],
+                TipoAtendimento::BALCAO => [self::FINALIZADO],
             },
             self::SAIU_PARA_ENTREGA, self::PRONTO_PARA_RETIRADA => [self::FINALIZADO],
             self::FINALIZADO, self::CANCELADO => [],
