@@ -373,7 +373,7 @@ test.describe('Registro de pedido', () => {
 			De modo a enviar o pedido correto para a cozinha
 	*/
 	test.describe('Pedir Meia Pizza', () => {
-		test.describe.only('Dado que estou na tela de registro de pedido E acesso a etapa "Produtos" E o modal de personalização da pizza "Napolitana" no tamanho "Grande" está aberto', () => {
+		test.describe('Dado que estou na tela de registro de pedido E acesso a etapa "Produtos" E o modal de personalização da pizza "Napolitana" no tamanho "Grande" está aberto', () => {
 			test.beforeEach(async () => {
 				await tela.selecionarEtapaProdutos();
 				await tela.buscarPizza('Napolitana');
