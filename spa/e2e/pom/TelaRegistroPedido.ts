@@ -44,6 +44,12 @@ export class TelaRegistroPedido {
 	private readonly valorTotalPersonalizacaoPizza: Locator;
 	private readonly botaoAdicionarPersonalizacaoPizza: Locator;
 	private readonly valorTotalPedido: Locator;
+	private readonly botaoMeiaPizza: Locator;
+	private readonly menuSelecaoSabores: Locator;
+	private readonly botaoSegundoSabor: Locator;
+	private readonly filtroSegundoSabor: Locator;
+	private readonly botaoFiltrarSegundoSabor: Locator;
+	private readonly listaOpcoesSegundoSabor: Locator;
 
 	constructor(page: Page) {
 		this.page = page;
@@ -83,6 +89,12 @@ export class TelaRegistroPedido {
 		this.valorTotalPersonalizacaoPizza = this.page.locator('#valor-total-personalizacao');
 		this.botaoAdicionarPersonalizacaoPizza = this.page.locator('#botao-adicionar-personalizacao-pizza');
 		this.valorTotalPedido = this.page.locator('#valor-total');
+		this.botaoMeiaPizza = this.page.getByTestId('botao-meia-pizza');
+		this.menuSelecaoSabores = this.page.locator('#sabores');
+		this.botaoSegundoSabor = this.page.getByTestId('botao-segundo-sabor');
+		this.filtroSegundoSabor = this.page.locator('#filtro-segundo-sabor');
+		this.botaoFiltrarSegundoSabor = this.page.locator('#botao-filtrar-segundo-sabor');
+		this.listaOpcoesSegundoSabor = this.page.locator('#lista-opcoes-pizza-segundo-sabor');
 	}
 
 	async abrir(): Promise<void> {
@@ -155,6 +167,23 @@ export class TelaRegistroPedido {
 
 	async diminuirQuantidadeIngredienteAdicional(nome: string, sabor: Sabor = 1): Promise<void> {
 		await this.ingredienteAdicional(nome, sabor).locator('.diminuir-quantidade-adicional').click();
+	}
+
+	async selecionarOpcaoMeiaPizza(): Promise<void> {
+		await this.botaoMeiaPizza.click();
+	}
+
+	async selecionarOpcaoSegundoSabor(): Promise<void> {
+		await this.botaoSegundoSabor.click();
+	}
+
+	async buscarSegundoSabor(filtro: string): Promise<void> {
+		await this.filtroSegundoSabor.fill(filtro);
+		await this.botaoFiltrarSegundoSabor.click();
+	}
+
+	async selecionarSegundoSabor(nome: string): Promise<void> {
+		await this.listaOpcoesSegundoSabor.locator('label').filter({ hasText: nome }).click();
 	}
 
 	async adicionarPersonalizacaoAoPedido(): Promise<void> {
@@ -280,6 +309,21 @@ export class TelaRegistroPedido {
 
 	async deveTerQuantidadeDeOpcoesDeIngredientesSubstitutos(quantidade: number, sabor: Sabor = 1): Promise<void> {
 		await expect(this.obterOpcoesIngredientesSubstitutos(sabor).locator('option')).toHaveCount(quantidade);
+	}
+
+	async deveExibirMenuSelecaoSabores(): Promise<void> {
+		await expect(this.menuSelecaoSabores).toBeVisible();
+	}
+
+	async deveExibirOpcoesDeSegundoSabor(quantidade: number): Promise<void> {
+		await expect(this.listaOpcoesSegundoSabor.locator('label')).toHaveCount(quantidade);
+	}
+
+	async deveAparecerMensagemNenhumaPizzaEncontradaParaSegundoSabor(): Promise<void> {
+		const mensagem = this.listaOpcoesSegundoSabor.locator('.mensagem');
+
+		await expect(mensagem).toHaveCount(1);
+		await expect(mensagem).toContainText('Nenhuma pizza encontrada.');
 	}
 
 	async deveExibirValorTotalDaPersonalizacaoPizza(valor: string): Promise<void> {

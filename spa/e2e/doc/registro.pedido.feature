@@ -153,6 +153,44 @@ Funcionalidade: Personalizar ingredientes da pizza
             Quando clico em adicionar a pizza personalizada ao pedido
             Então o resumo deve exibir a pizza "Napolitana" com o valor correspondente à personalização realizada
 
+Funcionalidade: Pedir Meia Pizza
+    A fim de atender às preferências do cliente
+    Como um atendente
+    Eu quero adicionar sabores diferentes na mesma pizza
+    De modo a enviar o pedido correto para a cozinha
+
+    Contexto:
+        Dado que estou na tela de registro de pedido
+        E acesso a etapa "Produtos"
+        E o modal de personalização da pizza "Napolitana" no tamanho "Grande" está aberto
+
+        Cenário: Exibição do menu de 2 sabores
+            Quando clico em "Meia Pizza"
+            Então o menu de seleção de sabores deve ser exibido
+
+        Cenário: Busca do segundo sabor para a meia pizza
+            Dado que o menu de seleção de sabores está aberto
+            Quando clico em "2° Sabor" e pesquiso por "Calabresa"
+            Então deve aparecer a opção de pizza "Calabresa" para seleção como segundo sabor
+
+        Cenário: Seleção do segundo sabor para a meia pizza (pizza inexistente)
+            Dado que o menu de seleção de sabores está aberto
+            Quando clico em "2° Sabor" e pesquiso por "Pizza inexistente"
+            Então deve aparecer a mensagem de aviso "Nenhuma pizza encontrada"
+
+        Cenário: Exibição dos ingredientes do segundo sabor da meia pizza
+            Dado que selecionei a pizza "Calabresa" como segundo sabor
+            Então devem ser exibidos os ingredientes padrão da pizza "Calabresa"
+            E devem ser ser exibidos os ingredientes substitutos disponíveis para a pizza "Calabresa"
+            E devem ser exibidos os adicionais disponíveis para a pizza "Calabresa"
+
+        Cenário: Adição de meia pizza ao pedido
+            Dado que selecionei a pizza "Calabresa" como segundo sabor
+            E a pizza "Calabresa" possui o ingrediente "Azeitona" como adicional
+            E a quantidade do "Azeitona" está em "2"
+            Quando clico em adicionar a meia pizza ao pedido
+            Então o resumo deve exibir a pizza "Napolitana / Calabresa" com o valor correspondente à personalização realizada
+
 Funcionalidade: Definir atendimento e cliente
     A fim de registrar corretamente como o pedido será atendido e para quem
     Como um atendente

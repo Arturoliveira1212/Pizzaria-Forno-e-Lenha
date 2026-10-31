@@ -366,6 +366,98 @@ test.describe('Registro de pedido', () => {
 	});
 
 	/*
+		Funcionalidade: Pedir Meia Pizza
+			A fim de atender às preferências do cliente
+			Como um atendente
+			Eu quero adicionar sabores diferentes na mesma pizza
+			De modo a enviar o pedido correto para a cozinha
+	*/
+	test.describe('Pedir Meia Pizza', () => {
+		test.describe.only('Dado que estou na tela de registro de pedido E acesso a etapa "Produtos" E o modal de personalização da pizza "Napolitana" no tamanho "Grande" está aberto', () => {
+			test.beforeEach(async () => {
+				await tela.selecionarEtapaProdutos();
+				await tela.buscarPizza('Napolitana');
+				await tela.selecionarTamanhoPizza('Napolitana', 'G');
+				await tela.abrirModalPersonalizacaoPizza('Napolitana');
+			});
+
+			/*
+				Cenário: Exibição do menu de 2 sabores
+					Quando clico em "Meia Pizza"
+					Então o menu de seleção de sabores deve ser exibido
+			*/
+			test('Exibição do menu de 2 sabores', async () => {
+				await tela.selecionarOpcaoMeiaPizza();
+				await tela.deveExibirMenuSelecaoSabores();
+			});
+
+			/*
+				Cenário: Busca do segundo sabor para a meia pizza
+					Dado que o menu de seleção de sabores está aberto
+					Quando clico em "2° Sabor" e pesquiso por "Calabresa"
+					Então deve aparecer a opção de pizza "Calabresa" para seleção como segundo sabor
+			*/
+			test('Busca do segundo sabor para a meia pizza', async () => {
+				await tela.selecionarOpcaoMeiaPizza();
+				await tela.selecionarOpcaoSegundoSabor();
+				await tela.buscarSegundoSabor('Calabresa');
+				await tela.deveExibirOpcoesDeSegundoSabor(1);
+			});
+
+			/*
+				Cenário: Seleção do segundo sabor para a meia pizza (pizza inexistente)
+					Dado que o menu de seleção de sabores está aberto
+					Quando clico em "2° Sabor" e pesquiso por "Pizza inexistente"
+					Então deve aparecer a mensagem de aviso "Nenhuma pizza encontrada"
+			*/
+			test('Seleção do segundo sabor para a meia pizza (pizza inexistente)', async () => {
+				await tela.selecionarOpcaoMeiaPizza();
+				await tela.selecionarOpcaoSegundoSabor();
+				await tela.buscarSegundoSabor('Pizza inexistente');
+				await tela.deveExibirOpcoesDeSegundoSabor(0);
+				await tela.deveAparecerMensagemNenhumaPizzaEncontradaParaSegundoSabor();
+			});
+
+			/*
+				Cenário: Exibição dos ingredientes do segundo sabor da meia pizza
+					Dado que selecionei a pizza "Calabresa" como segundo sabor
+					Então devem ser exibidos os ingredientes padrão da pizza "Calabresa"
+					E devem ser ser exibidos os ingredientes substitutos disponíveis para a pizza "Calabresa"
+					E devem ser exibidos os adicionais disponíveis para a pizza "Calabresa"
+			*/
+			test('Exibição dos ingredientes do segundo sabor da meia pizza', async () => {
+				await tela.selecionarOpcaoMeiaPizza();
+				await tela.selecionarOpcaoSegundoSabor();
+				await tela.buscarSegundoSabor('Calabresa');
+				await tela.selecionarSegundoSabor('Calabresa');
+				await tela.deveTerQuantidadeDeIngredientes(4, 2);
+				await tela.deveTerQuantidadeDeOpcoesDeIngredientesSubstitutos(7, 2);
+				await tela.deveTerQuantidadeDeAdicionais(3, 2);
+			});
+
+			/*
+				Cenário: Adição de meia pizza ao pedido
+					Dado que selecionei a pizza "Calabresa" como segundo sabor
+					E a pizza "Calabresa" possui o ingrediente "Azeitona" como adicional
+					E a quantidade do "Azeitona" está em "2"
+					Quando clico em adicionar a meia pizza ao pedido
+					Então o resumo deve exibir a pizza "Napolitana / Calabresa" com o valor correspondente à personalização realizada
+			*/
+			test('Adição de meia pizza ao pedido', async () => {
+				await tela.selecionarOpcaoMeiaPizza();
+				await tela.selecionarOpcaoSegundoSabor();
+				await tela.buscarSegundoSabor('Calabresa');
+				await tela.selecionarSegundoSabor('Calabresa');
+				await tela.aumentarQuantidadeIngredienteAdicional('Azeitona', 2);
+				await tela.aumentarQuantidadeIngredienteAdicional('Azeitona', 2);
+				await tela.adicionarPersonalizacaoAoPedido();
+				await tela.deveAparecerProdutoNoResumo('Pizza G', 'R$ 59,00', 'Napolitana / Calabresa');
+				await tela.deveExibirValorTotalDoPedido('R$ 59,00');
+			});
+		});
+	});
+
+	/*
 		Funcionalidade: Definir atendimento e cliente
 			A fim de registrar corretamente como o pedido será atendido e para quem
 			Como um atendente
