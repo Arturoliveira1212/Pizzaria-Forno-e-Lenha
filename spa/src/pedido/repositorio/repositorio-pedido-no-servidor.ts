@@ -152,7 +152,7 @@ export class RepositorioPedidoNoServidor implements RepositorioPedido {
 	}
 
 	private tratarErro(error: any, mensagemPadrao: string): never {
-		const mensagemErro = error instanceof HttpError ? error.data?.erros?.join(', ') : mensagemPadrao;
+		const mensagemErro = error instanceof HttpError ? error.data?.erros?.join('\n') : mensagemPadrao;
 		throw new RepositorioError(mensagemErro);
 	}
 }

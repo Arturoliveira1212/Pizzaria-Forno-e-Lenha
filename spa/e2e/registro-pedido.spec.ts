@@ -646,6 +646,36 @@ test.describe('Registro de pedido', () => {
 				await tela.registrarPedido();
 				await tela.deveRedirecionarParaInicio();
 			});
+
+			/*
+				Cenário: Finalização de pedido travada por estoque insuficiente
+					Dado que a pizza "Pepperoni" foi adicionada ao pedido com quantidade "3"
+					E o produto "Guaraná Antarctica 2L" foi adicionado ao pedido com quantidade "6"
+					E acesso a etapa "Atendimento"
+					E o estoque da pizza "Pepperoni" é insuficiente
+					E o estoque do produto "Guaraná Antarctica 2L" é insuficiente
+					Quando clico em "Registrar pedido"
+					Então deve aparecer a mensagem de erro
+			*/
+			test('Finalização de pedido travada por estoque insuficiente', async () => {
+				await tela.selecionarEtapaProdutos();
+
+				await tela.buscarPizza('Pepperoni');
+				for (let i = 0; i < 3; i++) {
+					await tela.adicionarPizzaAoPedido('Pepperoni');
+				}
+
+				await tela.buscarBebida('Guaraná Antarctica 2L');
+				for (let i = 0; i < 6; i++) {
+					await tela.adicionarBebidaAoPedido('Guaraná Antarctica 2L');
+				}
+
+				await tela.selecionarEtapaAtendimento();
+				await tela.registrarPedido();
+				await tela.deveExibirErroNoPedido(
+					'Pizza Pepperoni (P) não possui estoque suficiente. Retire ou atualize a quantidade da pizza no pedido. Produto Guaraná Antarctica 2L (ID 2) não possui estoque suficiente. Quantidade em estoque: 5.',
+				);
+			});
 		});
 	});
 });

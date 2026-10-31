@@ -276,3 +276,12 @@ Funcionalidade: Finalizar pedido
             Quando clico em "Registrar pedido"
             Então deve aparecer a mensagem de pedido realizado
             E devo ser redirecionado para a home
+
+        Cenário: Finalização de pedido travada por estoque insuficiente
+            Dado que a pizza "Pepperoni" foi adicionada ao pedido com quantidade "3"
+            E o produto "Guaraná Antarctica 2L" foi adicionado ao pedido com quantidade "6"
+            E acesso a etapa "Atendimento"
+            E o estoque da pizza "Pepperoni" é insuficiente
+            E o estoque do produto "Guaraná Antarctica 2L" é insuficiente
+            Quando clico em "Registrar pedido"
+            Então deve aparecer a mensagem de erro
