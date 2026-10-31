@@ -62,8 +62,6 @@ Todas as telas exigem login com CPF e senha. A semeadura do banco cria os seguin
 * Mariana Silva:  987.654.321-00 | atendente123
 * Miguel Coves: 123.456.789-01 | admin123
 
-A sessão expira após 15 minutos sem uso.
-
 ## Referências Bibliográficas
 
 Templates Bootstrap usados:

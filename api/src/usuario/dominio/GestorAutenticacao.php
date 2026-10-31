@@ -1,11 +1,9 @@
 <?php
 
 class GestorAutenticacao implements ProvedorUsuarioLogado {
-    public const INATIVIDADE_MAXIMA_EM_SEGUNDOS = 15 * 60;
     private const CHAVE_ID_USUARIO = 'idUsuario';
     private const CHAVE_IP = 'ip';
     private const CHAVE_NAVEGADOR = 'navegador';
-    private const CHAVE_ULTIMA_REQUISICAO = 'ultimaRequisicao';
     private const HASH_FICTICIO = '$argon2id$v=19$m=65536,t=4,p=1$VGRSZkRFNmg5ZFlZLmcxZQ$QYewcI/2z/yU9kpuYuTMHNd7WauROm8nWzRltPaG2eo';
 
     public function __construct(
@@ -42,7 +40,6 @@ class GestorAutenticacao implements ProvedorUsuarioLogado {
         $this->sessao->definir(self::CHAVE_ID_USUARIO, $usuario->id);
         $this->sessao->definir(self::CHAVE_IP, $ip);
         $this->sessao->definir(self::CHAVE_NAVEGADOR, $navegador);
-        $this->sessao->definir(self::CHAVE_ULTIMA_REQUISICAO, time());
 
         return $usuario;
     }
@@ -63,14 +60,6 @@ class GestorAutenticacao implements ProvedorUsuarioLogado {
             $this->sessao->destruir();
             throw new AutenticacaoException('Sessão inválida. Entre novamente no sistema.');
         }
-
-        $ultimaRequisicao = $this->sessao->obter(self::CHAVE_ULTIMA_REQUISICAO);
-        if (!is_int($ultimaRequisicao) || time() - $ultimaRequisicao > self::INATIVIDADE_MAXIMA_EM_SEGUNDOS) {
-            $this->sessao->destruir();
-            throw new AutenticacaoException('Sessão expirada por inatividade. Entre novamente no sistema.');
-        }
-
-        $this->sessao->definir(self::CHAVE_ULTIMA_REQUISICAO, time());
     }
 
     public function obterUsuarioLogado(): Usuario {
