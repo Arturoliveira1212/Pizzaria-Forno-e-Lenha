@@ -12,6 +12,32 @@ function capturarExcecao(callable $operacao): ?Throwable {
     return null;
 }
 
+function compararMovimentacaoEstoqueIngrediente(
+    MovimentacaoEstoqueIngrediente $movimentacao,
+    int $idIngredienteEsperado,
+    int $valorEsperado,
+    int $idUnidadeMedidaEsperado,
+    TipoOperacaoEstoque $tipoOperacaoEstoqueEsperado,
+) {
+    expect($movimentacao->ingrediente->id)->toBe($idIngredienteEsperado);
+    expect($movimentacao->quantidadeMedida->valor)->toBe($valorEsperado);
+    expect($movimentacao->quantidadeMedida->unidadeMedida->id)->toBe($idUnidadeMedidaEsperado);
+    expect($movimentacao->tipoOperacaoEstoque)->toBe($tipoOperacaoEstoqueEsperado);
+}
+
+function compararMovimentacaoEstoqueProdutoSimples(
+    MovimentacaoEstoqueProdutoSimples $movimentacao,
+    int $idProdutoSimplesEsperado,
+    int $valorEsperado,
+    int $idUnidadeMedidaEsperado,
+    TipoOperacaoEstoque $tipoOperacaoEstoqueEsperado,
+) {
+    expect($movimentacao->produtoSimples->id)->toBe($idProdutoSimplesEsperado);
+    expect($movimentacao->quantidadeMedida->valor)->toBe($valorEsperado);
+    expect($movimentacao->quantidadeMedida->unidadeMedida->id)->toBe($idUnidadeMedidaEsperado);
+    expect($movimentacao->tipoOperacaoEstoque)->toBe($tipoOperacaoEstoqueEsperado);
+}
+
 describe('GestorPedido', function () {
 
     beforeEach(function () {
@@ -651,17 +677,6 @@ describe('GestorPedido', function () {
             expect($e->erros())->toBe(['O motivo do cancelamento é obrigatório.']);
         });
 
-        it('altera o status para cancelado e registra o cancelamento na mesma transação', function () {
-            allow($this->unidadeTrabalho)->toReceive('executar')->andRun(function (callable $operacao) {
-                $operacao();
-            });
-
-            expect($this->repositorioPedido)->toReceive('alterarStatus')->with(1, StatusPedido::CANCELADO);
-            expect($this->repositorioPedido)->toReceive('registrarCancelamento');
-
-            $this->gestorPedido->alterarStatus(1, StatusPedido::CANCELADO->value, 'Cliente desistiu do pedido');
-        });
-
     });
 
     describe('obterDetalhesPedido()', function () {
@@ -793,6 +808,60 @@ describe('GestorPedido - integração com banco de dados', function () {
             repositorioCliente: $this->repositorioCliente,
             repositorioUsuario: new RepositorioUsuarioEmBDR($this->bancoDados),
             repositorioEntregador: new RepositorioEntregadorEmBDR($this->bancoDados),
+        );
+
+        $this->idCocaCola = 1;
+        $this->idMolhoTomate = 1;
+        $this->idMussarela = 2;
+        $this->idCalabresa = 4;
+        $this->idPizzaMargherita = 1;
+        $this->idPizzaCalabresa = 2;
+
+        $this->pedidoMeiaPizza = new PedidoParaCadastro(
+            tipoAtendimento: TipoAtendimento::BALCAO->value,
+            idCliente: '',
+            itensPedido: [
+                new ItemSimplesParaCadastro(
+                    idProduto: $this->idCocaCola,
+                    quantidade: 1,
+                ),
+                new ItemPizzaParaCadastro(
+                    tamanho: TamanhoPizza::PEQUENA->value,
+                    quantidade: 2,
+                    saboresEscolhidos: [
+                        new SaborEscolhidoParaCadastro(
+                            idPizza: $this->idPizzaMargherita,
+                            ingredientesEscolhidos: [
+                                new IngredienteEscolhidoParaCadastro(
+                                    idIngrediente: $this->idMolhoTomate,
+                                    papel: PapelIngrediente::PADRAO->value,
+                                ),
+                                new IngredienteEscolhidoParaCadastro(
+                                    idIngrediente: $this->idMussarela,
+                                    papel: PapelIngrediente::PADRAO->value,
+                                ),
+                            ],
+                        ),
+                        new SaborEscolhidoParaCadastro(
+                            idPizza: $this->idPizzaCalabresa,
+                            ingredientesEscolhidos: [
+                                new IngredienteEscolhidoParaCadastro(
+                                    idIngrediente: $this->idMolhoTomate,
+                                    papel: PapelIngrediente::PADRAO->value,
+                                ),
+                                new IngredienteEscolhidoParaCadastro(
+                                    idIngrediente: $this->idMussarela,
+                                    papel: PapelIngrediente::PADRAO->value,
+                                ),
+                                new IngredienteEscolhidoParaCadastro(
+                                    idIngrediente: $this->idCalabresa,
+                                    papel: PapelIngrediente::PADRAO->value,
+                                ),
+                            ],
+                        ),
+                    ],
+                ),
+            ],
         );
     });
 
@@ -930,15 +999,6 @@ describe('GestorPedido - integração com banco de dados', function () {
 
         describe('atualizarEstoqueAposRegistrarPedido()', function () {
 
-            beforeAll(function () {
-                $this->idCocaCola = 1;
-                $this->idMolhoTomate = 1;
-                $this->idMussarela = 2;
-                $this->idCalabresa = 4;
-                $this->idPizzaMargherita = 1;
-                $this->idPizzaCalabresa = 2;
-            });
-
             it('atualiza o estoque dos produtos simples e ingredientes após registrar o pedido', function () {
                 $cocaColaAntes = $this->repositorioProdutoSimples->obterProdutoSimplesPorId($this->idCocaCola);
                 $molhoTomateAntes = $this->repositorioIngrediente->obterIngredientePorId($this->idMolhoTomate);
@@ -986,23 +1046,31 @@ describe('GestorPedido - integração com banco de dados', function () {
                 expect($cocaColaDepois->estoque->valor)->toBe($cocaColaAntes->estoque->valor - 2);
                 expect($molhoTomateDepois->estoque->valor)->toBe($molhoTomateAntes->estoque->valor - 150);
                 expect($mussarelaDepois->estoque->valor)->toBe($mussarelaAntes->estoque->valor - 300);
-
                 expect($movimentacoesEstoqueSaida)->toHaveLength(3);
 
-                expect($movimentacaoEstoqueMolho->ingrediente->id)->toBe($this->idMolhoTomate);
-                expect($movimentacaoEstoqueMolho->quantidadeMedida->valor)->toBe(150);
-                expect($movimentacaoEstoqueMolho->quantidadeMedida->unidadeMedida->id)->toBe(3);
-                expect($movimentacaoEstoqueMolho->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+                compararMovimentacaoEstoqueIngrediente(
+                    movimentacao: $movimentacaoEstoqueMolho,
+                    idIngredienteEsperado: $this->idMolhoTomate,
+                    valorEsperado: 150,
+                    idUnidadeMedidaEsperado: 3,
+                    tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::SAIDA,
+                );
 
-                expect($movimentacaoEstoqueMussarela->ingrediente->id)->toBe($this->idMussarela);
-                expect($movimentacaoEstoqueMussarela->quantidadeMedida->valor)->toBe(300);
-                expect($movimentacaoEstoqueMussarela->quantidadeMedida->unidadeMedida->id)->toBe(1);
-                expect($movimentacaoEstoqueMussarela->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+                compararMovimentacaoEstoqueIngrediente(
+                    movimentacao: $movimentacaoEstoqueMussarela,
+                    idIngredienteEsperado: $this->idMussarela,
+                    valorEsperado: 300,
+                    idUnidadeMedidaEsperado: 1,
+                    tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::SAIDA,
+                );
 
-                expect($movimentacaoEstoqueCocaCola->produtoSimples->id)->toBe($this->idCocaCola);
-                expect($movimentacaoEstoqueCocaCola->quantidadeMedida->valor)->toBe(2);
-                expect($movimentacaoEstoqueCocaCola->quantidadeMedida->unidadeMedida->id)->toBe(2);
-                expect($movimentacaoEstoqueCocaCola->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+                compararMovimentacaoEstoqueProdutoSimples(
+                    movimentacao: $movimentacaoEstoqueCocaCola,
+                    idProdutoSimplesEsperado: $this->idCocaCola,
+                    valorEsperado: 2,
+                    idUnidadeMedidaEsperado: 2,
+                    tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::SAIDA,
+                );
             });
 
             it('atualiza o estoque dos produtos simples e ingredientes após registrar o pedido (meia pizza)', function () {
@@ -1011,52 +1079,7 @@ describe('GestorPedido - integração com banco de dados', function () {
                 $mussarelaAntes = $this->repositorioIngrediente->obterIngredientePorId($this->idMussarela);
                 $calabresaAntes = $this->repositorioIngrediente->obterIngredientePorId($this->idCalabresa);
 
-                $pedido = $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
-                    tipoAtendimento: TipoAtendimento::BALCAO->value,
-                    idCliente: '',
-                    itensPedido: [
-                        new ItemSimplesParaCadastro(
-                            idProduto: $this->idCocaCola,
-                            quantidade: 1,
-                        ),
-                        new ItemPizzaParaCadastro(
-                            tamanho: TamanhoPizza::PEQUENA->value,
-                            quantidade: 2,
-                            saboresEscolhidos: [
-                                new SaborEscolhidoParaCadastro(
-                                    idPizza: $this->idPizzaMargherita,
-                                    ingredientesEscolhidos: [
-                                        new IngredienteEscolhidoParaCadastro(
-                                            idIngrediente: $this->idMolhoTomate,
-                                            papel: PapelIngrediente::PADRAO->value,
-                                        ),
-                                        new IngredienteEscolhidoParaCadastro(
-                                            idIngrediente: $this->idMussarela,
-                                            papel: PapelIngrediente::PADRAO->value,
-                                        ),
-                                    ],
-                                ),
-                                new SaborEscolhidoParaCadastro(
-                                    idPizza: $this->idPizzaCalabresa,
-                                    ingredientesEscolhidos: [
-                                        new IngredienteEscolhidoParaCadastro(
-                                            idIngrediente: $this->idMolhoTomate,
-                                            papel: PapelIngrediente::PADRAO->value,
-                                        ),
-                                        new IngredienteEscolhidoParaCadastro(
-                                            idIngrediente: $this->idMussarela,
-                                            papel: PapelIngrediente::PADRAO->value,
-                                        ),
-                                        new IngredienteEscolhidoParaCadastro(
-                                            idIngrediente: $this->idCalabresa,
-                                            papel: PapelIngrediente::PADRAO->value,
-                                        ),
-                                    ],
-                                ),
-                            ],
-                        ),
-                    ],
-                ));
+                $pedido = $this->gestorPedido->registrarPedido($this->pedidoMeiaPizza);
 
                 $cocaColaDepois = $this->repositorioProdutoSimples->obterProdutoSimplesPorId($this->idCocaCola);
                 $molhoTomateDepois = $this->repositorioIngrediente->obterIngredientePorId($this->idMolhoTomate);
@@ -1079,38 +1102,149 @@ describe('GestorPedido - integração com banco de dados', function () {
                 expect($mussarelaDepois->estoque->valor)->toBe($mussarelaAntes->estoque->valor - 200);
                 expect($calabresaDepois->estoque->valor)->toBe($calabresaAntes->estoque->valor - 100);
                 expect($cocaColaDepois->estoque->valor)->toBe($cocaColaAntes->estoque->valor - 1);
-
                 expect($movimentacoesEstoqueSaida)->toHaveLength(6);
 
-                expect($movimentacaoEstoqueMolho1->ingrediente->id)->toBe($this->idMolhoTomate);
-                expect($movimentacaoEstoqueMolho1->quantidadeMedida->valor)->toBe(50);
-                expect($movimentacaoEstoqueMolho1->quantidadeMedida->unidadeMedida->id)->toBe(3);
-                expect($movimentacaoEstoqueMolho1->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+                compararMovimentacaoEstoqueIngrediente(
+                    movimentacao: $movimentacaoEstoqueMolho1,
+                    idIngredienteEsperado: $this->idMolhoTomate,
+                    valorEsperado: 50,
+                    idUnidadeMedidaEsperado: 3,
+                    tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::SAIDA,
+                );
 
-                expect($movimentacaoEstoqueMussarela1->ingrediente->id)->toBe($this->idMussarela);
-                expect($movimentacaoEstoqueMussarela1->quantidadeMedida->valor)->toBe(100);
-                expect($movimentacaoEstoqueMussarela1->quantidadeMedida->unidadeMedida->id)->toBe(1);
-                expect($movimentacaoEstoqueMussarela1->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+                compararMovimentacaoEstoqueIngrediente(
+                    movimentacao: $movimentacaoEstoqueMussarela1,
+                    idIngredienteEsperado: $this->idMussarela,
+                    valorEsperado: 100,
+                    idUnidadeMedidaEsperado: 1,
+                    tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::SAIDA,
+                );
 
-                expect($movimentacaoEstoqueMolho2->ingrediente->id)->toBe($this->idMolhoTomate);
-                expect($movimentacaoEstoqueMolho2->quantidadeMedida->valor)->toBe(50);
-                expect($movimentacaoEstoqueMolho2->quantidadeMedida->unidadeMedida->id)->toBe(3);
-                expect($movimentacaoEstoqueMolho2->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+                compararMovimentacaoEstoqueIngrediente(
+                    movimentacao: $movimentacaoEstoqueMolho2,
+                    idIngredienteEsperado: $this->idMolhoTomate,
+                    valorEsperado: 50,
+                    idUnidadeMedidaEsperado: 3,
+                    tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::SAIDA,
+                );
 
-                expect($movimentacaoEstoqueMussarela2->ingrediente->id)->toBe($this->idMussarela);
-                expect($movimentacaoEstoqueMussarela2->quantidadeMedida->valor)->toBe(100);
-                expect($movimentacaoEstoqueMussarela2->quantidadeMedida->unidadeMedida->id)->toBe(1);
-                expect($movimentacaoEstoqueMussarela2->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+                compararMovimentacaoEstoqueIngrediente(
+                    movimentacao: $movimentacaoEstoqueMussarela2,
+                    idIngredienteEsperado: $this->idMussarela,
+                    valorEsperado: 100,
+                    idUnidadeMedidaEsperado: 1,
+                    tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::SAIDA,
+                );
 
-                expect($movimentacaoEstoqueCalabresa->ingrediente->id)->toBe($this->idCalabresa);
-                expect($movimentacaoEstoqueCalabresa->quantidadeMedida->valor)->toBe(100);
-                expect($movimentacaoEstoqueCalabresa->quantidadeMedida->unidadeMedida->id)->toBe(1);
-                expect($movimentacaoEstoqueCalabresa->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+                compararMovimentacaoEstoqueIngrediente(
+                    movimentacao: $movimentacaoEstoqueCalabresa,
+                    idIngredienteEsperado: $this->idCalabresa,
+                    valorEsperado: 100,
+                    idUnidadeMedidaEsperado: 1,
+                    tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::SAIDA,
+                );
 
-                expect($movimentacaoEstoqueCocaCola->produtoSimples->id)->toBe($this->idCocaCola);
-                expect($movimentacaoEstoqueCocaCola->quantidadeMedida->valor)->toBe(1);
-                expect($movimentacaoEstoqueCocaCola->quantidadeMedida->unidadeMedida->id)->toBe(2);
-                expect($movimentacaoEstoqueCocaCola->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+                compararMovimentacaoEstoqueProdutoSimples(
+                    movimentacao: $movimentacaoEstoqueCocaCola,
+                    idProdutoSimplesEsperado: $this->idCocaCola,
+                    valorEsperado: 1,
+                    idUnidadeMedidaEsperado: 2,
+                    tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::SAIDA,
+                );
+            });
+
+        });
+
+    });
+
+    describe('alterarStatus()', function () {
+
+        describe('cancelarPedido()', function () {
+
+            describe('atualizarEstoqueAposCancelarPedido()', function () {
+
+                it('atualiza o estoque dos produtos simples e ingredientes após cancelar o pedido', function () {
+                    $pedido = $this->gestorPedido->registrarPedido($this->pedidoMeiaPizza);
+
+                    $cocaColaAntes = $this->repositorioProdutoSimples->obterProdutoSimplesPorId($this->idCocaCola);
+                    $molhoTomateAntes = $this->repositorioIngrediente->obterIngredientePorId($this->idMolhoTomate);
+                    $mussarelaAntes = $this->repositorioIngrediente->obterIngredientePorId($this->idMussarela);
+                    $calabresaAntes = $this->repositorioIngrediente->obterIngredientePorId($this->idCalabresa);
+
+                    $this->gestorPedido->alterarStatus($pedido->id, StatusPedido::CANCELADO->value, 'Motivo do cancelamento');
+
+                    $cocaColaDepois = $this->repositorioProdutoSimples->obterProdutoSimplesPorId($this->idCocaCola);
+                    $molhoTomateDepois = $this->repositorioIngrediente->obterIngredientePorId($this->idMolhoTomate);
+                    $mussarelaDepois = $this->repositorioIngrediente->obterIngredientePorId($this->idMussarela);
+                    $calabresaDepois = $this->repositorioIngrediente->obterIngredientePorId($this->idCalabresa);
+
+                    /** @var Pedido */
+                    $pedidoAtualizado = $this->repositorioPedido->obterPedidoPorId($pedido->id);
+                    $movimentacoesEstoqueEntrada = $pedidoAtualizado->obterMovimentacoesEstoque(TipoOperacaoEstoque::ENTRADA);
+                    [
+                        $movimentacaoEstoqueMolho1,
+                        $movimentacaoEstoqueMolho2,
+                        $movimentacaoEstoqueMussarela1,
+                        $movimentacaoEstoqueMussarela2,
+                        $movimentacaoEstoqueCalabresa,
+                        $movimentacaoEstoqueCocaCola,
+                    ] = $movimentacoesEstoqueEntrada;
+
+                    expect($molhoTomateDepois->estoque->valor)->toBe($molhoTomateAntes->estoque->valor + 100);
+                    expect($mussarelaDepois->estoque->valor)->toBe($mussarelaAntes->estoque->valor + 200);
+                    expect($calabresaDepois->estoque->valor)->toBe($calabresaAntes->estoque->valor + 100);
+                    expect($cocaColaDepois->estoque->valor)->toBe($cocaColaAntes->estoque->valor + 1);
+                    expect($movimentacoesEstoqueEntrada)->toHaveLength(6);
+
+                    compararMovimentacaoEstoqueIngrediente(
+                        movimentacao: $movimentacaoEstoqueMolho1,
+                        idIngredienteEsperado: $this->idMolhoTomate,
+                        valorEsperado: 50,
+                        idUnidadeMedidaEsperado: 3,
+                        tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::ENTRADA,
+                    );
+
+                    compararMovimentacaoEstoqueIngrediente(
+                        movimentacao: $movimentacaoEstoqueMussarela1,
+                        idIngredienteEsperado: $this->idMussarela,
+                        valorEsperado: 100,
+                        idUnidadeMedidaEsperado: 1,
+                        tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::ENTRADA,
+                    );
+
+                    compararMovimentacaoEstoqueIngrediente(
+                        movimentacao: $movimentacaoEstoqueMolho2,
+                        idIngredienteEsperado: $this->idMolhoTomate,
+                        valorEsperado: 50,
+                        idUnidadeMedidaEsperado: 3,
+                        tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::ENTRADA,
+                    );
+
+                    compararMovimentacaoEstoqueIngrediente(
+                        movimentacao: $movimentacaoEstoqueMussarela2,
+                        idIngredienteEsperado: $this->idMussarela,
+                        valorEsperado: 100,
+                        idUnidadeMedidaEsperado: 1,
+                        tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::ENTRADA,
+                    );
+
+                    compararMovimentacaoEstoqueIngrediente(
+                        movimentacao: $movimentacaoEstoqueCalabresa,
+                        idIngredienteEsperado: $this->idCalabresa,
+                        valorEsperado: 100,
+                        idUnidadeMedidaEsperado: 1,
+                        tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::ENTRADA,
+                    );
+
+                    compararMovimentacaoEstoqueProdutoSimples(
+                        movimentacao: $movimentacaoEstoqueCocaCola,
+                        idProdutoSimplesEsperado: $this->idCocaCola,
+                        valorEsperado: 1,
+                        idUnidadeMedidaEsperado: 2,
+                        tipoOperacaoEstoqueEsperado: TipoOperacaoEstoque::ENTRADA,
+                    );
+                });
+
             });
 
         });

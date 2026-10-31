@@ -118,9 +118,12 @@ class GestorPedido {
             data: new DateTime(),
         );
 
-        $this->unidadeTrabalho->executar(function () use ($idPedido, $cancelamento) {
+        $pedido = $this->obterPedidoPorId($idPedido);
+
+        $this->unidadeTrabalho->executar(function () use ($idPedido, $pedido, $cancelamento) {
             $this->repositorioPedido->alterarStatus($idPedido, StatusPedido::CANCELADO);
             $this->repositorioPedido->registrarCancelamento($idPedido, $cancelamento);
+            $this->atualizarEstoqueAposCancelarPedido($pedido);
         });
     }
 
@@ -410,6 +413,44 @@ class GestorPedido {
         }
     }
 
+    private function atualizarEstoqueIngrediente(Pedido $pedido, Ingrediente $ingrediente, QuantidadeMedida $consumo, TipoOperacaoEstoque $tipoOperacaoEstoque): void {
+        $this->repositorioIngrediente->atualizarEstoqueIngrediente(
+            idIngrediente: $ingrediente->id,
+            quantidade: $consumo,
+            tipoOperacaoEstoque: $tipoOperacaoEstoque,
+        );
+
+        $this->repositorioMovimentacaoEstoque->registrarMovimentacaoEstoque(
+            pedido: $pedido,
+            movimentacao: new MovimentacaoEstoqueIngrediente(
+                id: 0,
+                data: new DateTime(),
+                tipoOperacaoEstoque: $tipoOperacaoEstoque,
+                quantidade: $consumo,
+                ingrediente: $ingrediente,
+            ),
+        );
+    }
+
+    private function atualizarEstoqueProdutoSimples(Pedido $pedido, ProdutoSimples $produtoSimples, QuantidadeMedida $consumo, TipoOperacaoEstoque $tipoOperacaoEstoque): void {
+        $this->repositorioProdutoSimples->atualizarEstoqueProdutoSimples(
+            idProduto: $produtoSimples->id,
+            quantidade: $consumo,
+            tipoOperacaoEstoque: $tipoOperacaoEstoque,
+        );
+
+        $this->repositorioMovimentacaoEstoque->registrarMovimentacaoEstoque(
+            pedido: $pedido,
+            movimentacao: new MovimentacaoEstoqueProdutoSimples(
+                id: 0,
+                data: new DateTime(),
+                tipoOperacaoEstoque: $tipoOperacaoEstoque,
+                quantidade: $consumo,
+                produtoSimples: $produtoSimples,
+            ),
+        );
+    }
+
     private function atualizarEstoqueAposRegistrarPedido(Pedido $pedido): void {
         foreach ($pedido->itensPedido as $itemPedido) {
             if ($itemPedido instanceof ItemPizza) {
@@ -439,21 +480,11 @@ class GestorPedido {
                     quantidadeItem: $itemPizza->quantidade,
                 );
 
-                $this->repositorioIngrediente->atualizarEstoqueIngrediente(
-                    idIngrediente: $ingredienteEscolhido->ingrediente->id,
-                    quantidade: $consumo,
-                    tipoOperacaoEstoque: TipoOperacaoEstoque::SAIDA,
-                );
-
-                $this->repositorioMovimentacaoEstoque->registrarMovimentacaoEstoque(
+                $this->atualizarEstoqueIngrediente(
                     pedido: $pedido,
-                    movimentacao: new MovimentacaoEstoqueIngrediente(
-                        id: 0,
-                        data: new DateTime(),
-                        tipoOperacaoEstoque: TipoOperacaoEstoque::SAIDA,
-                        quantidade: $consumo,
-                        ingrediente: $ingredienteEscolhido->ingrediente,
-                    ),
+                    ingrediente: $ingredienteEscolhido->ingrediente,
+                    consumo: $consumo,
+                    tipoOperacaoEstoque: TipoOperacaoEstoque::SAIDA,
                 );
             }
         }
@@ -462,21 +493,49 @@ class GestorPedido {
     private function atualizarEstoqueItemSimplesAposRegistrarPedido(Pedido $pedido, ItemSimples $itemSimples): void {
         $consumo = $itemSimples->obterConsumo();
 
-        $this->repositorioProdutoSimples->atualizarEstoqueProdutoSimples(
-            idProduto: $itemSimples->produtoSimples->id,
-            quantidade: $consumo,
+        $this->atualizarEstoqueProdutoSimples(
+            pedido: $pedido,
+            produtoSimples: $itemSimples->produtoSimples,
+            consumo: $consumo,
             tipoOperacaoEstoque: TipoOperacaoEstoque::SAIDA,
         );
+    }
 
-        $this->repositorioMovimentacaoEstoque->registrarMovimentacaoEstoque(
+    private function atualizarEstoqueAposCancelarPedido(Pedido $pedido): void {
+        $movimentacoesSaida = $pedido->obterMovimentacoesEstoque(TipoOperacaoEstoque::SAIDA);
+
+        foreach ($movimentacoesSaida as $movimentacaoSaida) {
+            if ($movimentacaoSaida instanceof MovimentacaoEstoqueIngrediente) {
+                $this->atualizarEstoqueIngredienteAposCancelarPedido($pedido, $movimentacaoSaida);
+            }
+
+            if ($movimentacaoSaida instanceof MovimentacaoEstoqueProdutoSimples) {
+                $this->atualizarEstoqueProdutoSimplesAposCancelarPedido($pedido, $movimentacaoSaida);
+            }
+        }
+    }
+
+    private function atualizarEstoqueIngredienteAposCancelarPedido(Pedido $pedido, MovimentacaoEstoqueIngrediente $movimentacaoSaida): void {
+        $ingrediente = $movimentacaoSaida->ingrediente;
+        $consumo = $movimentacaoSaida->quantidadeMedida;
+
+        $this->atualizarEstoqueIngrediente(
             pedido: $pedido,
-            movimentacao: new MovimentacaoEstoqueProdutoSimples(
-                id: 0,
-                data: new DateTime(),
-                tipoOperacaoEstoque: TipoOperacaoEstoque::SAIDA,
-                quantidade: $consumo,
-                produtoSimples: $itemSimples->produtoSimples,
-            ),
+            ingrediente: $ingrediente,
+            consumo: $consumo,
+            tipoOperacaoEstoque: TipoOperacaoEstoque::ENTRADA,
+        );
+    }
+
+    private function atualizarEstoqueProdutoSimplesAposCancelarPedido(Pedido $pedido, MovimentacaoEstoqueProdutoSimples $movimentacaoSaida): void {
+        $produtoSimples = $movimentacaoSaida->produtoSimples;
+        $consumo = $movimentacaoSaida->quantidadeMedida;
+
+        $this->atualizarEstoqueProdutoSimples(
+            pedido: $pedido,
+            produtoSimples: $produtoSimples,
+            consumo: $consumo,
+            tipoOperacaoEstoque: TipoOperacaoEstoque::ENTRADA,
         );
     }
 

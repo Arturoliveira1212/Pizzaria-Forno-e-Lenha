@@ -121,6 +121,9 @@ class Pedido {
         );
     }
 
+    /**
+     * @return MovimentacaoEstoque[]
+     */
     public function obterMovimentacoesEstoque(?TipoOperacaoEstoque $tipoOperacaoEstoque): array {
         if ($tipoOperacaoEstoque === null) {
             return $this->movimentacoesEstoque;
