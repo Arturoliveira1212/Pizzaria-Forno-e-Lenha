@@ -61,4 +61,40 @@ class RepositorioPromocaoEmBDR implements RepositorioPromocao {
 
         return $query;
     }
+
+    public function obterPromocaoPorId(int $id): ?Promocao {
+        try {
+            $sql = 'SELECT
+                promocao.id,
+                promocao.descricao,
+                promocao.quantidadeMinima,
+                promocao.tamanho,
+                promocao.percentualDesconto,
+                promocao.dataInicio,
+                promocao.validade
+                    FROM promocao
+                        WHERE promocao.id = :id';
+
+            $resultado = $this->bancoDados->consultar($sql, [
+                'id' => $id,
+            ]);
+            if (empty($resultado)) {
+                return null;
+            }
+
+            $linha = $resultado[0];
+
+            return new Promocao(
+                id: (int) $linha['id'],
+                descricao: $linha['descricao'],
+                quantidadeMinima: (int) $linha['quantidadeMinima'],
+                tamanhoPizza: TamanhoPizza::from($linha['tamanho']),
+                percentualDesconto: new Percentual((int) $linha['percentualDesconto']),
+                dataInicio: $linha['dataInicio'] ? new DateTime($linha['dataInicio']) : null,
+                dataFim: $linha['validade'] ? new DateTime($linha['validade']) : null,
+            );
+        } catch (Throwable $e) {
+            throw new RepositorioException('Erro ao obter promoção por ID.');
+        }
+    }
 }

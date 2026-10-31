@@ -10,93 +10,77 @@ describe('RepositorioPedidoEmBDR', function () {
             senha: $_ENV['DB_PASSWORD_TEST'],
         ));
 
+        $this->repositorioUsuario = new RepositorioUsuarioEmBDR($this->bancoDados);
+        $this->repositorioCliente = new RepositorioClienteEmBDR($this->bancoDados);
+        $this->repositorioPizza = new RepositorioPizzaEmBDR($this->bancoDados);
+        $this->repositorioProdutoSimples = new RepositorioProdutoSimplesEmBDR($this->bancoDados);
+        $this->repositorioPromocao = new RepositorioPromocaoEmBDR($this->bancoDados);
+        $this->repositorioEntregador = new RepositorioEntregadorEmBDR($this->bancoDados);
         $this->repositorioPedido = new RepositorioPedidoEmBDR(
             bancoDados: $this->bancoDados,
-            repositorioPizza: new RepositorioPizzaEmBDR($this->bancoDados),
-            repositorioCliente: new RepositorioClienteEmBDR($this->bancoDados),
-            repositorioUsuario: new RepositorioUsuarioEmBDR($this->bancoDados),
-            repositorioEntregador: new RepositorioEntregadorEmBDR($this->bancoDados),
+            repositorioPizza: $this->repositorioPizza,
+            repositorioCliente: $this->repositorioCliente,
+            repositorioUsuario: $this->repositorioUsuario,
+            repositorioEntregador: $this->repositorioEntregador,
         );
     });
 
     describe('registrarPedido()', function () {
 
         beforeAll(function () {
-            $this->itemPizza = new ItemPizza(
-                id: 0,
-                quantidade: 1,
-                saboresEscolhidos: [
-                    new SaborEscolhido(
-                        id: 0,
-                        pizza: PizzaFactory::margherita(),
-                        ingredientesEscolhidos: [
-                            IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::molho()),
-                            IngredienteEscolhidoFactory::padrao(2, IngredienteFactory::mussarela()),
-                        ],
-                    ),
-                ],
-                tamanhoPizza: TamanhoPizza::MEDIA,
-            );
+            $this->usuario = $this->repositorioUsuario->obterUsuarioPorId(1);
+            $this->cliente = $this->repositorioCliente->obterClientePorId(10);
+            $this->pizzaBacon = $this->repositorioPizza->obterPizzaPorId(10);
+            $this->pizzaPortuguesa = $this->repositorioPizza->obterPizzaPorId(5);
+            $this->pudim = $this->repositorioProdutoSimples->obterProdutoSimplesPorId(5);
+            $this->promocao = $this->repositorioPromocao->obterPromocaoPorId(1);
 
-            $this->itemSimples = new ItemSimples(
+            $this->pedido = new Pedido(
                 id: 0,
-                quantidade: 1,
-                produtoSimples: ProdutoSimplesFactory::cocaCola(),
-            );
-
-            $this->cliente = new Cliente(
-                id: 11,
-                nome: 'Artur Alves',
-                telefone: new Telefone('22', '99999-9999'),
-                cpf: new Cpf('15975348625'),
-                endereco: new Endereco(
-                    id: 0,
-                    logradouro: 'Rua A',
-                    numero: '1',
-                    bairro: 'Centro',
-                    cidade: 'Cidade',
-                    estado: 'Rio de Janeiro',
-                    uf: 'RJ',
-                ),
-                beneficioFidelidade: new BeneficioFidelidade(
-                    id: 1,
-                    percentualDesconto: new Percentual(5),
-                    dataConcessao: new DateTime('-1 day'),
-                    validade: new DateTime('+7 days'),
-                    utilizado: false,
-                ),
-            );
-
-            $this->pedidoSucesso = new Pedido(
-                id: 0,
-                usuario: UsuarioFactory::atendente(),
+                usuario: $this->usuario,
                 data: new DateTime(),
                 tipoAtendimento: TipoAtendimento::ENTREGA,
                 cliente: $this->cliente,
                 itensPedido: [
-                    $this->itemSimples,
-                    $this->itemPizza,
+                    new ItemPizza(
+                        id: 0,
+                        quantidade: 2,
+                        saboresEscolhidos: [
+                            new SaborEscolhido(
+                                id: 0,
+                                pizza: $this->pizzaBacon,
+                                ingredientesEscolhidos: array_map(function (IngredientePadrao $ingredientePadrao) {
+                                    return IngredienteEscolhidoFactory::padrao(0, $ingredientePadrao->ingrediente);
+                                }, $this->pizzaBacon->ingredientesPadrao),
+                            ),
+                            new SaborEscolhido(
+                                id: 0,
+                                pizza: $this->pizzaPortuguesa,
+                                ingredientesEscolhidos: array_map(function (IngredientePadrao $ingredientePadrao) {
+                                    return IngredienteEscolhidoFactory::padrao(0, $ingredientePadrao->ingrediente);
+                                }, $this->pizzaPortuguesa->ingredientesPadrao),
+                            ),
+                        ],
+                        tamanhoPizza: TamanhoPizza::GRANDE,
+                    ),
+                    new ItemSimples(
+                        id: 0,
+                        quantidade: 1,
+                        produtoSimples: $this->pudim,
+                    ),
                 ],
                 status: StatusPedido::RECEBIDO,
                 descontosPromocao: [
                     new DescontoPromocao(
-                        1,
-                        new Dinheiro(309),
-                        new Promocao(
-                            1,
-                            'Promocao de teste',
-                            1,
-                            TamanhoPizza::MEDIA,
-                            new Percentual(10),
-                            null,
-                            null,
-                        ),
+                        id: 0,
+                        promocao: $this->promocao,
+                        valorDesconto: new Dinheiro(centavos: 1150),
                     ),
                 ],
                 descontoFidelidade: new DescontoFidelidade(
-                    1,
-                    new Dinheiro(337),
-                    $this->cliente->beneficioFidelidade,
+                    id: 0,
+                    valorDesconto: new Dinheiro(centavos: 1185),
+                    beneficioFidelidade: $this->cliente->beneficioFidelidade,
                 ),
             );
 
@@ -117,75 +101,49 @@ describe('RepositorioPedidoEmBDR', function () {
             );
         });
 
-        it('persiste o pedido e todas as suas relações', function () {
-            $this->repositorioPedido->registrarPedido($this->pedidoSucesso);
+        it('registra o pedido e todas as suas relações', function () {
+            $this->repositorioPedido->registrarPedido($this->pedido);
+            $pedidoSalvo = $this->repositorioPedido->obterPedidoPorId($this->pedido->id);
 
-            $pedidoPersistido = $this->bancoDados->consultar('SELECT * FROM pedido ORDER BY id DESC LIMIT 1')[0];
-            $idPedido = (int) $pedidoPersistido['id'];
+            expect($pedidoSalvo)->toBeAnInstanceOf(Pedido::class);
+            expect($pedidoSalvo->usuario)->toBeAnInstanceOf(Usuario::class);
+            expect($pedidoSalvo->usuario->id)->toBe($this->pedido->usuario->id);
+            expect($pedidoSalvo->data)->toBeAnInstanceOf(DateTime::class);
+            expect($pedidoSalvo->tipoAtendimento)->toBe($this->pedido->tipoAtendimento);
+            expect($pedidoSalvo->cliente)->toBeAnInstanceOf(Cliente::class);
+            expect($pedidoSalvo->cliente->id)->toBe($this->pedido->cliente->id);
+            expect($pedidoSalvo->status)->toBe(StatusPedido::RECEBIDO);
+            expect($pedidoSalvo->taxaEntrega->centavos)->toBe(1000);
+            expect($pedidoSalvo->itensPedido)->toHaveLength(2);
+            expect($pedidoSalvo->descontosPromocao)->toHaveLength(1);
 
-            expect($pedidoPersistido['valorTotal'])->toBe(4034);
-            expect($pedidoPersistido['taxaEntrega'])->toBe(1000);
-            expect($pedidoPersistido['status'])->toBe('RECEBIDO');
-            expect($pedidoPersistido['tipoAtendimento'])->toBe('ENTREGA');
-            expect($pedidoPersistido['idCliente'])->toBe(11);
+            $itemPizza = $pedidoSalvo->itensPedido[0];
+            $saborBacon = $itemPizza->saboresEscolhidos[0];
+            $saborPortuguesa = $itemPizza->saboresEscolhidos[1];
 
-            $dadosItemSimples = $this->bancoDados->consultar(
-                'SELECT quantidade, precoPraticado, idProdutoSimples FROM item_pedido_simples WHERE idPedido = :pedidoId',
-                ['pedidoId' => $idPedido],
-            );
-            expect($dadosItemSimples)->toBe([
-                ['quantidade' => 1, 'precoPraticado' => 590, 'idProdutoSimples' => 1],
-            ]);
+            expect($itemPizza)->toBeAnInstanceOf(ItemPizza::class);
+            expect($itemPizza->quantidade)->toBe(2);
+            expect($itemPizza->tamanhoPizza)->toBe(TamanhoPizza::GRANDE);
+            expect($itemPizza->precoPraticado->centavos)->toBe(5750);
+            expect($itemPizza->saboresEscolhidos)->toHaveLength(2);
 
-            $dadosItemPizza = $this->bancoDados->consultar(
-                'SELECT quantidade, precoPraticado, tamanho FROM item_pedido_pizza WHERE idPedido = :pedidoId',
-                ['pedidoId' => $idPedido],
-            );
+            expect($saborBacon)->toBeAnInstanceOf(SaborEscolhido::class);
+            expect($saborBacon->pizza->id)->toBe($this->pizzaBacon->id);
+            expect($saborBacon->ingredientesEscolhidos)->toHaveLength(4);
 
-            expect($dadosItemPizza)->toBe([
-                ['quantidade' => 1, 'precoPraticado' => 3090, 'tamanho' => 'MEDIA'],
-            ]);
+            expect($saborPortuguesa)->toBeAnInstanceOf(SaborEscolhido::class);
+            expect($saborPortuguesa->pizza->id)->toBe($this->pizzaPortuguesa->id);
+            expect($saborPortuguesa->ingredientesEscolhidos)->toHaveLength(6);
 
-            $dadosSaboresEscolhidos = $this->bancoDados->consultar(
-                'SELECT sabor_escolhido.idPizza
-                    FROM sabor_escolhido
-                    INNER JOIN item_pedido_pizza ON item_pedido_pizza.id = sabor_escolhido.idItemPedidoPizza
-                        WHERE item_pedido_pizza.idPedido = :pedidoId',
-                ['pedidoId' => $idPedido],
-            );
-            expect($dadosSaboresEscolhidos)->toBe([
-                ['idPizza' => 2],
-            ]);
+            $descontoPromocao = $pedidoSalvo->descontosPromocao[0];
+            expect($descontoPromocao)->toBeAnInstanceOf(DescontoPromocao::class);
+            expect($descontoPromocao->promocao->id)->toBe($this->promocao->id);
+            expect($descontoPromocao->valorDesconto->centavos)->toBe(1150);
 
-            $dadosIngredientesEscolhidos = $this->bancoDados->consultar(
-                'SELECT ingrediente_escolhido.idIngrediente, ingrediente_escolhido.custo, ingrediente_escolhido.papel
-                    FROM ingrediente_escolhido
-                    INNER JOIN sabor_escolhido ON sabor_escolhido.id = ingrediente_escolhido.idSaborEscolhido
-                    INNER JOIN item_pedido_pizza ON item_pedido_pizza.id = sabor_escolhido.idItemPedidoPizza
-                        WHERE item_pedido_pizza.idPedido = :pedidoId
-                            ORDER BY ingrediente_escolhido.idIngrediente',
-                ['pedidoId' => $idPedido],
-            );
-            expect($dadosIngredientesEscolhidos)->toBe([
-                ['idIngrediente' => 1, 'custo' => 0, 'papel' => 'PADRAO'],
-                ['idIngrediente' => 2, 'custo' => 0, 'papel' => 'PADRAO'],
-            ]);
-
-            $dadosDescontosPromocao = $this->bancoDados->consultar(
-                'SELECT valorDesconto, idPromocao FROM desconto_promocao WHERE idPedido = :pedidoId',
-                ['pedidoId' => $idPedido],
-            );
-            expect($dadosDescontosPromocao)->toBe([
-                ['valorDesconto' => 309, 'idPromocao' => 1],
-            ]);
-
-            $dadosDescontoFidelidade = $this->bancoDados->consultar(
-                'SELECT valorDesconto, idBeneficioFidelidade FROM desconto_fidelidade WHERE idPedido = :pedidoId',
-                ['pedidoId' => $idPedido],
-            );
-            expect($dadosDescontoFidelidade)->toBe([
-                ['valorDesconto' => 337, 'idBeneficioFidelidade' => 1],
-            ]);
+            $descontoFidelidade = $pedidoSalvo->descontoFidelidade;
+            expect($descontoFidelidade)->toBeAnInstanceOf(DescontoFidelidade::class);
+            expect($descontoFidelidade->beneficioFidelidade->id)->toBe($this->cliente->beneficioFidelidade->id);
+            expect($descontoFidelidade->valorDesconto->centavos)->toBe(1185);
         });
 
         it('lança exceção quando ocorre um erro na persistência', function () {
@@ -220,9 +178,9 @@ describe('RepositorioPedidoEmBDR', function () {
     describe('obterPedidoPorId()', function () {
 
         it('retorna o pedido com cliente, itens e entrega registrados', function () {
-            $pizza = new RepositorioPizzaEmBDR($this->bancoDados)->obterPizzaPorId(1);
-            $cliente = new RepositorioClienteEmBDR($this->bancoDados)->obterClientePorId('1');
-            $entregador = new RepositorioEntregadorEmBDR($this->bancoDados)->obterEntregadorPorId(1);
+            $pizza = $this->repositorioPizza->obterPizzaPorId(1);
+            $cliente = $this->repositorioCliente->obterClientePorId('1');
+            $entregador = $this->repositorioEntregador->obterEntregadorPorId(1);
 
             $pedido = new Pedido(
                 id: 0,
