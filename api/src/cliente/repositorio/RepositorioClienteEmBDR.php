@@ -193,6 +193,38 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
         return $agrupado;
     }
 
+    public function obterBeneficioFidelidadePorId(int $idBeneficioFidelidade): ?BeneficioFidelidade {
+        try {
+            $sql = 'SELECT
+                beneficio_fidelidade.id,
+                beneficio_fidelidade.percentualDesconto,
+                beneficio_fidelidade.dataConcessao,
+                beneficio_fidelidade.validade,
+                beneficio_fidelidade.utilizado
+                    FROM beneficio_fidelidade
+                        WHERE beneficio_fidelidade.id = :idBeneficioFidelidade';
+
+            $resultado = $this->bancoDados->consultar($sql, [
+                'idBeneficioFidelidade' => $idBeneficioFidelidade,
+            ]);
+            if (empty($resultado)) {
+                return null;
+            }
+
+            $linha = $resultado[0];
+
+            return new BeneficioFidelidade(
+                id: (int) $linha['id'],
+                percentualDesconto: new Percentual((int) $linha['percentualDesconto']),
+                dataConcessao: new DateTime($linha['dataConcessao']),
+                validade: new DateTime($linha['validade']),
+                utilizado: (bool) $linha['utilizado'],
+            );
+        } catch (Throwable $th) {
+            throw new RepositorioException('Erro ao obter benefício de fidelidade por ID.');
+        }
+    }
+
     public function marcarBeneficioFidelidadeComoUtilizado(Cliente $cliente, BeneficioFidelidade $beneficioFidelidade): void {
         try {
             $sql = 'UPDATE beneficio_fidelidade SET utilizado = :utilizado

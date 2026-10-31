@@ -120,4 +120,14 @@ class Pedido {
             movimentacoesEstoque: $this->movimentacoesEstoque,
         );
     }
+
+    public function obterMovimentacoesEstoque(?TipoOperacaoEstoque $tipoOperacaoEstoque): array {
+        if ($tipoOperacaoEstoque === null) {
+            return $this->movimentacoesEstoque;
+        }
+
+        return array_values(array_filter($this->movimentacoesEstoque, function (MovimentacaoEstoque $movimentacao) use ($tipoOperacaoEstoque) {
+            return $movimentacao->tipoOperacaoEstoque === $tipoOperacaoEstoque;
+        }));
+    }
 }

@@ -342,4 +342,92 @@ describe('Pedido', function () {
 
     });
 
+    describe('copiarComId()', function () {
+
+        it('cria uma cópia do pedido com um novo identificador', function () {
+            $pedidoOriginal = new Pedido(
+                id: Pedido::MENOR_ID_PERMITIDO,
+                usuario: UsuarioFactory::atendente(),
+                data: new DateTime(),
+                tipoAtendimento: TipoAtendimento::BALCAO,
+                cliente: null,
+                itensPedido: $this->itensPedido,
+                status: StatusPedido::RECEBIDO,
+            );
+
+            $novoId = Pedido::MENOR_ID_PERMITIDO + 1;
+            $pedidoCopia = $pedidoOriginal->copiarComId($novoId);
+
+            expect($pedidoCopia->id)->toBe($novoId);
+            expect($pedidoCopia->usuario)->toBe($pedidoOriginal->usuario);
+            expect($pedidoCopia->data)->toBe($pedidoOriginal->data);
+            expect($pedidoCopia->tipoAtendimento)->toBe($pedidoOriginal->tipoAtendimento);
+            expect($pedidoCopia->cliente)->toBe($pedidoOriginal->cliente);
+            expect($pedidoCopia->itensPedido)->toBe($pedidoOriginal->itensPedido);
+            expect($pedidoCopia->status)->toBe($pedidoOriginal->status);
+        });
+
+    });
+
+    describe('obterMovimentacoesEstoque()', function () {
+
+        beforeAll(function () {
+            $this->movimentacaoEntrada = new MovimentacaoEstoqueIngrediente(
+                id: 1,
+                data: new DateTime(),
+                tipoOperacaoEstoque: TipoOperacaoEstoque::ENTRADA,
+                quantidade: new QuantidadeMedida(
+                    valor: 10,
+                    unidadeMedida: UnidadeMedidaFactory::gramas(),
+                ),
+                ingrediente: IngredienteFactory::mussarela(),
+            );
+
+            $this->movimentacaoSaida = new MovimentacaoEstoqueIngrediente(
+                id: 2,
+                data: new DateTime(),
+                tipoOperacaoEstoque: TipoOperacaoEstoque::SAIDA,
+                quantidade: new QuantidadeMedida(
+                    valor: 5,
+                    unidadeMedida: UnidadeMedidaFactory::gramas(),
+                ),
+                ingrediente: IngredienteFactory::mussarela(),
+            );
+
+            $this->pedido = new Pedido(
+                id: Pedido::MENOR_ID_PERMITIDO,
+                usuario: UsuarioFactory::atendente(),
+                data: new DateTime(),
+                tipoAtendimento: TipoAtendimento::BALCAO,
+                cliente: null,
+                itensPedido: $this->itensPedido,
+                status: StatusPedido::RECEBIDO,
+                movimentacoesEstoque: [$this->movimentacaoEntrada, $this->movimentacaoSaida],
+            );
+        });
+
+        it('retorna todas as movimentações de estoque quando o tipo de operação é nulo', function () {
+            $movimentacoes = $this->pedido->obterMovimentacoesEstoque(null);
+
+            expect($movimentacoes)->toHaveLength(2);
+            expect($movimentacoes[0])->toBe($this->movimentacaoEntrada);
+            expect($movimentacoes[1])->toBe($this->movimentacaoSaida);
+        });
+
+        it('retorna apenas as movimentações de estoque do tipo ENTRADA', function () {
+            $movimentacoesEntrada = $this->pedido->obterMovimentacoesEstoque(TipoOperacaoEstoque::ENTRADA);
+
+            expect($movimentacoesEntrada)->toHaveLength(1);
+            expect($movimentacoesEntrada[0])->toBe($this->movimentacaoEntrada);
+        });
+
+        it('retorna apenas as movimentações de estoque do tipo SAIDA', function () {
+            $movimentacoesSaida = $this->pedido->obterMovimentacoesEstoque(TipoOperacaoEstoque::SAIDA);
+
+            expect($movimentacoesSaida)->toHaveLength(1);
+            expect($movimentacoesSaida[0])->toBe($this->movimentacaoSaida);
+        });
+
+    });
+
 });

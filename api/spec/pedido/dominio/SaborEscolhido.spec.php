@@ -58,7 +58,7 @@ describe('SaborEscolhido', function () {
                         IngredienteEscolhidoFactory::padrao(1, IngredienteFactory::catupiry()),
                     ],
                 );
-            })->toThrow(new DominioException('O ingrediente Catupiry(8) não é permitido como padrão para a pizza.'));
+            })->toThrow(new DominioException('O ingrediente Catupiry(7) não é permitido como padrão para a pizza.'));
         });
 
         it('lança exceção quando o ingrediente escolhido como substituto não é permitido para a pizza', function () {
@@ -71,7 +71,7 @@ describe('SaborEscolhido', function () {
                         IngredienteEscolhidoFactory::substituto(1, IngredienteFactory::bacon()),
                     ],
                 );
-            })->toThrow(new DominioException('O ingrediente Bacon(7) não é permitido como substituto para a pizza.'));
+            })->toThrow(new DominioException('O ingrediente Bacon(18) não é permitido como substituto para a pizza.'));
         });
 
         it('lança exceção quando o ingrediente escolhido como adicional não é permitido para a pizza', function () {
@@ -97,7 +97,7 @@ describe('SaborEscolhido', function () {
                         IngredienteEscolhidoFactory::adicional(1, IngredienteFactory::bacon(), 500),
                     ],
                 );
-            })->toThrow(new DominioException('O custo adicional do ingrediente Bacon(7) não corresponde ao preço definido para a pizza.'));
+            })->toThrow(new DominioException('O custo adicional do ingrediente Bacon(18) não corresponde ao preço definido para a pizza.'));
         });
 
         it('lança exceção quando os ingredientes escolhidos não incluem todos os ingredientes não personalizáveis da pizza', function () {

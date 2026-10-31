@@ -128,11 +128,11 @@ class GestorPedido {
         $pedido = $this->criarPedido($pedidoParaCadastro);
         $this->validarEstoqueItensPedido($pedido->itensPedido);
 
-        $this->unidadeTrabalho->executar(function () use ($pedido) {
+        $this->unidadeTrabalho->executar(function () use (&$pedido) {
             $this->repositorioPedido->registrarPedido($pedido);
-            $this->atualizarEstoqueItensPedido($pedido);
             $this->marcarBeneficioFidelidadeComoUtilizado($pedido);
             $this->gerarNovoBeneficioFidelidade($pedido);
+            $this->atualizarEstoqueAposRegistrarPedido($pedido);
         });
 
         return $pedido;
@@ -410,21 +410,21 @@ class GestorPedido {
         }
     }
 
-    private function atualizarEstoqueItensPedido(Pedido $pedido): void {
+    private function atualizarEstoqueAposRegistrarPedido(Pedido $pedido): void {
         foreach ($pedido->itensPedido as $itemPedido) {
             if ($itemPedido instanceof ItemPizza) {
-                $this->atualizarEstoqueItemPizza(pedido: $pedido, itemPizza: $itemPedido);
+                $this->atualizarEstoqueItemPizzaAposRegistrarPedido(pedido: $pedido, itemPizza: $itemPedido);
                 continue;
             }
 
             if ($itemPedido instanceof ItemSimples) {
-                $this->atualizarEstoqueItemSimples(pedido: $pedido, itemSimples: $itemPedido);
+                $this->atualizarEstoqueItemSimplesAposRegistrarPedido(pedido: $pedido, itemSimples: $itemPedido);
                 continue;
             }
         }
     }
 
-    private function atualizarEstoqueItemPizza(Pedido $pedido, ItemPizza $itemPizza): void {
+    private function atualizarEstoqueItemPizzaAposRegistrarPedido(Pedido $pedido, ItemPizza $itemPizza): void {
         $saboresEscolhidos = $itemPizza->saboresEscolhidos;
         $quantidadeSabores = count($saboresEscolhidos);
 
@@ -459,7 +459,7 @@ class GestorPedido {
         }
     }
 
-    private function atualizarEstoqueItemSimples(Pedido $pedido, ItemSimples $itemSimples): void {
+    private function atualizarEstoqueItemSimplesAposRegistrarPedido(Pedido $pedido, ItemSimples $itemSimples): void {
         $consumo = $itemSimples->obterConsumo();
 
         $this->repositorioProdutoSimples->atualizarEstoqueProdutoSimples(

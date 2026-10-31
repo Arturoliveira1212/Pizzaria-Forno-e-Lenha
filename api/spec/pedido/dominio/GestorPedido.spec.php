@@ -779,118 +779,340 @@ describe('GestorPedido - integração com banco de dados', function () {
             senha: $_ENV['DB_PASSWORD_TEST'],
         ));
 
-        $this->gestorPedido = GestorFactory::criarGestorPedido($this->bancoDados, new UsuarioLogadoFixo(UsuarioFactory::atendente()));
+        $this->gestorPedido = GestorFactory::criarGestorPedido(
+            bancoDados: $this->bancoDados,
+            provedorUsuarioLogado: new UsuarioLogadoFixo(UsuarioFactory::atendente()),
+        );
+
+        $this->repositorioCliente = new RepositorioClienteEmBDR($this->bancoDados);
+        $this->repositorioProdutoSimples = new RepositorioProdutoSimplesEmBDR($this->bancoDados);
+        $this->repositorioIngrediente = new RepositorioIngredienteEmBDR($this->bancoDados);
+        $this->repositorioPedido = new RepositorioPedidoEmBDR(
+            bancoDados: $this->bancoDados,
+            repositorioPizza: new RepositorioPizzaEmBDR($this->bancoDados),
+            repositorioCliente: $this->repositorioCliente,
+            repositorioUsuario: new RepositorioUsuarioEmBDR($this->bancoDados),
+            repositorioEntregador: new RepositorioEntregadorEmBDR($this->bancoDados),
+        );
     });
 
     describe('registrarPedido()', function () {
 
-        it('marca o benefício como utilizado quando o pedido tem desconto fidelidade', function () {
-            $beneficioAntes = $this->bancoDados->consultar(
-                'SELECT id, utilizado FROM beneficio_fidelidade WHERE idCliente = :idCliente ORDER BY id',
-                ['idCliente' => 11],
-            )[0] ?? null;
+        describe('marcarBeneficioFidelidadeComoUtilizado()', function () {
 
-            $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
-                tipoAtendimento: TipoAtendimento::BALCAO->value,
-                idCliente: '11',
-                itensPedido: [
-                    new ItemSimplesParaCadastro(
-                        idProduto: 1,
-                        quantidade: 10,
-                    ),
-                ],
-            ));
+            beforeAll(function () {
+                $this->idCliente = 11; // Artur Alves
+            });
 
-            $beneficioDepois = $this->bancoDados->consultar(
-                'SELECT id, utilizado FROM beneficio_fidelidade
-                    WHERE id = :id
-                    ORDER BY id',
-                ['id' => $beneficioAntes['id']],
-            )[0] ?? null;
+            it('marca o benefício como utilizado quando o pedido tem desconto fidelidade', function () {
+                $clienteAntes = $this->repositorioCliente->obterClientePorId($this->idCliente);
+                $beneficioAntes = $clienteAntes->beneficioFidelidade;
 
-            expect($beneficioDepois)->toBe([
-                'id' => $beneficioAntes['id'],
-                'utilizado' => 1,
-            ]);
+                $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
+                    tipoAtendimento: TipoAtendimento::BALCAO->value,
+                    idCliente: $this->idCliente,
+                    itensPedido: [
+                        new ItemSimplesParaCadastro(
+                            idProduto: 1,
+                            quantidade: 1,
+                        ),
+                    ],
+                ));
+
+                $clienteDepois = $this->repositorioCliente->obterClientePorId($this->idCliente);
+                $beneficioDepois = $this->repositorioCliente->obterBeneficioFidelidadePorId($beneficioAntes->id);
+
+                expect($beneficioAntes)->toBeAnInstanceOf(BeneficioFidelidade::class);
+                expect($beneficioAntes->utilizado)->toBe(false);
+
+                expect($beneficioDepois)->toBeAnInstanceOf(BeneficioFidelidade::class);
+                expect($beneficioDepois->id)->toBe($beneficioAntes->id);
+                expect($beneficioDepois->utilizado)->toBe(true);
+
+                expect($clienteDepois->beneficioFidelidade)->toBe(null);
+            });
+
+            it('não marca o benefício como utilizado quando o pedido não tem desconto fidelidade', function () {
+                $clienteAntes = $this->repositorioCliente->obterClientePorId($this->idCliente);
+                $beneficioAntes = $clienteAntes->beneficioFidelidade;
+
+                $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
+                    tipoAtendimento: TipoAtendimento::BALCAO->value,
+                    idCliente: $this->idCliente,
+                    itensPedido: [
+                        new ItemSimplesParaCadastro(
+                            idProduto: 2,
+                            quantidade: 1,
+                        ),
+                    ],
+                ));
+
+                $clienteDepois = $this->repositorioCliente->obterClientePorId($this->idCliente);
+                $beneficioDepois = $clienteDepois->beneficioFidelidade;
+
+                expect($beneficioAntes)->toBe(null);
+                expect($beneficioDepois)->toBe(null);
+            });
+
         });
 
-        it('gera um novo benefício de fidelidade para o cliente quando o pedido atinge as regras', function () {
-            $quantidadeAntes = $this->bancoDados->consultar(
-                'SELECT COUNT(*) AS total FROM beneficio_fidelidade WHERE idCliente = :idCliente',
-                ['idCliente' => 11],
-            )[0]['total'] ?? 0;
+        describe('gerarNovoBeneficioFidelidade()', function () {
 
-            $pedido = $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
-                tipoAtendimento: TipoAtendimento::BALCAO->value,
-                idCliente: '11',
-                itensPedido: [
-                    new ItemSimplesParaCadastro(
-                        idProduto: 1,
-                        quantidade: 10,
-                    ),
-                    new ItemPizzaParaCadastro(
-                        tamanho: TamanhoPizza::MEDIA->value,
-                        quantidade: 4,
-                        saboresEscolhidos: [
-                            new SaborEscolhidoParaCadastro(
-                                idPizza: 1,
-                                ingredientesEscolhidos: [
-                                    new IngredienteEscolhidoParaCadastro(
-                                        idIngrediente: 1,
-                                        papel: PapelIngrediente::PADRAO->value,
-                                    ),
-                                ],
-                            ),
-                        ],
-                    ),
-                ],
-            ));
+            it('gera um novo benefício de fidelidade para o cliente quando o pedido atinge as regras', function () {
+                $idCliente = 2; // Carlos Eduardo Lima
 
-            $beneficiosDepois = $this->bancoDados->consultar(
-                'SELECT id, percentualDesconto, dataConcessao, validade, utilizado
-                    FROM beneficio_fidelidade
-                    WHERE idCliente = :idCliente
-                    ORDER BY id DESC',
-                ['idCliente' => 11],
-            );
+                $clienteAntes = $this->repositorioCliente->obterClientePorId($idCliente);
+                $beneficioAntes = $clienteAntes->beneficioFidelidade;
 
-            $beneficioDepois = $beneficiosDepois[0] ?? null;
-            $novaQuantidade = $quantidadeAntes + 1;
-            $quantidadeDepois = count($beneficiosDepois);
+                $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
+                    tipoAtendimento: TipoAtendimento::BALCAO->value,
+                    idCliente: $idCliente,
+                    itensPedido: [
+                        new ItemSimplesParaCadastro(
+                            idProduto: 1,
+                            quantidade: 10,
+                        ),
+                        new ItemPizzaParaCadastro(
+                            tamanho: TamanhoPizza::MEDIA->value,
+                            quantidade: 4,
+                            saboresEscolhidos: [
+                                new SaborEscolhidoParaCadastro(
+                                    idPizza: 1,
+                                    ingredientesEscolhidos: [
+                                        new IngredienteEscolhidoParaCadastro(
+                                            idIngrediente: 1,
+                                            papel: PapelIngrediente::PADRAO->value,
+                                        ),
+                                    ],
+                                ),
+                            ],
+                        ),
+                    ],
+                ));
 
-            expect($quantidadeDepois)->toBe($novaQuantidade);
-            expect($beneficioDepois)->toBe([
-                'id' => $beneficioDepois['id'],
-                'percentualDesconto' => $beneficioDepois['percentualDesconto'],
-                'dataConcessao' => $beneficioDepois['dataConcessao'],
-                'validade' => $beneficioDepois['validade'],
-                'utilizado' => 0,
-            ]);
+                $clienteDepois = $this->repositorioCliente->obterClientePorId($idCliente);
+                $beneficioDepois = $clienteDepois->beneficioFidelidade;
+
+                expect($beneficioAntes)->toBe(null);
+
+                expect($beneficioDepois)->toBeAnInstanceOf(BeneficioFidelidade::class);
+                expect($beneficioDepois->percentualDesconto->valor)->toBe(5);
+                expect($beneficioDepois->dataConcessao)->toBeAnInstanceOf(DateTime::class);
+                expect($beneficioDepois->validade)->toBeAnInstanceOf(DateTime::class);
+                expect($beneficioDepois->utilizado)->toBe(false);
+            });
+
+            it('não gera benefício de fidelidade para o cliente quando o pedido não atinge as regras', function () {
+                $idCliente = 3; // Fernanda Oliveira Costa
+
+                $clienteAntes = $this->repositorioCliente->obterClientePorId($idCliente);
+                $beneficioAntes = $clienteAntes->beneficioFidelidade;
+
+                $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
+                    tipoAtendimento: TipoAtendimento::BALCAO->value,
+                    idCliente: '11',
+                    itensPedido: [
+                        new ItemSimplesParaCadastro(
+                            idProduto: 1,
+                            quantidade: 1,
+                        ),
+                    ],
+                ));
+
+                $clienteDepois = $this->repositorioCliente->obterClientePorId($idCliente);
+                $beneficioDepois = $clienteDepois->beneficioFidelidade;
+
+                expect($beneficioAntes)->toBe(null);
+                expect($beneficioDepois)->toBe(null);
+            });
+
         });
 
-        it('não gera um novo benefício de fidelidade para o cliente quando o pedido não atinge as regras', function () {
-            $quantidadeAntes = $this->bancoDados->consultar(
-                'SELECT COUNT(*) AS total FROM beneficio_fidelidade WHERE idCliente = :idCliente',
-                ['idCliente' => 11],
-            )[0]['total'] ?? 0;
+        describe('atualizarEstoqueAposRegistrarPedido()', function () {
 
-            $pedido = $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
-                tipoAtendimento: TipoAtendimento::BALCAO->value,
-                idCliente: '11',
-                itensPedido: [
-                    new ItemSimplesParaCadastro(
-                        idProduto: 1,
-                        quantidade: 1,
-                    ),
-                ],
-            ));
+            beforeAll(function () {
+                $this->idCocaCola = 1;
+                $this->idMolhoTomate = 1;
+                $this->idMussarela = 2;
+                $this->idCalabresa = 4;
+                $this->idPizzaMargherita = 1;
+                $this->idPizzaCalabresa = 2;
+            });
 
-            $quantidadeDepois = $this->bancoDados->consultar(
-                'SELECT COUNT(*) AS total FROM beneficio_fidelidade WHERE idCliente = :idCliente',
-                ['idCliente' => 11],
-            )[0]['total'] ?? 0;
+            it('atualiza o estoque dos produtos simples e ingredientes após registrar o pedido', function () {
+                $cocaColaAntes = $this->repositorioProdutoSimples->obterProdutoSimplesPorId($this->idCocaCola);
+                $molhoTomateAntes = $this->repositorioIngrediente->obterIngredientePorId($this->idMolhoTomate);
+                $mussarelaAntes = $this->repositorioIngrediente->obterIngredientePorId($this->idMussarela);
 
-            expect($quantidadeDepois)->toBe($quantidadeAntes);
+                $pedido = $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
+                    tipoAtendimento: TipoAtendimento::BALCAO->value,
+                    idCliente: '',
+                    itensPedido: [
+                        new ItemSimplesParaCadastro(
+                            idProduto: $this->idCocaCola,
+                            quantidade: 2,
+                        ),
+                        new ItemPizzaParaCadastro(
+                            tamanho: TamanhoPizza::MEDIA->value,
+                            quantidade: 2,
+                            saboresEscolhidos: [
+                                new SaborEscolhidoParaCadastro(
+                                    idPizza: $this->idPizzaMargherita,
+                                    ingredientesEscolhidos: [
+                                        new IngredienteEscolhidoParaCadastro(
+                                            idIngrediente: $this->idMolhoTomate,
+                                            papel: PapelIngrediente::PADRAO->value,
+                                        ),
+                                        new IngredienteEscolhidoParaCadastro(
+                                            idIngrediente: $this->idMussarela,
+                                            papel: PapelIngrediente::PADRAO->value,
+                                        ),
+                                    ],
+                                ),
+                            ],
+                        ),
+                    ],
+                ));
+
+                $cocaColaDepois = $this->repositorioProdutoSimples->obterProdutoSimplesPorId($this->idCocaCola);
+                $molhoTomateDepois = $this->repositorioIngrediente->obterIngredientePorId($this->idMolhoTomate);
+                $mussarelaDepois = $this->repositorioIngrediente->obterIngredientePorId($this->idMussarela);
+
+                /** @var Pedido */
+                $pedidoAtualizado = $this->repositorioPedido->obterPedidoPorId($pedido->id);
+                $movimentacoesEstoqueSaida = $pedidoAtualizado->obterMovimentacoesEstoque(TipoOperacaoEstoque::SAIDA);
+                [$movimentacaoEstoqueMolho, $movimentacaoEstoqueMussarela, $movimentacaoEstoqueCocaCola] = $movimentacoesEstoqueSaida;
+
+                expect($cocaColaDepois->estoque->valor)->toBe($cocaColaAntes->estoque->valor - 2);
+                expect($molhoTomateDepois->estoque->valor)->toBe($molhoTomateAntes->estoque->valor - 150);
+                expect($mussarelaDepois->estoque->valor)->toBe($mussarelaAntes->estoque->valor - 300);
+
+                expect($movimentacoesEstoqueSaida)->toHaveLength(3);
+
+                expect($movimentacaoEstoqueMolho->ingrediente->id)->toBe($this->idMolhoTomate);
+                expect($movimentacaoEstoqueMolho->quantidadeMedida->valor)->toBe(150);
+                expect($movimentacaoEstoqueMolho->quantidadeMedida->unidadeMedida->id)->toBe(3);
+                expect($movimentacaoEstoqueMolho->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+
+                expect($movimentacaoEstoqueMussarela->ingrediente->id)->toBe($this->idMussarela);
+                expect($movimentacaoEstoqueMussarela->quantidadeMedida->valor)->toBe(300);
+                expect($movimentacaoEstoqueMussarela->quantidadeMedida->unidadeMedida->id)->toBe(1);
+                expect($movimentacaoEstoqueMussarela->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+
+                expect($movimentacaoEstoqueCocaCola->produtoSimples->id)->toBe($this->idCocaCola);
+                expect($movimentacaoEstoqueCocaCola->quantidadeMedida->valor)->toBe(2);
+                expect($movimentacaoEstoqueCocaCola->quantidadeMedida->unidadeMedida->id)->toBe(2);
+                expect($movimentacaoEstoqueCocaCola->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+            });
+
+            it('atualiza o estoque dos produtos simples e ingredientes após registrar o pedido (meia pizza)', function () {
+                $cocaColaAntes = $this->repositorioProdutoSimples->obterProdutoSimplesPorId($this->idCocaCola);
+                $molhoTomateAntes = $this->repositorioIngrediente->obterIngredientePorId($this->idMolhoTomate);
+                $mussarelaAntes = $this->repositorioIngrediente->obterIngredientePorId($this->idMussarela);
+                $calabresaAntes = $this->repositorioIngrediente->obterIngredientePorId($this->idCalabresa);
+
+                $pedido = $this->gestorPedido->registrarPedido(new PedidoParaCadastro(
+                    tipoAtendimento: TipoAtendimento::BALCAO->value,
+                    idCliente: '',
+                    itensPedido: [
+                        new ItemSimplesParaCadastro(
+                            idProduto: $this->idCocaCola,
+                            quantidade: 1,
+                        ),
+                        new ItemPizzaParaCadastro(
+                            tamanho: TamanhoPizza::PEQUENA->value,
+                            quantidade: 2,
+                            saboresEscolhidos: [
+                                new SaborEscolhidoParaCadastro(
+                                    idPizza: $this->idPizzaMargherita,
+                                    ingredientesEscolhidos: [
+                                        new IngredienteEscolhidoParaCadastro(
+                                            idIngrediente: $this->idMolhoTomate,
+                                            papel: PapelIngrediente::PADRAO->value,
+                                        ),
+                                        new IngredienteEscolhidoParaCadastro(
+                                            idIngrediente: $this->idMussarela,
+                                            papel: PapelIngrediente::PADRAO->value,
+                                        ),
+                                    ],
+                                ),
+                                new SaborEscolhidoParaCadastro(
+                                    idPizza: $this->idPizzaCalabresa,
+                                    ingredientesEscolhidos: [
+                                        new IngredienteEscolhidoParaCadastro(
+                                            idIngrediente: $this->idMolhoTomate,
+                                            papel: PapelIngrediente::PADRAO->value,
+                                        ),
+                                        new IngredienteEscolhidoParaCadastro(
+                                            idIngrediente: $this->idMussarela,
+                                            papel: PapelIngrediente::PADRAO->value,
+                                        ),
+                                        new IngredienteEscolhidoParaCadastro(
+                                            idIngrediente: $this->idCalabresa,
+                                            papel: PapelIngrediente::PADRAO->value,
+                                        ),
+                                    ],
+                                ),
+                            ],
+                        ),
+                    ],
+                ));
+
+                $cocaColaDepois = $this->repositorioProdutoSimples->obterProdutoSimplesPorId($this->idCocaCola);
+                $molhoTomateDepois = $this->repositorioIngrediente->obterIngredientePorId($this->idMolhoTomate);
+                $mussarelaDepois = $this->repositorioIngrediente->obterIngredientePorId($this->idMussarela);
+                $calabresaDepois = $this->repositorioIngrediente->obterIngredientePorId($this->idCalabresa);
+
+                /** @var Pedido */
+                $pedidoAtualizado = $this->repositorioPedido->obterPedidoPorId($pedido->id);
+                $movimentacoesEstoqueSaida = $pedidoAtualizado->obterMovimentacoesEstoque(TipoOperacaoEstoque::SAIDA);
+                [
+                    $movimentacaoEstoqueMolho1,
+                    $movimentacaoEstoqueMolho2,
+                    $movimentacaoEstoqueMussarela1,
+                    $movimentacaoEstoqueMussarela2,
+                    $movimentacaoEstoqueCalabresa,
+                    $movimentacaoEstoqueCocaCola,
+                ] = $movimentacoesEstoqueSaida;
+
+                expect($molhoTomateDepois->estoque->valor)->toBe($molhoTomateAntes->estoque->valor - 100);
+                expect($mussarelaDepois->estoque->valor)->toBe($mussarelaAntes->estoque->valor - 200);
+                expect($calabresaDepois->estoque->valor)->toBe($calabresaAntes->estoque->valor - 100);
+                expect($cocaColaDepois->estoque->valor)->toBe($cocaColaAntes->estoque->valor - 1);
+
+                expect($movimentacoesEstoqueSaida)->toHaveLength(6);
+
+                expect($movimentacaoEstoqueMolho1->ingrediente->id)->toBe($this->idMolhoTomate);
+                expect($movimentacaoEstoqueMolho1->quantidadeMedida->valor)->toBe(50);
+                expect($movimentacaoEstoqueMolho1->quantidadeMedida->unidadeMedida->id)->toBe(3);
+                expect($movimentacaoEstoqueMolho1->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+
+                expect($movimentacaoEstoqueMussarela1->ingrediente->id)->toBe($this->idMussarela);
+                expect($movimentacaoEstoqueMussarela1->quantidadeMedida->valor)->toBe(100);
+                expect($movimentacaoEstoqueMussarela1->quantidadeMedida->unidadeMedida->id)->toBe(1);
+                expect($movimentacaoEstoqueMussarela1->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+
+                expect($movimentacaoEstoqueMolho2->ingrediente->id)->toBe($this->idMolhoTomate);
+                expect($movimentacaoEstoqueMolho2->quantidadeMedida->valor)->toBe(50);
+                expect($movimentacaoEstoqueMolho2->quantidadeMedida->unidadeMedida->id)->toBe(3);
+                expect($movimentacaoEstoqueMolho2->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+
+                expect($movimentacaoEstoqueMussarela2->ingrediente->id)->toBe($this->idMussarela);
+                expect($movimentacaoEstoqueMussarela2->quantidadeMedida->valor)->toBe(100);
+                expect($movimentacaoEstoqueMussarela2->quantidadeMedida->unidadeMedida->id)->toBe(1);
+                expect($movimentacaoEstoqueMussarela2->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+
+                expect($movimentacaoEstoqueCalabresa->ingrediente->id)->toBe($this->idCalabresa);
+                expect($movimentacaoEstoqueCalabresa->quantidadeMedida->valor)->toBe(100);
+                expect($movimentacaoEstoqueCalabresa->quantidadeMedida->unidadeMedida->id)->toBe(1);
+                expect($movimentacaoEstoqueCalabresa->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+
+                expect($movimentacaoEstoqueCocaCola->produtoSimples->id)->toBe($this->idCocaCola);
+                expect($movimentacaoEstoqueCocaCola->quantidadeMedida->valor)->toBe(1);
+                expect($movimentacaoEstoqueCocaCola->quantidadeMedida->unidadeMedida->id)->toBe(2);
+                expect($movimentacaoEstoqueCocaCola->tipoOperacaoEstoque)->toBe(TipoOperacaoEstoque::SAIDA);
+            });
+
         });
 
     });
