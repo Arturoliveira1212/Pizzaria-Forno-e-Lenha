@@ -28,7 +28,7 @@
             "@db:reset-test",
             "kahlan --reporter=verbose"
         ],
-        "st": "phpstan analyze src --level=6",
+        "st": "phpstan analyze src --level=7",
         "format": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php"
     },
     "config": {

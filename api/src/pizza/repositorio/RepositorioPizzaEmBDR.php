@@ -452,23 +452,8 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
      * @param array<array<string, mixed>> $linhas
      * @return array<int, mixed[]>
      */
-    private function agruparPor(array $linhas, string $chave, callable $criarObjeto, mixed ...$parametros): array {
-        $agrupado = [];
-
-        foreach ($linhas as $linha) {
-            $id = (int) $linha[$chave];
-            $agrupado[$id][] = $criarObjeto($linha, ...$parametros);
-        }
-
-        return $agrupado;
-    }
-
-    /**
-     * @param array<array<string, mixed>> $linhas
-     * @return array<int, mixed[]>
-     */
     private function agruparPorPizza(array $linhas, callable $criarObjeto, mixed ...$parametros): array {
-        return $this->agruparPor($linhas, 'idPizza', $criarObjeto, ...$parametros);
+        return AgrupadorDados::agruparPor($linhas, 'idPizza', $criarObjeto, ...$parametros);
     }
 
     /**
@@ -476,7 +461,7 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
      * @return array<int, mixed[]>
      */
     private function agruparPorIngredientePadrao(array $linhas, callable $criarObjeto, mixed ...$parametros): array {
-        return $this->agruparPor($linhas, 'idIngredientePadrao', $criarObjeto, ...$parametros);
+        return AgrupadorDados::agruparPor($linhas, 'idIngredientePadrao', $criarObjeto, ...$parametros);
     }
 
     /**
@@ -484,6 +469,6 @@ class RepositorioPizzaEmBDR implements RepositorioPizza {
      * @return array<int, mixed[]>
      */
     private function agruparPorIngredienteSubstituto(array $linhas, callable $criarObjeto, mixed ...$parametros): array {
-        return $this->agruparPor($linhas, 'idIngredienteSubstituto', $criarObjeto, ...$parametros);
+        return AgrupadorDados::agruparPor($linhas, 'idIngredienteSubstituto', $criarObjeto, ...$parametros);
     }
 }

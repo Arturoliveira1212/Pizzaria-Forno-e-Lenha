@@ -60,7 +60,12 @@ class BancoDados {
     }
 
     public function ultimoIdInserido(): string {
-        return $this->pdo->lastInsertId();
+        $id = $this->pdo->lastInsertId();
+        if ($id === false) {
+            throw new Exception('Não foi possível obter o último ID inserido.');
+        }
+
+        return $id;
     }
 
     public function iniciarTransacao(): void {

@@ -114,7 +114,7 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
 
     /**
      * @param int[] $idsClientes
-     * @return array<string, Endereco[]>
+     * @return array<int, Endereco[]>
      */
     private function buscarEndereco(array $idsClientes): array {
         $idsClientesString = implode(',', $idsClientes);
@@ -147,7 +147,7 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
 
     /**
      * @param int[] $idsClientes
-     * @return array<string, BeneficioFidelidade[]>
+     * @return array<int, BeneficioFidelidade[]>
      */
     private function buscarBeneficioFidelidade(array $idsClientes): array {
         $idsClientesString = implode(',', $idsClientes);
@@ -180,17 +180,10 @@ class RepositorioClienteEmBDR implements RepositorioCliente {
 
     /**
      * @param array<array<string, mixed>> $linhas
-     * @return array<string, BeneficioFidelidade[]|Endereco[]>
+     * @return array<int, mixed[]>
      */
     private function agruparPorCliente(array $linhas, callable $criarObjeto): array {
-        $agrupado = [];
-
-        foreach ($linhas as $linha) {
-            $idCliente = $linha['idCliente'];
-            $agrupado[$idCliente][] = $criarObjeto($linha);
-        }
-
-        return $agrupado;
+        return AgrupadorDados::agruparPor($linhas, 'idCliente', $criarObjeto);
     }
 
     public function obterBeneficioFidelidadePorId(int $idBeneficioFidelidade): ?BeneficioFidelidade {

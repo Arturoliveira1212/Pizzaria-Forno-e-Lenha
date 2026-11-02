@@ -960,7 +960,7 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
      * @return array<int, mixed[]>
      */
     private function agruparPorPedido(array $linhas, callable $criarObjeto, mixed ...$parametros): array {
-        return $this->agruparPor($linhas, 'idPedido', $criarObjeto, ...$parametros);
+        return AgrupadorDados::agruparPor($linhas, 'idPedido', $criarObjeto, ...$parametros);
     }
 
     /**
@@ -968,7 +968,7 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
      * @return array<int, mixed[]>
      */
     private function agruparPorItemPizza(array $linhas, callable $criarObjeto, mixed ...$parametros): array {
-        return $this->agruparPor($linhas, 'idItemPedidoPizza', $criarObjeto, ...$parametros);
+        return AgrupadorDados::agruparPor($linhas, 'idItemPedidoPizza', $criarObjeto, ...$parametros);
     }
 
     /**
@@ -976,21 +976,6 @@ class RepositorioPedidoEmBDR implements RepositorioPedido {
      * @return array<int, mixed[]>
      */
     private function agruparPorSaborEscolhido(array $linhas, callable $criarObjeto, mixed ...$parametros): array {
-        return $this->agruparPor($linhas, 'idSaborEscolhido', $criarObjeto, ...$parametros);
-    }
-
-    /**
-     * @param array<array<string, mixed>> $linhas
-     * @return array<int, mixed[]>
-     */
-    private function agruparPor(array $linhas, string $chave, callable $criarObjeto, mixed ...$parametros): array {
-        $agrupado = [];
-
-        foreach ($linhas as $linha) {
-            $id = (int) $linha[$chave];
-            $agrupado[$id][] = $criarObjeto($linha, ...$parametros);
-        }
-
-        return $agrupado;
+        return AgrupadorDados::agruparPor($linhas, 'idSaborEscolhido', $criarObjeto, ...$parametros);
     }
 }

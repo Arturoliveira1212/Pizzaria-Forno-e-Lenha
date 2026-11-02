@@ -38,7 +38,7 @@ class SessaoPHP implements Sessao {
     }
 
     /**
-     * @return array{lifetime: int, path: string, domain: string, secure: bool, httponly: bool, samesite: string}
+     * @return array{lifetime: int, path: string, domain: string, secure: bool, httponly: bool, samesite: 'Lax'|'None'|'Strict'}
      */
     private function obterParametrosCookie(): array {
         return [
