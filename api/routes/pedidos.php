@@ -112,7 +112,7 @@ return function (Router $app, BancoDados $bancoDados) {
                 'erros' => $e->erros(),
             ]]);
         } catch (Throwable $e) {
-            $response->status(500)->json(['message' => 'Houve um erro interno no servidor.' . $e->getMessage()]);
+            $response->status(500)->json(['message' => 'Houve um erro interno no servidor.']);
         }
     });
 
