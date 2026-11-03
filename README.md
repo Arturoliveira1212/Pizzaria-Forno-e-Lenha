@@ -59,8 +59,17 @@ pnpm test
 
 Todas as telas exigem login com CPF e senha. A semeadura do banco cria os seguintes usuários:
 
-* Mariana Silva:  987.654.321-00 | atendente123
-* Miguel Coves: 123.456.789-01 | admin123
+* Mariana Silva (atendente):  987.654.321-00 | atendente123
+* Miguel Coves (administrador): 123.456.789-01 | admin123
+
+A sessão expira após 1 dia.
+
+## Relatórios
+
+A aba "Relatórios" aparece apenas para administradores e tem dois relatórios com filtro por período:
+
+* Pedidos por período
+* Distribuição de pedidos
 
 ## Referências Bibliográficas
 
@@ -83,3 +92,10 @@ Documentação de ferramentas extras usadas:
 - https://phinx.org/
 - https://getbootstrap.com/
 - https://github.com/visionmedia/page.js
+- https://www.chartjs.org/
+- https://github.com/feross/buffer
+
+Documentação do PHP para o login:
+- https://www.php.net/manual/pt_BR/function.password-hash.php (hash das senhas com Argon2id)
+- https://www.php.net/manual/pt_BR/function.password-verify.php
+- https://www.php.net/manual/pt_BR/ref.session.php (sessões)
