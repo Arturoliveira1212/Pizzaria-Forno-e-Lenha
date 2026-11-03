@@ -66,6 +66,9 @@
                 "src/promocao/dominio/",
                 "src/promocao/dto/",
                 "src/promocao/repositorio/",
+                "src/relatorio/dominio/",
+                "src/relatorio/dto/",
+                "src/relatorio/repositorio/",
                 "src/usuario/dominio/",
                 "src/usuario/repositorio/",
                 "spec/factory/"

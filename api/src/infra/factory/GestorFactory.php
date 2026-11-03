@@ -36,4 +36,11 @@ class GestorFactory {
             geradorHashSenha: new GeradorHashSenha($_ENV['PIMENTA']),
         );
     }
+
+    public static function criarGestorRelatorio(BancoDados $bancoDados): GestorRelatorio {
+        return new GestorRelatorio(
+            autorizacao: new Autorizacao(new SessaoPHP()),
+            repositorioRelatorio: new RepositorioRelatorioEmBDR($bancoDados),
+        );
+    }
 }
