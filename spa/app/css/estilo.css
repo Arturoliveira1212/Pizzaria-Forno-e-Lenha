@@ -3,3 +3,7 @@
 	width: 100%;
 	object-fit: cover;
 }
+
+.grafico-relatorio {
+	max-width: 720px;
+}

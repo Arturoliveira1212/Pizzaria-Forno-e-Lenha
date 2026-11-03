@@ -212,6 +212,9 @@ importers:
             buffer:
                 specifier: ^6.0.3
                 version: 6.0.3
+            chart.js:
+                specifier: ^4.4.9
+                version: 4.4.9
             page:
                 specifier: ^1.11.6
                 version: 1.11.6
@@ -269,6 +272,9 @@ packages:
 
     '@jridgewell/trace-mapping@0.3.31':
         resolution: { integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw== }
+
+    '@kurkle/color@0.3.4':
+        resolution: { integrity: sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w== }
 
     '@oxc-project/types@0.151.0':
         resolution: { integrity: sha512-J1yXrIlNDZVzE3ada310xeAw7nH8yCAyLPuUIsjKatFPmfn5bS1oW+cM+QsGOtVWd5nhSpbwZWx/rue+r5Z+PA== }
@@ -454,6 +460,10 @@ packages:
     chai@6.2.2:
         resolution: { integrity: sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg== }
         engines: { node: '>=18' }
+
+    chart.js@4.4.9:
+        resolution: { integrity: sha512-EyZ9wWKgpAU0fLJ43YAEIF8sr5F2W3LqbS40ZJyHIner2lY14ufqv2VMp69MAiZ2rpwxEUxEhIH/0U3xyRynxg== }
+        engines: { pnpm: '>=8' }
 
     convert-source-map@2.0.0:
         resolution: { integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg== }
@@ -798,6 +808,8 @@ snapshots:
             '@jridgewell/resolve-uri': 3.1.2
             '@jridgewell/sourcemap-codec': 1.6.0
 
+    '@kurkle/color@0.3.4': {}
+
     '@oxc-project/types@0.151.0': {}
 
     '@playwright/test@1.63.0':
@@ -940,6 +952,10 @@ snapshots:
             ieee754: 1.2.1
 
     chai@6.2.2: {}
+
+    chart.js@4.4.9:
+        dependencies:
+            '@kurkle/color': 0.3.4
 
     convert-source-map@2.0.0: {}
 
