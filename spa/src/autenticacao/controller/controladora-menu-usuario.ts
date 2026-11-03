@@ -22,6 +22,10 @@ export class ControladoraMenuUsuario {
 		return true;
 	}
 
+	verificarAdministrador(): boolean {
+		return this.gestorAutenticacao.obterUsuarioLogado()?.ehAdministrador() ?? false;
+	}
+
 	encerrarSessaoExpirada(): void {
 		this.gestorAutenticacao.esquecerUsuarioLogado();
 		this.visaoMenuUsuario.ocultarMenu();

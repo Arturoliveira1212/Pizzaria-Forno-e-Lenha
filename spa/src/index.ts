@@ -72,6 +72,15 @@ page('/pedido', async () => {
 	await carregarConteudo('/app/pages/listagem-pedidos.html', (await import('../app/js/listagem-pedidos.js')).default);
 });
 
+page('/relatorios', async () => {
+	if (!visaoMenuUsuario.verificarAdministrador()) {
+		page.redirect('/');
+		return;
+	}
+
+	await carregarConteudo('/app/pages/relatorios.html', (await import('../app/js/relatorios.js')).default);
+});
+
 page('*', async () => {
 	await carregarConteudo('/app/pages/404.html');
 });

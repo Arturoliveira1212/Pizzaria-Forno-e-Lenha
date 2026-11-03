@@ -4,4 +4,8 @@ export class UsuarioLogado {
 		public readonly nome: string,
 		public readonly papel: string,
 	) {}
+
+	ehAdministrador(): boolean {
+		return this.papel === 'ADMINISTRADOR';
+	}
 }
