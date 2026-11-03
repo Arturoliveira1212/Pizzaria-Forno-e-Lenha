@@ -1,7 +1,8 @@
 <?php
 
 class GestorAutenticacao implements ProvedorUsuarioLogado {
-    private const CHAVE_ID_USUARIO = 'idUsuario';
+    public const CHAVE_ID_USUARIO = 'idUsuario';
+    public const CHAVE_PAPEL = 'papel';
     private const CHAVE_IP = 'ip';
     private const CHAVE_NAVEGADOR = 'navegador';
     private const HASH_FICTICIO = '$argon2id$v=19$m=65536,t=4,p=1$VGRSZkRFNmg5ZFlZLmcxZQ$QYewcI/2z/yU9kpuYuTMHNd7WauROm8nWzRltPaG2eo';
@@ -38,6 +39,7 @@ class GestorAutenticacao implements ProvedorUsuarioLogado {
         $this->sessao->regenerar();
         $this->sessao->limpar();
         $this->sessao->definir(self::CHAVE_ID_USUARIO, $usuario->id);
+        $this->sessao->definir(self::CHAVE_PAPEL, $usuario->papel->value);
         $this->sessao->definir(self::CHAVE_IP, $ip);
         $this->sessao->definir(self::CHAVE_NAVEGADOR, $navegador);
 
