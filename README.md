@@ -70,12 +70,6 @@ Script para geração do valor de senha gravado (pimenta, sal e Argon2id):
 cd api && php scripts-hash-senha/gera-hash-senha.php
 ````
 
-Script para a verificação de uma senha com o valor gerado no comando anterior:
-
-````bash
-cd api && php scripts-hash-senha/verifica-senha.php
-````
-
 ## Relatórios
 
 A aba "Relatórios" aparece apenas para administradores e tem dois relatórios com filtro por período:
